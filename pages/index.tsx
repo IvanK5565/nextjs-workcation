@@ -22,9 +22,7 @@ export default function Home({ data }: { data: Location[] }) {
       <div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
         <SearchBar />
         <main className="py-6 xl:flex-1 xl:overflow-x-hidden">
-          {Array.from({length: data.length},(_,i) => 
-            <LocationCards data={data[i]} key={i} />
-          )}
+          {data.map((d, i) => <LocationCards data={d} key={i} />)}
         </main>
       </div>
     </div>

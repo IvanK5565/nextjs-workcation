@@ -9,10 +9,9 @@ export default function LocationCards({data}:{data:Location}){
       <p className="text-gray-600">{data.description}</p>
     </div>
     <div className="mt-6 sm:overflow-x-auto">
-      <div className="px-4 sm:inline-flex sm:pb-8">
-        {Array.from({ length: data.properties.length }, (_, i) =>
-          <HouseCard data={data.properties[i]} className={clsx({ "mt-10": i > 0 }, "sm:mt-0 sm:w-80 sm:flex-shrink-0 sm:px-2")} key={i} />
-        )}
+      <div className="px-4 sm:inline-flex sm:pb-8">{
+        data.properties.map((d, i) => <HouseCard data={d} className={clsx({ "mt-10": i > 0 }, "sm:mt-0 sm:w-80 sm:flex-shrink-0 sm:px-2")} key={i} />)
+      }
       </div>
     </div>
   </div>
