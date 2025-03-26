@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 
 
 export type Location = {
@@ -150,5 +151,15 @@ export async function getHousesData():Promise<Location[]> {
         PhoenixLoc,
         DallasLoc    
     ]
+    const sequelize = new Sequelize("school-diary", "school-diary", "school-diary", {
+        host: "127.0.0.1",
+        dialect: "mysql"
+      })
+      try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+      } catch (error) {
+        console.error('Unable to connect to the database:', error);
+      }
     return data;
 }
