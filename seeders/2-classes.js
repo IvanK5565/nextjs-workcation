@@ -1,0 +1,62 @@
+'use strict';
+
+//import { faker } from "@faker-js/faker";
+const { faker } = require('@faker-js/faker');
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+    async up(queryInterface, Sequelize) {
+        /**
+         * Example:
+         * await queryInterface.bulkInsert('People', [{
+         *   name: 'John Doe',
+         *   isBetaMember: false
+         * }], {});
+        */
+
+        const results = (await queryInterface.sequelize.query(`
+        SELECT \`user_id\` FROM \`school-diary\`.\`USERS\`
+        WHERE role=\'teacher\' AND status='active';
+    `));
+        const teachers = results[0];
+        // console.log(teachers);
+        await queryInterface.sequelize.query(`INSERT INTO \`school-diary\`.\`CLASSES\`
+     (\`teacher_id\`, \`title\`, \`year\`, \`status\`)
+     VALUES
+     ('${teachers[12].user_id}', 
+     '11', 
+     '2013', 
+     'closed'
+     );
+     `);
+
+        for (let i = 0; i < 12; i++) {
+            const teacher_id = teachers[i].user_id;
+            const title = i.toString();
+            const year = 2025;
+            const status = 'active';
+
+
+            const sql = `INSERT INTO \`school-diary\`.\`CLASSES\`
+      (\`teacher_id\`, \`title\`, \`year\`, \`status\`)
+      VALUES
+      ('${teacher_id}', 
+      '${title}', 
+      '${year}', 
+      '${status}'
+      );
+      `
+            // console.log(sql);
+            await queryInterface.sequelize.query(sql);
+        }
+    },
+
+    async down(queryInterface, Sequelize) {
+        /**
+         * Example:
+         * await queryInterface.bulkDelete('People', null, {});
+         */
+        await queryInterface.sequelize.query(`DELETE FROM \`school-diary\`.\`CLASSES\``);
+        await queryInterface.sequelize.query('ALTER TABLE `CLASSES` AUTO_INCREMENT = 1;');
+    }
+};
