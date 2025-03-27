@@ -23,7 +23,7 @@ export default function Home() {
                         Workcation helps you find work-friendly rentals in beautiful locations so you can enjoy some nice weather even when you’re not on vacation.
                     </p>
                     <div className="mt-6">
-                        <a href="#" className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Book your escape.</a>
+                        <a href="../workcation" className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Book your escape.</a>
                     </div>
                 </div>
             </div>
