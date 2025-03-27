@@ -1,5 +1,5 @@
 
-export default function Home({ data }: { data: Location[] }) {
+export default function Home() {
   return (
     <><a href="workcation">go</a></>
   );
