@@ -14,9 +14,9 @@ router.get(async (req, res) => {
   .put((req, res) => {
     const data = req.body;
     console.log("put in users_in_class/id:"+data);
-    return;
+    res.status(200);
   })
-  .all((req, res) => {
+  .all((_, res) => {
     res.status(405).json({
       error: "Method not allowed",
     });

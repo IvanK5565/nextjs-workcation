@@ -1,6 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useEffect, useState } from "react";
-import { Sequelize } from "sequelize";
 import { db } from "@/pages/api/db";
 
 type Class = {
@@ -16,7 +15,7 @@ type User_class = {
 export const getServerSideProps = (async () =>{
   const [data] = await db.query(`SELECT user_id, first_name, last_name, email, password, role, status FROM USERS LIMIT 10`);
  return {props:{data:data}};
-}) satisfies GetServerSideProps<{data:any}>;
+}) satisfies GetServerSideProps<{data:object}>;
 
 
 
@@ -42,6 +41,9 @@ export default function Home({
       }
     }
     fetchClasses();
+    if (data) {
+      return
+    }
   },[])
 
   useEffect(()=>{
