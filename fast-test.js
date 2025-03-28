@@ -1,13 +1,7 @@
-import { Sequelize } from "sequelize";
-
+import {db} from "./pages/api/db"
 async function test() {
 
-  const sequelize = new Sequelize("school-diary", "school-diary", "school-diary", {
-    host: "127.0.0.1",
-    dialect: "mysql"
-  })
-
-  const [res] = await db.query(`select count(*) from \`USERS\` where banned=0 and graduated=0 and role='student';`);
+  const [res] = await db.query(`select count(*) from users where banned=0 and graduated=0 and role='student';`);
   console.log(res[0]['count(*)']);
 }
 
