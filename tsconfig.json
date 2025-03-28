@@ -17,6 +17,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "migrations/1-migration.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "migrations/20250328143609-migration.jsjs"],
   "exclude": ["node_modules"]
 }

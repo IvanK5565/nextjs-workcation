@@ -18,7 +18,7 @@ module.exports = {
     PRIMARY KEY (\`class_id\`),
     UNIQUE KEY \`class_id_UNIQUE\` (\`class_id\`),
     KEY \`teacher_id_idx\` (\`teacher_id\`),
-    CONSTRAINT \`teacher_id\` FOREIGN KEY (\`teacher_id\`) REFERENCES \`USERS\` (\`user_id\`)
+    CONSTRAINT \`teacher_id\` FOREIGN KEY (\`teacher_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;  `)
     },
 
@@ -27,6 +27,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.sequelize.query(`DROP TABLE \`school-diary\`.\`CLASSES\``)
+    await queryInterface.sequelize.query(`DROP TABLE \`CLASSES\``)
   }
 };

@@ -19,9 +19,9 @@ module.exports = {
     KEY \`class_id_idx\` (\`class_id\`),
     KEY \`user_id_idx\` (\`teacher_id\`),
     KEY \`student_id_idx\` (\`student_id\`),
-    CONSTRAINT \`class_id\` FOREIGN KEY (\`class_id\`) REFERENCES \`CLASSES\` (\`class_id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT \`student_fk\` FOREIGN KEY (\`student_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT \`teacher_fk\` FOREIGN KEY (\`teacher_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT \`class_id\` FOREIGN KEY (\`class_id\`) REFERENCES \`CLASSES\` (\`class_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT \`student_fk\` FOREIGN KEY (\`student_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
+    CONSTRAINT \`teacher_fk\` FOREIGN KEY (\`teacher_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;`)
   },
 
@@ -30,6 +30,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.sequelize.query(`DROP TABLE \`school-diary\`.\`USER_CLASSES\``)
+    await queryInterface.sequelize.query(`DROP TABLE \`USER_CLASSES\``)
   }
 };

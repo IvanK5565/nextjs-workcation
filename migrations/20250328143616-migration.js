@@ -1,3 +1,4 @@
+
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
@@ -7,14 +8,20 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.sequelize.query(`CREATE SCHEMA IF NOT EXISTS \`school-diary\` DEFAULT CHARACTER SET utf8;`)
+    await queryInterface.sequelize.query(`
+    ALTER TABLE \`school-diary\`.\`SUBJECTS\` 
+    RENAME TO  \`school-diary\`.\`subjects\` ;`)
   },
 
   async down(queryInterface, Sequelize) {
     /**
+     * Add reverting commands here.
+     *
      * Example:
      * await queryInterface.dropTable('users');
      */
-    // await queryInterface.sequelize.query(`DROP DATABASE \`school-diary\``)
+    await queryInterface.sequelize.query(`
+    ALTER TABLE \`school-diary\`.\`subjects\` 
+    RENAME TO  \`school-diary\`.\`SUBJECTS\` ;`)
   }
 };

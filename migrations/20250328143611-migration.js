@@ -23,6 +23,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.sequelize.query(`DROP TABLE \`school-diary\`.\`SUBJECTS\``)
+    await queryInterface.sequelize.query(`DROP TABLE \`SUBJECTS\``)
   }
 };

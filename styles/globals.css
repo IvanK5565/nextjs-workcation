@@ -2,24 +2,24 @@
 @plugin "@tailwindcss/forms";
 
 .form-checkbox, .form-radio, .form-select{
-    border-color: transparent;
-    border-radius: var(--radius-lg);
-    color: white;
+  border-color: transparent;
+  border-radius: var(--radius-lg);
+  color: white;
 }
 .form-select{
-    background-color: var(--color-gray-700);
+  background-color: var(--color-gray-700);
 }
 .form-checkbox:focus, .form-radio:focus, .form-select:focus{
-    outline: none;
+  outline: none;
 }
 .form-checkbox, .form-radio{
-    width: 1.5em;
-    height: 1.5em;
-    background-color: var(--color-gray-900);
+  width: 1.5em;
+  height: 1.5em;
+  background-color: var(--color-gray-900);
 }
 .form-checkbox:checked, .form-radio:checked{
-    background-color: var(--color-indigo-500);
+  background-color: var(--color-indigo-500);
 }
 .form-radio{
-    border-radius: 1.5em;
+  border-radius: 1.5em;
 }

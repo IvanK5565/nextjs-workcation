@@ -14,10 +14,10 @@ module.exports = {
     * }], {});
     */
     const [students] = await queryInterface.sequelize.query(`
-      select user_id from \`school-diary\`.\`USERS\` where status='active' and role='student';
+      select user_id from users where status='active' and role='student';
     `);
     const [classes] = await queryInterface.sequelize.query(`
-      select class_id, teacher_id from \`school-diary\`.CLASSES where status='active';
+      select class_id, teacher_id from classes where status='active';
     `);
     const students_in_class_count = students.length / classes.length;
 
@@ -26,8 +26,8 @@ module.exports = {
         const class_id = classes[i].class_id;
         const student_id = students[j+i*students_in_class_count].user_id;
         const teacher_id = classes[i].teacher_id;
-        await queryInterface.sequelize.query(`INSERT INTO \`school-diary\`.\`USER_CLASSES\`
-        (\`class_id\`, \`student_id\`, \`teacher_id\`)
+        await queryInterface.sequelize.query(`INSERT INTO user_classes
+        (class_id, student_id, teacher_id)
         VALUES
         ('${class_id}', 
         '${student_id}', 
@@ -43,7 +43,7 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.sequelize.query(`DELETE FROM \`school-diary\`.\`USER_CLASSES\``);
-    await queryInterface.sequelize.query('ALTER TABLE `USER_CLASSES` AUTO_INCREMENT = 1;');
+    await queryInterface.sequelize.query(`DELETE FROM user_classes`);
+    await queryInterface.sequelize.query('ALTER TABLE user_classes AUTO_INCREMENT = 1;');
   }
 };

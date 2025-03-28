@@ -35,8 +35,8 @@ module.exports = {
         }
       })()
       
-      const sql = `INSERT INTO \`school-diary\`.\`USERS\`
-      (\`first_name\`, \`last_name\`, \`email\`, \`password\`, \`role\`, \`status\`)
+      const sql = `INSERT INTO users
+      (first_name, last_name, email, password, role, status)
       VALUES
       ('${first_name}', 
       '${last_name}', 
@@ -56,7 +56,7 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.sequelize.query(`DELETE FROM \`school-diary\`.\`USERS\``);
-    await queryInterface.sequelize.query('ALTER TABLE `USERS` AUTO_INCREMENT = 1;');
+    await queryInterface.sequelize.query(`DELETE FROM users`);
+    await queryInterface.sequelize.query('ALTER TABLE users AUTO_INCREMENT = 1;');
   }
 };

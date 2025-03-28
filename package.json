@@ -9,6 +9,7 @@
     "lint": "next lint",
     "migrate": "npx sequelize-cli db:migrate",
     "migrate-undo": "npx sequelize-cli db:migrate:undo:all",
+    "migrate-new": "npx sequelize-cli migration:generate --name migration",
     "seed": "npx sequelize-cli db:seed:all",
     "seed-undo": "npx sequelize-cli db:seed:undo:all",
     "ft": "node fast-test.js"
@@ -17,6 +18,7 @@
     "clsx": "^2.1.1",
     "mysql2": "^3.14.0",
     "next": "15.2.3",
+    "next-connect": "^1.0.0-next.4",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -30,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sequelize": "^4.28.20",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",

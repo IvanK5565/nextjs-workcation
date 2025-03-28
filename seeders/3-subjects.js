@@ -99,8 +99,8 @@ module.exports = {
         for (let i = 0; i < 20; i++) {
             const name = subjects[i].name;
             const description = subjects[i].description;
-            await queryInterface.sequelize.query(`INSERT INTO \`school-diary\`.\`SUBJECTS\`
-        (\`name\`, \`description\`)
+            await queryInterface.sequelize.query(`INSERT INTO subjects
+        (name, description)
         VALUES
         ('${name}', 
         '${description}'
@@ -114,7 +114,7 @@ module.exports = {
          * Example:
          * await queryInterface.bulkDelete('People', null, {});
          */
-        await queryInterface.sequelize.query(`DELETE FROM \`school-diary\`.\`SUBJECTS\``);
-        await queryInterface.sequelize.query('ALTER TABLE `SUBJECTS` AUTO_INCREMENT = 1;');
+        await queryInterface.sequelize.query(`DELETE FROM subjects`);
+        await queryInterface.sequelize.query('ALTER TABLE subjects AUTO_INCREMENT = 1;');
     }
 };
