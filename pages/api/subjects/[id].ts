@@ -1,25 +1,25 @@
-//classes/id
+//subjects/id
 import { NextApiRequest, NextApiResponse } from "next";
-import { createRouter } from "next-connect";
 import ctx from "@/server/container";
+import { createRouter } from "next-connect";
 
 export const router = createRouter<NextApiRequest, NextApiResponse>();
 router
-.use(async (req, res, next) => {
-    console.log("classes/id");
+  .use(async (req, res, next) => {
+    console.log("subjects/id");
     await ctx.resolve('sequelize').authenticate();
     next();
   })
-  .get(async (req, res) => {    
-    const result = await ctx.resolve('ClassesController').GetById(req,res);
+  .get(async (req, res) => {
+    const result = await ctx.resolve("SubjectsController").GetById(req, res);
     res.status(200).json(result);
   })
   .post(async (req, res) => {
-    const result = await ctx.resolve('ClassesController').Put(req,res);
+    const result = await ctx.resolve("SubjectsController").Put(req, res);
     res.status(200).json(result);
   })
   .delete(async (req, res) => {
-    const result = await ctx.resolve('ClassesController').Delete(req,res);
+    const result = await ctx.resolve("SubjectsController").Delete(req, res);
     res.status(200).json(result);
   })
   .all((req, res) => {
@@ -27,7 +27,6 @@ router
       error: "Method not allowed",
     });
   });
-
 export default router.handler({
   onError: (err, req, res) => {
     res.status(500).json({

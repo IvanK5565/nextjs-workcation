@@ -161,8 +161,8 @@ export interface User {
   password: string,
   role: 'admin' | 'teacher' | 'student',
   status: 'active' | 'banned' | 'graduated' | 'fired',
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Class {
@@ -171,16 +171,16 @@ export interface Class {
   title: string;
   year: number;
   status: 'draft' | 'active' | 'closed';
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Subject {
   subject_id?: number;
   name: string | null;
   description: string | null;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 
@@ -189,8 +189,8 @@ export interface UserClass {
   class_id: number;
   student_id: number;
   teacher_id: number;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Journal {
@@ -203,6 +203,6 @@ export interface Journal {
   lecture_type: 'exam' | 'lesson' | 'homework';
   lecture_status: 'missing' | 'cancelled' | 'sick' | 'nothing';
   mark_val: number | null;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -2,13 +2,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Op, QueryTypes } from "sequelize";
 // import sequelize from "@/utils/db";
-import container from "@/utils/container";
+import ctx from "@/server/container";
 import { createRouter } from "next-connect";
-import { User } from "../data";
-import Users from "@/models/users";
+import Users from "@/server/models/users";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-const sequelize = container.resolve('sequelize');
+const sequelize = ctx.resolve('sequelize');
 
 router.use(async (req, res, next) => {
   await sequelize.authenticate();

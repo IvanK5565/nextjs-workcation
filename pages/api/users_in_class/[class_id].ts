@@ -1,10 +1,9 @@
 //users_in_class/class_id
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { QueryTypes } from "sequelize";
 import sequelize from '@/utils/db';
 import { createRouter } from "next-connect";
-import Users from '@/models/users';
-import Classes from '@/models/classes';
+import Users from '@/server/models/users';
+import Classes from '@/server/models/classes';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 

@@ -4,8 +4,8 @@ import { User, Class } from "./api/data";
 import { createRouter } from "next-connect";
 import { QueryTypes } from "sequelize";
 import { IncomingMessage, ServerResponse } from "http";
-import container from "@/utils/container";
-import Classes from "@/models/classes";
+import ctx from "@/server/container";
+import Classes from "@/server/models/classes";
 import { Sequelize } from "sequelize-typescript";
 
 const router = createRouter<
@@ -13,7 +13,7 @@ IncomingMessage & { body?: Record<string, string> },
 ServerResponse
 >()
 .get(async ()=>{
-  const sequelize = container.resolve('sequelize') as Sequelize;
+  const sequelize = ctx.resolve('sequelize') as Sequelize;
   sequelize.authenticate();
   // let sql = `SELECT class_id, teacher_id, title, year, status FROM classes WHERE status='active'`;
   // const classes = await sequelize.query(sql, { type: QueryTypes.SELECT });

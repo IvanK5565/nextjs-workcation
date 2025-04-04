@@ -2,9 +2,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import sequelize from "@/utils/db";
 import { createRouter } from "next-connect";
-import User_classes from "@/models/user_classes";
-import Users from "@/models/users";
-import Classes from "@/models/classes";
+import User_classes from "@/server/models/user_classes";
+import Users from "@/server/models/users";
+import Classes from "@/server/models/classes";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 

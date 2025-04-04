@@ -1,8 +1,8 @@
 import '@/utils/db';
-import Users from '@/models/users';
+import Users from '@/server/models/users';
 import { NextApiRequest, NextApiResponse } from "next";
 import { createRouter } from "next-connect";
-import Classes from '@/models/classes';
+import Classes from '@/server/models/classes';
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 

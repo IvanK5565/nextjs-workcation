@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Op } from "sequelize";
 import sequelize from "@/utils/db";
 import { createRouter } from "next-connect";
-import Users from "@/models/users";
+import Users from "@/server/models/users";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 

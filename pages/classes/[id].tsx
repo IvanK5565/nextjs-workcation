@@ -1,33 +1,32 @@
 import React from "react"
 import { NextApiRequest, NextApiResponse } from "next"
 import { Class, User } from "@/pages/api/data";
-import { GetServerSideProps } from "next";
 import { createRouter } from "next-connect";
-import { IncomingMessage, ServerResponse } from "http";
-import { QueryTypes } from "sequelize";
-import Classes from "@/models/classes";
 import 'reflect-metadata'
-import Users from "@/models/users";
-import sequelize from "@/utils/db";
+import ctx from "@/server/container";
 
 export function getServerSideProps(context: any) {
   const { req, res, params } = context;
+  req.query = {id:params.id};
+  
+  console.log('---------------------------------------------');
+  console.log(params);
 
   const router = createRouter<NextApiRequest, NextApiResponse>()
+  .use(async (_req,_res,next)=>{
+    await ctx.resolve("sequelize").authenticate();
+    next();
+  })
     .get(async (req, res) => {
-      await sequelize.authenticate();
-      const classes: Classes[] = await Classes.findAll({
-        where: {
-          class_id: params.id,
-        }
-      })
-      const teachers: Users[] = await Users.findAll({
-        where:{
-          role: 'teacher',
-        }
-      })
+      const _class = await ctx.resolve('ClassesController').GetById(req,res);
+      
+      req.query.role='teacher';
+      const teachers = await ctx.resolve('UsersController').Get(req,res);
 
-      return { props: { _class: JSON.parse(JSON.stringify(classes[0])), teachers: JSON.parse(JSON.stringify(teachers)) } };
+      return { props: { 
+        _class: JSON.parse(JSON.stringify(_class)),
+        teachers: JSON.parse(JSON.stringify(teachers)) }
+      };
 
     })
     .post(
@@ -64,7 +63,7 @@ export function getServerSideProps(context: any) {
       }
     )
   return router.run(req, res);
-}
+};
 
 export default function Home({
   teachers,
