@@ -9,8 +9,8 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.sequelize.query(`
-    ALTER TABLE \`USER_CLASSES\` 
-    RENAME TO  \`user_classes\` ;`)
+    ALTER TABLE user_classes 
+    RENAME TO  user_classes ;`)
   },
 
   async down(queryInterface, Sequelize) {
@@ -21,7 +21,7 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
     await queryInterface.sequelize.query(`
-    ALTER TABLE \`user_classes\` 
-    RENAME TO  \`USER_CLASSES\` ;`)
+    ALTER TABLE user_classes 
+    RENAME TO  user_classes ;`)
   }
 };

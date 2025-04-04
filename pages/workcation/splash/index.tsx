@@ -1,6 +1,15 @@
+import { useState } from "react"
+
+enum LandingStates {
+  About,
+  Login,
+  Register,
+}
+
 export default function Home() {
+  const [landing, setLanding] = useState(LandingStates.About); 
   return <div className="bg-gray-100">
-    <div className="px-8 py-12 max-w-xl mx-auto lg:max-w-full lg:px-0 lg:py-20 lg:relative lg:min-h-screen">
+    <div className="px-8 py-8 max-w-xl mx-auto lg:max-w-full lg:px-0 lg:py-20 lg:relative lg:min-h-screen">
       <div className="xl:max-w-6xl lg:mx-auto">
         <div className="lg:w-7/12 lg:pl-12 lg:pr-8">
           <svg className="h-10 w-auto" viewBox="0 0 185 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -14,20 +23,61 @@ export default function Home() {
               <polygon className="text-gray-100" fill="currentColor" points="0,0 0,100 100,0" />
             </svg>
           </div>
-          <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-            You can work from anywhere.
-            <br className="hidden sm:inline" />
-            <span className="text-indigo-500"> Take advantage of it.</span>
-          </h1>
-          <p className="mt-4 text-gray-600 text-xl">
-            Workcation helps you find work-friendly rentals in beautiful locations so you can enjoy some nice weather even when you’re not on vacation.
-          </p>
-          <div className="mt-6">
-            <a href="../workcation" className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Book your escape.</a>
-          </div>
+          <Login className={landing==LandingStates.Login?"block":"hidden"} onRegister={()=>setLanding(LandingStates.Register)} />
+          <Register className={landing==LandingStates.Register?"block":"hidden"} onLogin={()=>setLanding(LandingStates.Login)} />
+          <About className={landing==LandingStates.About?"block":"hidden"} onLogin={()=>setLanding(LandingStates.Login)} />
         </div>
       </div>
     </div>
   </div>
 }
-
+function Register({className, onLogin}:{className?:string, onLogin:Function}) {
+  const [myState, setState] = useState(false);
+  return <div className={className?className:""}>
+    <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+      Create your account.
+    </h1>
+    <form className="flex flex-col">
+      <label htmlFor="login" className="mt-4 text-2xl text-indigo-500 font-bold leading-tight">Email</label>
+      <input className="rounded-lg" type="text" name="email" id="login" placeholder="example@email.com" />
+      <label htmlFor="password" className="mt-2 text-2xl text-indigo-500 font-bold leading-tight">Password</label>
+      <input className="rounded-lg" type="password" name="password" id="password" placeholder="Password" />
+      <span onClick={()=>{onLogin()}} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min">Already have an account?</span>
+    <div className="flex flex-row-reverse justify-between">
+      <button type="submit" className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Confirm.</button>
+    </div>
+    </form>
+  </div>
+}
+function Login({className, onRegister}:{className?:string, onRegister:Function}) {
+  return <div className={className?className:""}>
+    <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+      Sign in your account.
+    </h1>
+    <form className="flex flex-col">
+      <label htmlFor="login" className="mt-4 text-2xl text-indigo-500 font-bold leading-tight">Email</label>
+      <input className="rounded-lg" type="text" name="email" id="login" placeholder="example@email.com" />
+      <label htmlFor="password" className="mt-2 text-2xl text-indigo-500 font-bold leading-tight">Password</label>
+      <input className="rounded-lg" type="password" name="password" id="password" placeholder="Password" />
+      <span onClick={()=>{onRegister()}} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min">Don`t have an account?</span>
+    <div className="flex flex-row-reverse justify-between">
+      <button type="submit" className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Confirm.</button>
+    </div>
+    </form>
+  </div>
+}
+function About({className, onLogin}:{className?:string, onLogin:Function}) {
+  return <div className={className?className:""}>
+    <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+      You can work from anywhere.
+      <br className="hidden sm:inline" />
+      <span className="text-indigo-500"> Take advantage of it.</span>
+    </h1>
+    <p className="mt-4 text-gray-600 text-xl">
+      Workcation helps you find work-friendly rentals in beautiful locations so you can enjoy some nice weather even when you’re not on vacation.
+    </p>
+    <div className="mt-6">
+      <button onClick={()=>onLogin()} className="px-5 py-3 inline-block bg-indigo-500 hover:bg-indigo-400 rounded-lg text-white font-semibold tracking-wide uppercase shadow-lg">Book your escape.</button>
+    </div>
+  </div>
+}

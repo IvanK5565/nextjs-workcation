@@ -1,8 +1,8 @@
 {
   "development": {
+    "database": "school-diary",
     "username": "school-diary",
     "password": "school-diary",
-    "database": "school-diary",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

@@ -1,50 +1,43 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useEffect, useState } from "react";
-import { db } from "@/pages/api/db";
+import { User, Class } from "./api/data";
+import { createRouter } from "next-connect";
+import { QueryTypes } from "sequelize";
+import { IncomingMessage, ServerResponse } from "http";
+import container from "@/utils/container";
+import Classes from "@/models/classes";
+import { Sequelize } from "sequelize-typescript";
 
-type Class = {
-  class_id: number,
-  title: string,
-}
-type User_class = {
-  user_class_id:number,
-  class_id:number,
-  student_id:number,
-}
+const router = createRouter<
+IncomingMessage & { body?: Record<string, string> },
+ServerResponse
+>()
+.get(async ()=>{
+  const sequelize = container.resolve('sequelize') as Sequelize;
+  sequelize.authenticate();
+  // let sql = `SELECT class_id, teacher_id, title, year, status FROM classes WHERE status='active'`;
+  // const classes = await sequelize.query(sql, { type: QueryTypes.SELECT });
+  const classes = await Classes.findAll({
+    attributes:['class_id','teacher_id','title','year', 'status'],
+    where:{
+      status:'active',
+    },
+  })
+  return JSON.parse(JSON.stringify(classes));
+})
 
-export const getServerSideProps = (async () =>{
-  const [data] = await db.query(`SELECT user_id, first_name, last_name, email, password, role, status FROM USERS LIMIT 10`);
- return {props:{data:data}};
-}) satisfies GetServerSideProps<{data:object}>;
-
-
+export const getServerSideProps = (async ({req,res}) =>{
+  const classes = await router.run(req,res) as Class[];
+ return ({props:{classes}});
+}) satisfies GetServerSideProps<{classes:Class[]}>;
 
 export default function Home({
-  data,
+  classes,
 }:InferGetServerSidePropsType<typeof getServerSideProps>) {
-  // console.log(data);
   
   const [selectedClass, setClass] = useState<number>();
-  const [classes, setClasses] = useState<Class[]>([]);
   const [users, setUsers] = useState<[]>([]);
-  
-  useEffect(()=>{
-    async function fetchClasses() {
-      try{
-        const response = await fetch('/api/classes');
-        const results = await response.json();
-        setClasses(results);
-        return results;
-      }
-      catch(e){
-        console.log(e);
-      }
-    }
-    fetchClasses();
-    if (data) {
-      return
-    }
-  },[])
+
 
   useEffect(()=>{
     async function fetchClasses() {
@@ -74,12 +67,12 @@ export default function Home({
         ))}
       </select>
     </div>
-    <div>
-      {(users as User_class[]).map((u,i) => (
-        <div className="border-b flex justify-center" key={i}>
-          <p className="border">{u.user_class_id}</p>
-          <p className="border">{u.class_id}</p>
-          <p className="border">{u.student_id}</p>
+    <div className="flex justify-between">
+      {(users as User[]).map((u,i) => (
+        <div className="border-b block w-full" key={i}>
+          <p className="border">{u.user_id}</p>
+          <p className="border">{u.last_name}</p>
+          <p className="border">{u.first_name}</p>
           </div>
       ))}
     </div>

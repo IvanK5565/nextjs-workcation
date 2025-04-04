@@ -153,3 +153,56 @@ export async function getHousesData(): Promise<Location[]> {
   return data;
 }
 
+export interface User {
+  user_id?: number,
+  first_name: string,
+  last_name: string,
+  email: string,
+  password: string,
+  role: 'admin' | 'teacher' | 'student',
+  status: 'active' | 'banned' | 'graduated' | 'fired',
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Class {
+  class_id?: number;
+  teacher_id: number;
+  title: string;
+  year: number;
+  status: 'draft' | 'active' | 'closed';
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Subject {
+  subject_id?: number;
+  name: string | null;
+  description: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+
+export interface UserClass {
+  user_class_id?: number;
+  class_id: number;
+  student_id: number;
+  teacher_id: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Journal {
+  id?: number;
+  student_id: number;
+  subject_id: number;
+  class_id: number;
+  teacher_id: number;
+  lecture_time: string | null;
+  lecture_type: 'exam' | 'lesson' | 'homework';
+  lecture_status: 'missing' | 'cancelled' | 'sick' | 'nothing';
+  mark_val: number | null;
+  created_at: Date;
+  updated_at: Date;
+}

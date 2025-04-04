@@ -11,8 +11,8 @@ module.exports = {
     \`subject_id\` int NOT NULL AUTO_INCREMENT,
     \`name\` varchar(45) DEFAULT NULL,
     \`description\` varchar(100) DEFAULT NULL,
-    \`created_at\` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-    \`updated_at\` timestamp NULL DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    \`createdAt\` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    \`updatedAt\` timestamp NULL DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (\`subject_id\`),
     UNIQUE KEY \`subject_id_UNIQUE\` (\`subject_id\`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;  `)

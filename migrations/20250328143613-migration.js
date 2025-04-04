@@ -17,8 +17,8 @@ module.exports = {
       \`lecture_type\` enum('exam','lesson','homework') NOT NULL,
       \`lecture_status\` enum('missing','cancelled','sick','nothing') NOT NULL,
       \`mark_val\` int DEFAULT NULL,
-      \`created_at\` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-      \`updated_at\` timestamp NULL DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      \`createdAt\` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+      \`updatedAt\` timestamp NULL DEFAULT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (\`id\`),
       UNIQUE KEY \`id_UNIQUE\` (\`id\`),
       KEY \`student_fk_idx\` (\`student_id\`),
@@ -26,8 +26,8 @@ module.exports = {
       KEY \`class_fk_idx\` (\`class_id\`),
       KEY \`teacher_fk_idx\` (\`teacher_id\`),
       CONSTRAINT \`class_fk\` FOREIGN KEY (\`class_id\`) REFERENCES \`CLASSES\` (\`class_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
-      CONSTRAINT \`journal_student_fk\` FOREIGN KEY (\`student_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
-      CONSTRAINT \`journal_teacher_fk\` FOREIGN KEY (\`teacher_id\`) REFERENCES \`USERS\` (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
+      CONSTRAINT \`journal_student_fk\` FOREIGN KEY (\`student_id\`) REFERENCES users (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
+      CONSTRAINT \`journal_teacher_fk\` FOREIGN KEY (\`teacher_id\`) REFERENCES users (\`user_id\`) ON DELETE CASCADE ON UPDATE RESTRICT,
       CONSTRAINT \`subject_fk\` FOREIGN KEY (\`subject_id\`) REFERENCES \`SUBJECTS\` (\`subject_id\`) ON DELETE CASCADE ON UPDATE RESTRICT
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;`)
   },

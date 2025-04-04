@@ -1,28 +1,53 @@
 //users
 import { NextApiRequest, NextApiResponse } from "next";
-import { QueryTypes } from "sequelize";
-import { db } from "@/pages/api/db";
+import { Op, QueryTypes } from "sequelize";
+// import sequelize from "@/utils/db";
+import container from "@/utils/container";
 import { createRouter } from "next-connect";
+import { User } from "../data";
+import Users from "@/models/users";
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
-
+const sequelize = container.resolve('sequelize');
 
 router.use(async (req, res, next) => {
-    const start = Date.now();
-    await next(); // call next in chain
-    const end = Date.now();
-    console.log(`Request took ${end - start}ms`);
-  })
+  await sequelize.authenticate();
+  next(); // call next in chain
+})
   .get(async (req, res) => {
-    const users = await db.query("SELECT * FROM users LIMIT 10", { type: QueryTypes.SELECT });
+    const { first_name, last_name, email, role, status, limit, page } = req.query;
+    const limit_n = Number.parseInt(limit as string);
+    const page_n = Number.parseInt(page as string);
+
+    const filters: { [key: string]: any } = {};
+    const where: { [key: string]: any } = {};
+
+    if (first_name) {
+      where.first_name = {
+        [Op.like]: `%${first_name}%`,
+      };
+    }
+    if (last_name) {
+      where.last_name = {
+        [Op.like]: `%${last_name}%`,
+      };
+    }
+    if (email) {
+      where.email = {
+        [Op.like]: `%${email}%`,
+      };
+    }
+    if (role) where.role = role;
+    if (status) where.status = status;
+    if (where) { filters.where = where; }
+    if (limit_n) { filters.limit = limit_n; }
+    if (limit_n && page_n) {
+      filters.limit = limit_n;
+      filters.offset = limit_n * (page_n - 1);
+    }
+
+    const users = await Users.findAll(filters);
     res.status(200).json(users);
-  })
-  .post((req,res) => {
-    const data = req.body;
-    console.log("post in users:"+data);
-    
-    res.status(200).json([{message:"ALLDONE"}]);
-    return
   })
   .all((req, res) => {
     res.status(405).json({
