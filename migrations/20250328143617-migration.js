@@ -9,7 +9,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.sequelize.query(`
-    ALTER TABLE user_classes 
+    ALTER TABLE USER_CLASSES 
     RENAME TO  user_classes ;`)
   },
 
@@ -22,6 +22,6 @@ module.exports = {
      */
     await queryInterface.sequelize.query(`
     ALTER TABLE user_classes 
-    RENAME TO  user_classes ;`)
+    RENAME TO  USER_CLASSES ;`)
   }
 };

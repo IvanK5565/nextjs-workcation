@@ -1,19 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import BaseContext from "../BaseContext";
-import { Op } from "sequelize";
 import BaseController from "./BaseController";
-import IContextContainer from "../IContextContainer";
-import { DELETE, GET, POST, USE } from "../API/decorators";
+import { DELETE, POST, GET } from "../API/decorators";
 import { FilterType, DEFAULT_LIMIT, DEFAULT_PAGE } from "../constants";
-import { IService } from "../services";
 
-@USE((req,res,next)=>next())
-export default class SubjectsController extends BaseController {
+export default class UserClassesController extends BaseController {
 
-  protected getService(): IService { return this.di.SubjectsService }
-  
-  @POST('api/subjects')
-  @POST('api/subjects/[id]')
+  protected getService() { return this.di.UserClassesService }
+
+  @POST('api/usersInClass')
+  @POST('api/usersInClass/[id]')
   public save(req: NextApiRequest, res: NextApiResponse) {
     this.service.save(req.body)
       .catch(e => {
@@ -23,7 +18,7 @@ export default class SubjectsController extends BaseController {
       .then(x => res.status(200).send(x));
   }
 
-  @GET('api/subjects/[id]')
+  @GET('api/usersInClass/[id]')
   public findById(req: NextApiRequest, res: NextApiResponse) {
     const { id } = req.query;
     const numId = Number(id);
@@ -41,7 +36,7 @@ export default class SubjectsController extends BaseController {
       });
   }
 
-  @GET('api/subjects')
+  @GET('api/usersInClass')
   public findByFilter(req: NextApiRequest, res: NextApiResponse) {
     const { limit, page, ...filters } = req.query as FilterType;
     let parsedLimit = Number(limit);
@@ -59,7 +54,7 @@ export default class SubjectsController extends BaseController {
       });
   }
 
-  @DELETE('api/subjects')
+  @DELETE('api/usersInClass')
   public deleteById(req: NextApiRequest, res: NextApiResponse) {
     const id = Number(req.query.id);
     if (isNaN(id)) {

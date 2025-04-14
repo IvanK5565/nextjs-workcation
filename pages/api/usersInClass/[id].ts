@@ -1,15 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from 'next'
 import { createRouter } from "next-connect";
-import ctx from "@/server/container";
+import ctx from '@/server/container'
 
-const controller = ctx.resolve('ClassesController');
+const controller = ctx.resolve("UserClassesController");
 
 // export const router = createRouter<NextApiRequest, NextApiResponse>();
 // router
-//   .get(controller.findById)
-//   .post(controller.save.bind(controller))
-//   .delete(controller.deleteById.bind(controller))
-//   .all((req, res) => {
+//   .get(controller.getUsersInOneClass.bind(controller))
+//   .post(controller.update.bind(controller))
+//   .delete(controller.delete.bind(controller))
+//   .all((_, res) => {
 //     res.status(405).json({
 //       error: "Method not allowed",
 //     });
@@ -23,4 +23,4 @@ const controller = ctx.resolve('ClassesController');
 //   },
 // });
 
-export default controller.handler('api/classes/[id]');
+export default controller.handler('api/usersInClass/[id]');

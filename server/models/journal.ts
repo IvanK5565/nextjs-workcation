@@ -1,9 +1,24 @@
 import { Model, DataTypes } from 'sequelize';
+import IContextContainer from '../IContextContainer';
+import { LectureStatus, LectureType } from '../constants';
 
-export default function JournalModel({sequelize}:any) {
-  
-  class Journal extends Model {}
+class Journal extends Model{
+  declare id: number;
+  declare student_id: number;
+  declare subject_id: number;
+  declare class_id: number;
+  declare teacher_id: number;
+  declare lecture_time: Date;
+  declare lecture_type: LectureType;
+  declare lecture_status: LectureStatus;
+  declare mark_val: number;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+}
 
+export type JournalType = typeof Journal;
+
+export default (ctx: IContextContainer) => {
   Journal.init(
     {
       id: {
@@ -50,12 +65,12 @@ export default function JournalModel({sequelize}:any) {
     },
     lecture_type: {
       type: DataTypes.ENUM,
-      values: ['exam', 'lesson', 'homework'],
+      values: Object.values(LectureType),
       allowNull: false,
     },
     lecture_status: {
       type: DataTypes.ENUM,
-      values: ['missing', 'cancelled', 'sick', 'nothing'],
+      values: Object.values(LectureStatus),
       allowNull: false,
     },
     mark_val: {
@@ -76,19 +91,12 @@ export default function JournalModel({sequelize}:any) {
     },
   },
   {
-    sequelize,
+    sequelize: ctx.db,
     modelName: 'Journal',
     tableName: 'journal',
     timestamps: true,
     underscored: true,
   }
   );
-  
-  // Associations
-  // Journal.belongsTo(sequelize.models.Users, { foreignKey: 'student_id', as: 'student' });
-  // Journal.belongsTo(sequelize.models.Subjects, { foreignKey: 'subject_id', as: 'subject' });
-  // Journal.belongsTo(sequelize.models.Classes, { foreignKey: 'class_id', as: '_class' });
-  // Journal.belongsTo(sequelize.models.Users, { foreignKey: 'teacher_id', as: 'teacher' });  
-
   return Journal;
 }

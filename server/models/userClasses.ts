@@ -1,9 +1,19 @@
 import { Model, DataTypes } from 'sequelize';
+import IContextContainer from '../IContextContainer';
 
-export default function User_classesModel({ sequelize, Users }: any) {
-  class User_classes extends Model { }
+class UserClasses extends Model {
+  declare user_class_id: number;
+  declare class_id: number;
+  declare student_id: number;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+}
 
-  User_classes.init(
+export type UserClassesType = typeof UserClasses;
+
+export default (ctx: IContextContainer) => {
+
+  UserClasses.init(
     {
       user_class_id: {
         type: DataTypes.INTEGER,
@@ -23,7 +33,7 @@ export default function User_classesModel({ sequelize, Users }: any) {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: Users,
+          model: ctx.UsersModel,
           key: 'id', // Assuming Users has an 'id' column as the primary key
         },
       },
@@ -41,12 +51,12 @@ export default function User_classesModel({ sequelize, Users }: any) {
       },
     },
     {
-      sequelize,
-      modelName: 'User_classes',
-      tableName: 'user_classes',
+      sequelize: ctx.db,
+      modelName: 'UserClasses',
+      tableName: 'userClasses',
       timestamps: true,
       underscored: true,
     }
   );
-  return User_classes;
+  return UserClasses;
 }

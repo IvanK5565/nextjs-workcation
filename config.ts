@@ -12,6 +12,12 @@ const prodConfig = {
     dev: isDev,
     baseUrl: process.env.BASE_URL,
     apiUrl:  process.env.API_STRING,
+    database: process.env.DB_NAME!,
+    username: process.env.DB_USER!,
+    password: process.env.DB_PASS!,
+    host: process.env.DB_HOST!,
+    dialect: "mysql",
+    port: Number(process.env.DB_PORT),
 
 }
 

@@ -7,7 +7,7 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.sequelize.query(`CREATE TABLE user_classes (
+    await queryInterface.sequelize.query(`CREATE TABLE USER_CLASSES (
     \`user_class_id\` int NOT NULL AUTO_INCREMENT,
     \`class_id\` int NOT NULL,
     \`student_id\` int NOT NULL,

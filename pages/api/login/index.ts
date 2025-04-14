@@ -1,28 +1,12 @@
-//users
 import { NextApiRequest, NextApiResponse } from "next";
-import { Op, QueryTypes } from "sequelize";
-import sequelize from "@/utils/db";
 import { createRouter } from "next-connect";
-import { User } from "../data";
-import Users from "@/server/models/users";
+import ctx from "@/server/container";
 
-const router = createRouter<NextApiRequest, NextApiResponse>();
+const controller = ctx.resolve('UsersController');
 
-
-router.use(async (req, res, next) => {
-  await sequelize.authenticate();
-  next(); // call next in chain
-})
-  .get(async (req, res) => {
-    const { email, password } = req.query;
-    const user = await Users.findOne({
-      where: {
-        email: email,
-        password: password,
-      }
-    });
-    res.status(200).json(user);
-  })
+export const router = createRouter<NextApiRequest, NextApiResponse>();
+router
+  .get(controller.actionLogin.bind(controller))
   .all((req, res) => {
     res.status(405).json({
       error: "Method not allowed",

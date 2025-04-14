@@ -1,11 +1,17 @@
 import { Model, DataTypes } from 'sequelize';
+import IContextContainer from '../IContextContainer';
 
+class Subjects extends Model {
+  declare subject_id: number;
+  declare name: string;
+  declare description: string;
+  declare createdAt: Date;
+  declare updatedAt: Date;
+}
 
-export default function SubjectsModel({ sequelize, Journal }: any) {
+export type SubjectsType = typeof Subjects;
 
-  class Subjects extends Model { }
-
-
+export default (ctx: IContextContainer) => {
   Subjects.init(
     {
       subject_id: {
@@ -36,16 +42,12 @@ export default function SubjectsModel({ sequelize, Journal }: any) {
       },
     },
     {
-      sequelize,
+      sequelize: ctx.db,
       modelName: 'Subjects',
       tableName: 'subjects',
       timestamps: true,
       underscored: true,
     }
   );
-
-  // Associations
-  Subjects.hasMany(Journal, { foreignKey: 'subject_id', as: 'subjects_marks' });
-
   return Subjects;
 }

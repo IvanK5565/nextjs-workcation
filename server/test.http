@@ -1,0 +1,13 @@
+GET http://localhost:3000/api/register HTTP/1.1
+
+###
+
+POST http://localhost:3000/api/classes/1 HTTP/1.1
+content-type: application/json
+
+{
+    "title":"title", 
+    "status":"active", 
+    "teacher_id":2,
+    "year":2025
+}

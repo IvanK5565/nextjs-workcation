@@ -8,7 +8,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     await queryInterface.sequelize.query(`
-    CREATE TABLE users (
+    CREATE TABLE USERS (
       \`user_id\` int NOT NULL AUTO_INCREMENT,
       \`first_name\` varchar(45) NOT NULL,
       \`last_name\` varchar(45) NOT NULL,
