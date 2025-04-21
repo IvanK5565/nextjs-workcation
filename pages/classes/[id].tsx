@@ -1,13 +1,12 @@
-import React, { FormEvent } from "react"
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult, NextApiRequest, NextApiResponse } from "next"
-import { Class, User } from "@/pages/api/data";
-import { createRouter } from "next-connect";
-import 'reflect-metadata'
 import ctx from "@/server/container";
-import Board from "@/components/temp/board";
-import { IncomingMessage, ServerResponse } from "http";
-import { NextApiRequestCookies } from "next/dist/server/api-utils";
-import { FilterType } from "@/server/constants";
+import { IncomingMessage } from "http";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { FormEvent } from "react";
+import 'reflect-metadata';
+import { Classes as Class } from "@/server/models/classes";
+import { Users as User } from "@/server/models/users";
+import Button from "@/components/ui/button";
+
 
 export default function Home({
   teachers,
@@ -44,31 +43,24 @@ export default function Home({
           <option value="draft">Draft</option>
         </select>
         <input type="number" name="year" defaultValue={_class.year} required />
-        <button type="submit" className="border">Submit</button>
+        <Button type="submit" className="border mt-5">Submit</Button>
       </form>
     </div>
   </>
 }
 
-type SSRRequest = IncomingMessage & 
-{ 
-  query?:Partial<{[key: string]: string | string[];}>,
-}
 
-export const getServerSideProps = (async (context:GetServerSidePropsContext) => {
-  const { res, query } = context
 
-  const req = context.req as SSRRequest;
-  req.query = query;
+// export const getServerSideProps = (async (context:GetServerSidePropsContext) => {
+//   const { res, query } = context
+//   const req = context.req as SSRRequest;
+//   req.query = query;
   
-  const controller = ctx.resolve('ClassesController');
-  // const _router = createRouter<SSRRequest,NextApiResponse>();
-  // .get(controller.getClassByIdAndTeachersSSR.bind(controller))
-  // return (await router.run(req, res)) as GetServerSidePropsResult<{ props:{teachers: User[], _class: Class} }>;
+//   const handler = ctx.resolve('ClassesController').handlerSSR('classes/[id]');
+//   const result = await handler(req as any,res as any) as {props:any};
+//   return result;
+// })satisfies GetServerSideProps;
 
-
-  const handler = controller.handlerSSR('classes/[id]');
-  const result = await handler(req as any,res as any) as {props:any};
-  return result;
-})satisfies GetServerSideProps;
-
+export const getServerSideProps = ctx.resolve('getServerSideProps')(
+  'classes/[id]',
+  ['ClassesController', 'UsersController'])

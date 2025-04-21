@@ -3,12 +3,12 @@ import UsersService from "./UsersService";
 import ClassesService from "./ClassesService";
 import SubjectsService from "./SubjectsService";
 import UserClassesService from "./UserClassesService";
-import { FilterType } from "../constants";
+import { StringMap } from "../utils/constants";
 
 export interface IService {
-  save(body:FilterType):Promise<any>;
+  save(body:StringMap):Promise<any>;
   findById(id:Number):Promise<any>;
-  findByFilter(limit: number, page: number, filters?: FilterType):Promise<any>;
+  findByFilter(limit: number, page: number, filters?: StringMap):Promise<any>;
   delete(id: Number):Promise<any>;
 }
 

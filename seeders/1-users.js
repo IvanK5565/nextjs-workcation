@@ -49,6 +49,19 @@ module.exports = {
       // console.log(sql);
       await queryInterface.sequelize.query(sql);
     }
+    const sql = `INSERT INTO users
+    (first_name, last_name, email, password, role, status)
+    VALUES
+    ('ivan', 
+    'admin', 
+    'admin@admin.com', 
+    'admin', 
+    'admin',
+    'active'
+    );
+    `
+    // console.log(sql);
+    await queryInterface.sequelize.query(sql);
   },
 
   async down(queryInterface, Sequelize) {

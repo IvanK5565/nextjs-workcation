@@ -25,11 +25,17 @@ export default {
 export function Associations(container: IContextContainer) {
   // Associations
 
-  const Users = container.resolve("UsersModel");
-  const Classes = container.resolve("ClassesModel");
-  const Subjects = container.resolve("SubjectsModel");
-  const UserClasses = container.resolve("UserClassesModel");
-  const Journal = container.resolve("JournalModel");
+  // const Users = container.resolve("UsersModel");
+  // const Classes = container.resolve("ClassesModel");
+  // const Subjects = container.resolve("SubjectsModel");
+  // const UserClasses = container.resolve("UserClassesModel");
+  // const Journal = container.resolve("JournalModel");
+
+  const Users = container.UsersModel;
+  const Classes = container.ClassesModel;
+  const Subjects = container.SubjectsModel;
+  const UserClasses = container.UserClassesModel;
+  const Journal = container.JournalModel;
 
   Users.hasMany(Classes, { foreignKey: 'teacher_id', as: 'classes' }); // Assuming `teacher_id` exists in Classes table
   Users.belongsToMany(Classes, { through: UserClasses, foreignKey: 'student_id', as: 'student_classes' });

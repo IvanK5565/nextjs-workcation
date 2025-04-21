@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import BaseContext from "../BaseContext";
-import { DEFAULT_LIMIT, DEFAULT_PAGE, FilterType, UserRole } from "../constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, StringMap, UserRole } from "../utils/constants";
 import BaseController, { Middleware } from "./BaseController";
 import type IContextContainer from "../IContextContainer";
 import { IService } from "../services";
-import { DELETE, GET, POST, SSR, USE } from "../API/decorators";
+import { DELETE, GET, POST, SSR, USE } from "./decorators";
 
 
-@USE(async (req, res, next) => {
+@USE(async (_req, _res, next) => {
   return await next();
 })
 export default class ClassesController extends BaseController {
@@ -19,7 +19,7 @@ export default class ClassesController extends BaseController {
   @POST('api/classes')
   @POST('api/classes/[id]')
   public save(req: NextApiRequest, res: NextApiResponse) {
-    this.service.save(req.body)
+    this.di.ClassesService.save(req.body)
       .catch(e => {
         console.error("save classes ", e);
         res.status(500).send(e);
@@ -27,68 +27,33 @@ export default class ClassesController extends BaseController {
       .then(x => res.status(200).send(x));
   }
 
-  
+
   @SSR('classes/[id]')
-  public getEditClassDataSSR(req: NextApiRequest, res: NextApiResponse) {
+  public getEditClassDataSSR(req: NextApiRequest) {
     const { id } = req.query;
-    const filters = { role: UserRole.TEACHER }
-    return Promise.all([
-      this.di.ClassesService.findById(Number(id)),
-      this.di.UsersService.findByFilter(100, 1, filters)
-    ]).then(results => {
-      let _class = results[0];
-      let teachers = results[1];
-      return {
-        props: {
-          _class: JSON.parse(JSON.stringify(_class)),
-          teachers: JSON.parse(JSON.stringify(teachers))
-        }
-      };
-    }).catch(error => {
-      console.error(error);
-      
-      return { props: { error: JSON.parse(JSON.stringify(error)) } };
-    })
+    return this.di.ClassesService.findById(Number(id)).then(res => ({_class: res}))
   }
-  
-  
+
+
   @USE((_req, _res, next) => {
     next();
-  },'api/classes/[id]')
+  }, 'api/classes/[id]')
   @GET('api/classes/[id]')
-  public findById(req: NextApiRequest, res: NextApiResponse) {
-    const { id } = req.query;
+  public findById({ query }: NextApiRequest) {
+    const { id } = query;
     const numId = Number(id);
-    if (isNaN(numId) || numId <= 0) {
-      res.status(500).send("Invalid id");
-      return;
-    }
-    this.di.ClassesService.findById(numId)
-      .catch(e => {
-        console.error("Error in getting by id: ", e);
-        res.status(500).send(e);
-      })
-      .then(results => {
-        res.status(200).send(results);
-      });
+    return this.di.ClassesService.findById(numId);
   }
 
   @GET('api/classes')
-  public findByFilter(req: NextApiRequest, res: NextApiResponse) {
-    const { limit, page, ...filters } = req.query as FilterType;
+  public findByFilter(req: NextApiRequest) {
+    const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
     if (isNaN(parsedPage)) parsedPage = DEFAULT_PAGE;
 
-    this.di.ClassesService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesService.get: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.ClassesService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }
 
   @DELETE('api/classes/[i]')
@@ -98,14 +63,7 @@ export default class ClassesController extends BaseController {
       res.status(500).send('Invalid id');
     }
 
-    this.service.delete(id)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesController.delete: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.ClassesService.delete(id);
   }
 }
 

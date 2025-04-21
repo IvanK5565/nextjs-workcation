@@ -1,11 +1,11 @@
 import { Op } from "sequelize";
 import BaseContext from "../BaseContext";
-import { FilterType } from "../constants";
+import { StringMap } from "../utils/constants";
 import { IService } from ".";
 
 export default class ClassesService extends BaseContext implements IService {
 
-  public async save(body: FilterType) {
+  public async save(body: StringMap) {
     const { id, ...fields } = body;
     let model = this.di.ClassesModel.build();
     if (id) {
@@ -16,7 +16,7 @@ export default class ClassesService extends BaseContext implements IService {
       model = finded;
     } 
     
-    //------------------------
+    /**********************/
    model.set(fields);
    return model.validate()
     .catch(e => Error(`Non-valid model: ${e}`))
@@ -26,16 +26,14 @@ export default class ClassesService extends BaseContext implements IService {
   }
 
   public findById(id: number) {
-    return this.di.ClassesModel.findByPk(id)
+    return this.di.ClassesModel.findByPk(id);
   }
 
-  public findByFilter(limit: number, page: number, filters?: FilterType) {
-    if (filters !== undefined && filters.title) {
-      filters.title = {
-        [Op.like]: `%${filters.title}%`, // Search for names containing the query string
-      } as FilterType;
+  public findByFilter(limit: number, page: number, filters?: StringMap) {
+    if (filters && filters.title) {
+      const title = {[Op.like]: `%${filters.title}%`}
       return this.di.ClassesModel.findAll({
-        where: filters,
+        where: {...filters, title},
         limit: limit,
         offset: limit * (page - 1),
       })

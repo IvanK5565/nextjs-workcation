@@ -26,7 +26,7 @@ module.exports = {
         const class_id = classes[i].class_id;
         const student_id = students[j+i*students_in_class_count].user_id;
         const teacher_id = classes[i].teacher_id;
-        await queryInterface.sequelize.query(`INSERT INTO user_classes
+        await queryInterface.sequelize.query(`INSERT INTO userClasses
         (class_id, student_id, teacher_id)
         VALUES
         ('${class_id}', 
@@ -43,7 +43,7 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    await queryInterface.sequelize.query(`DELETE FROM user_classes`);
-    await queryInterface.sequelize.query('ALTER TABLE user_classes AUTO_INCREMENT = 1;');
+    await queryInterface.sequelize.query(`DELETE FROM userClasses`);
+    await queryInterface.sequelize.query('ALTER TABLE userClasses AUTO_INCREMENT = 1;');
   }
 };

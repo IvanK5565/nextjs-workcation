@@ -26,6 +26,9 @@ export enum LectureStatus{
   NOTHING = 'nothing',
 }
 
-export type FilterType = Partial<{ [key: string]: string | FilterType; }>
+export const SALT_ROUNDS = 10
+
+export type StringMap = Record<string,string>
 export const DEFAULT_LIMIT = 100;
 export const DEFAULT_PAGE = 1;
+

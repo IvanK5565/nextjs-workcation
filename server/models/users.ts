@@ -1,8 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
-import { UserStatus, UserRole } from '../constants';
+import { UserStatus, UserRole } from '../utils/constants';
 
-class Users extends Model {
+export class Users extends Model {
   declare user_id: number;
   declare first_name: string;
   declare last_name: string;

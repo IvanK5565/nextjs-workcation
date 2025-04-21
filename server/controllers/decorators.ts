@@ -1,4 +1,4 @@
-import { Endpoint, Middleware } from "../controllers/BaseController";
+import { Endpoint, Middleware } from "./BaseController";
 
 export type RouteMetaData = {
   middlewares: Middleware[],
@@ -6,10 +6,7 @@ export type RouteMetaData = {
 }
 
 function getMetaData(key: string, target: any): RouteMetaData {
-  if (Reflect.hasMetadata(key, target)) {
-    return Reflect.getMetadata(key, target);
-  }
-  return {
+  return Reflect.getMetadata(key, target) ?? {
     middlewares: [],
     endpoints: [],
   };
@@ -20,13 +17,13 @@ function createEndpointDecorator(route:string, method: string){
     let handlers: RouteMetaData = getMetaData(route, target);
     let endpoint: Endpoint = {
       method: method,
-      // handler: target[propertyKey],
       handler: propertyKey,
     }
     handlers.endpoints.push(endpoint);
     Reflect.defineMetadata(route, handlers, target);
   }
 }
+
 
 export function GET(route: string) {
   return createEndpointDecorator(route, 'get')
@@ -37,6 +34,12 @@ export function POST(route: string) {
 export function DELETE(route: string) {
   return createEndpointDecorator(route, 'delete')
 }
+export function SSR(route: string) {
+  return createEndpointDecorator(route, 'ssr')
+}
+
+
+
 
 export function USE(middleware: Middleware): Function;
 export function USE(middleware: Middleware, route: string): Function;
@@ -48,25 +51,14 @@ export function USE(middleware: Middleware, route?: string): Function {
       Reflect.defineMetadata(route, handlers, target);
     }
   }
-  return function (constructor: Function) {
+  return function (constructor: Middleware) {
     const target = constructor.prototype;
-    let middlewares: Middleware[] = [];
-    if (Reflect.hasMetadata('middlewares', target)) {
-      middlewares = Reflect.getMetadata('middlewares', target);
-    }
+    let middlewares: Middleware[] = Reflect.getMetadata('middlewares', target) ?? [];
     middlewares.push(middleware);
     Reflect.defineMetadata('middlewares', middlewares, target);
   }
 }
 
-export function SSR(route: string) {
-  // return function (target: any, propertyKey: string) {
-  //   let handler = propertyKey;
-  //   // if (Reflect.hasMetadata(route, target)) {
-  //   //   handler = Reflect.getMetadata(route, target);
-  //   // }
-  //   Reflect.defineMetadata(route, handler, target);
-  // }
-
-    return createEndpointDecorator(`ssr:${route}`, 'get')
-}
+// export function SSR(route: string) {
+//     return createEndpointDecorator(`ssr:${route}`, 'get')
+// }

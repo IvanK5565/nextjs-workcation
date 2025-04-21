@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import BaseController from "./BaseController";
-import { DELETE, POST, GET } from "../API/decorators";
-import { FilterType, DEFAULT_LIMIT, DEFAULT_PAGE } from "../constants";
+import { DELETE, POST, GET } from "./decorators";
+import { StringMap, DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
 
 export default class UserClassesController extends BaseController {
 
@@ -9,13 +9,8 @@ export default class UserClassesController extends BaseController {
 
   @POST('api/usersInClass')
   @POST('api/usersInClass/[id]')
-  public save(req: NextApiRequest, res: NextApiResponse) {
-    this.service.save(req.body)
-      .catch(e => {
-        console.error("save classes ", e);
-        res.status(500).send(e);
-      })
-      .then(x => res.status(200).send(x));
+  public save(req: NextApiRequest) {
+    return this.di.UserClassesService.save(req.body);
   }
 
   @GET('api/usersInClass/[id]')
@@ -26,32 +21,18 @@ export default class UserClassesController extends BaseController {
       res.status(500).send("Invalid id");
       return;
     }
-    this.service.findById(numId)
-      .catch(e => {
-        console.error("Error in getting by id: ", e);
-        res.status(500).send(e);
-      })
-      .then(results => {
-        res.status(200).send(results);
-      });
+    return this.di.UserClassesService.findById(numId);
   }
 
   @GET('api/usersInClass')
   public findByFilter(req: NextApiRequest, res: NextApiResponse) {
-    const { limit, page, ...filters } = req.query as FilterType;
+    const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
     if (isNaN(parsedPage)) parsedPage = DEFAULT_PAGE;
 
-    this.service.findByFilter(parsedLimit, Math.max(1, parsedPage), filters)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesService.get: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.UserClassesService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }
 
   @DELETE('api/usersInClass')
@@ -61,13 +42,6 @@ export default class UserClassesController extends BaseController {
       res.status(500).send('Invalid id');
     }
 
-    this.service.delete(id)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesController.delete: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.UserClassesService.delete(id);
   }
 }

@@ -3,8 +3,8 @@ import BaseContext from "../BaseContext";
 import { Op } from "sequelize";
 import BaseController from "./BaseController";
 import IContextContainer from "../IContextContainer";
-import { DELETE, GET, POST, USE } from "../API/decorators";
-import { FilterType, DEFAULT_LIMIT, DEFAULT_PAGE } from "../constants";
+import { DELETE, GET, POST, USE } from "./decorators";
+import { StringMap, DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
 import { IService } from "../services";
 
 @USE((req,res,next)=>next())
@@ -15,12 +15,7 @@ export default class SubjectsController extends BaseController {
   @POST('api/subjects')
   @POST('api/subjects/[id]')
   public save(req: NextApiRequest, res: NextApiResponse) {
-    this.service.save(req.body)
-      .catch(e => {
-        console.error("save classes ", e);
-        res.status(500).send(e);
-      })
-      .then(x => res.status(200).send(x));
+    return this.di.SubjectsService.save(req.body);
   }
 
   @GET('api/subjects/[id]')
@@ -31,32 +26,18 @@ export default class SubjectsController extends BaseController {
       res.status(500).send("Invalid id");
       return;
     }
-    this.service.findById(numId)
-      .catch(e => {
-        console.error("Error in getting by id: ", e);
-        res.status(500).send(e);
-      })
-      .then(results => {
-        res.status(200).send(results);
-      });
+    return this.di.SubjectsService.findById(numId);
   }
 
   @GET('api/subjects')
   public findByFilter(req: NextApiRequest, res: NextApiResponse) {
-    const { limit, page, ...filters } = req.query as FilterType;
+    const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
     if (isNaN(parsedPage)) parsedPage = DEFAULT_PAGE;
 
-    this.service.findByFilter(parsedLimit, Math.max(1, parsedPage), filters)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesService.get: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.SubjectsService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }
 
   @DELETE('api/subjects')
@@ -66,13 +47,6 @@ export default class SubjectsController extends BaseController {
       res.status(500).send('Invalid id');
     }
 
-    this.service.delete(id)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesController.delete: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.SubjectsService.delete(id);
   }
 }

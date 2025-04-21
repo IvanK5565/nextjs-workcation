@@ -1,82 +1,48 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useEffect, useState } from "react";
-import { User, Class } from "./api/data";
-import { createRouter } from "next-connect";
-import { QueryTypes } from "sequelize";
-import { IncomingMessage, ServerResponse } from "http";
+import Header from "@/components/Header";
+import LocationCards from "@/components/LocationCards";
+import SearchBar from "@/components/SearchBar";
+import { getHousesData, Location } from "@/pages/api/data";
 import ctx from "@/server/container";
-import Classes from "@/server/models/classes";
-import { Sequelize } from "sequelize-typescript";
+import { GetServerSidePropsContext } from "next";
+import { getServerSession } from "next-auth/next"
 
-const router = createRouter<
-IncomingMessage & { body?: Record<string, string> },
-ServerResponse
->()
-.get(async ()=>{
-  const sequelize = ctx.resolve('sequelize') as Sequelize;
-  sequelize.authenticate();
-  // let sql = `SELECT class_id, teacher_id, title, year, status FROM classes WHERE status='active'`;
-  // const classes = await sequelize.query(sql, { type: QueryTypes.SELECT });
-  const classes = await Classes.findAll({
-    attributes:['class_id','teacher_id','title','year', 'status'],
-    where:{
-      status:'active',
-    },
-  })
-  return JSON.parse(JSON.stringify(classes));
-})
-
-export const getServerSideProps = (async ({req,res}) =>{
-  const classes = await router.run(req,res) as Class[];
- return ({props:{classes}});
-}) satisfies GetServerSideProps<{classes:Class[]}>;
-
-export default function Home({
-  classes,
-}:InferGetServerSidePropsType<typeof getServerSideProps>) {
-  
-  const [selectedClass, setClass] = useState<number>();
-  const [users, setUsers] = useState<[]>([]);
-
-
-  useEffect(()=>{
-    async function fetchClasses() {
-      if(!selectedClass) return;
-      try{
-        const response = await fetch(`/api/users_in_class/${selectedClass}`);
-        const results = await response.json();
-        console.log(results);
-        setUsers(results);
-        return results;
-      }
-      catch(e){
-        console.log(e);
-      }
-    }
-    fetchClasses();
-  },[selectedClass])
-  
+export default function Home({ data, user }: { data: Location[], user: any }) {
   return (
-    <>
-    <a href="workcation">go</a>
-    <div>
-      <select onChange={(e)=> setClass(Number(e.target.value))}>
-        <option value="">null</option>
-        {classes.map((cl,i) => (
-          <option key={i} value={cl.class_id}>{cl.title}</option>
-        ))}
-      </select>
+    <div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
+      <Header />
+      <div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
+        <SearchBar />
+        <main className="py-6 xl:flex-1 xl:overflow-x-hidden">
+          <p>{user?.email}</p>
+          {data.map((d, i) => <LocationCards data={d} key={i} />)}
+        </main>
+      </div>
     </div>
-    <div className="flex justify-between">
-      {(users as User[]).map((u,i) => (
-        <div className="border-b block w-full" key={i}>
-          <p className="border">{u.user_id}</p>
-          <p className="border">{u.last_name}</p>
-          <p className="border">{u.first_name}</p>
-          </div>
-      ))}
-    </div>
-    </>
   );
 }
 
+export const getServerSideProps = ctx.resolve('getServerSideProps')(
+  '/',
+  ['UsersController'])
+
+// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+//   // const session = await getServerSession(ctx.req, ctx.res, container.resolve('authOptions'))
+//   // if (!session) {
+//   //   return {
+//   //     redirect: {
+//   //       destination: "/signIn",
+//   //       permanent: false,
+//   //     },
+//   //   }
+//   // }
+//   // console.log(session)
+//   console.log('URL ', ctx.req.url)
+//   const data = getHousesData();
+//   return {
+//     props: {
+//       data,
+//       // user:session.user,
+//       // session: JSON.parse(JSON.stringify(session)),
+//     },
+//   }
+// }

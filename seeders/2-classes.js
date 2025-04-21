@@ -13,7 +13,9 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-
+     function rand(max) {
+      return Math.floor(Math.random() * max);
+    }
     const results = (await queryInterface.sequelize.query(`
         SELECT user_id FROM users
         WHERE role='teacher' AND status='active';
@@ -31,10 +33,12 @@ module.exports = {
      `);
 
     for (let i = 0; i < 12; i++) {
-      const teacher_id = teachers[i].user_id;
+      const teacher_id = teachers[rand(12)].user_id;
       const title = (i+1).toString();
       const year = 2025;
       const status = 'active';
+
+      console.log('---- added class: ', i)
 
 
       const sql = `INSERT INTO classes

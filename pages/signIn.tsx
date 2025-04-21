@@ -1,3 +1,6 @@
+import { authOptions } from "@/pages/api/auth/[...nextauth]"
+import { GetServerSidePropsContext } from "next"
+import { getServerSession } from "next-auth"
 import { About, SignIn, Register } from "@/components/signIn";
 import { useState } from "react"
 
@@ -30,4 +33,19 @@ export default function Home() {
       </div>
     </div>
   </div>
+}
+
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+  console.log('redirect')
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      }
+    }
+  }
+  return {props:{}}
 }

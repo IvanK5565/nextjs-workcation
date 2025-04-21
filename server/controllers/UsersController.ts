@@ -1,45 +1,47 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import BaseContext from "../BaseContext";
-import { Op } from "sequelize";
-import IContextContainer from "../IContextContainer";
 import BaseController from "./BaseController";
-import { DEFAULT_LIMIT, DEFAULT_PAGE, FilterType } from "../constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, StringMap, UserRole } from "../utils/constants";
 import { IService } from "../services";
-import { DELETE, GET, POST, RouteMetaData, USE } from "@/server/API/decorators";
+import { DELETE, GET, POST, SSR, USE } from "@/server/controllers/decorators";
+import type { SSRRequest } from "../utils/getServerSideProps";
+import { getHousesData } from "@/pages/api/data";
 
-@USE((req,res,next)=>next())
+// @USE((req, res, next) => next())
 export default class UsersController extends BaseController {
-  
+
   protected getService(): IService {
     return this.di.UsersService
   }
 
-  @GET('api/register')
-  public actionRegister(req: NextApiRequest, res: NextApiResponse){
-    console.log("ACTION REGISTER");
-    res.send("ACTION REGISTER");
+  @SSR('/')
+  public async getData(_req: SSRRequest) {
+    const data = getHousesData();
+    console.log("USERS SSR getData ", data)
+    return {data}
   }
 
-  public actionLogin(req: NextApiRequest, res: NextApiResponse) {
+  @SSR('classes/[id]')
+  public getTeachersSSR(req: NextApiRequest){
+    return this.di.UsersService.findByFilter(100, 1, { role: UserRole.TEACHER })
+    .then(teachers => ({teachers}))
+  }
+
+  @GET('api/register')
+  public actionRegister(req: NextApiRequest) {
+    console.log("ACTION REGISTER");
+    return "ACTION REGISTER";
+  }
+
+  @GET('api/login')
+  public actionLogin(req: NextApiRequest) {
     const { email, password } = req.query;
-    this.di.UsersService.getOneByFilter(req.query as FilterType)
-    .then(result => {
-      res.status(200).json(result);
-    })
-    .catch(e => {
-      console.error('Error in UsersController: ', e)
-    })
+    return this.di.UsersService.signIn(email as string, password as string);
   }
 
   @POST('api/users')
   @POST('api/users/[id]')
-  public save(req: NextApiRequest, res: NextApiResponse) {
-    this.service.save(req.body)
-      .catch(e => {
-        console.error("save classes ", e);
-        res.status(500).send(e);
-      })
-      .then(x => res.status(200).send(x));
+  public save(req: NextApiRequest) {
+    return this.di.UsersService.save(req.body);
   }
 
   @GET('api/users/[id]')
@@ -50,32 +52,18 @@ export default class UsersController extends BaseController {
       res.status(500).send("Invalid id");
       return;
     }
-    this.service.findById(numId)
-      .catch(e => {
-        console.error("Error in getting by id: ", e);
-        res.status(500).send(e);
-      })
-      .then(results => {
-        res.status(200).send(results);
-      });
+    return this.di.UsersService.findById(numId);
   }
 
   @GET('api/users')
   public findByFilter(req: NextApiRequest, res: NextApiResponse) {
-    const { limit, page, ...filters } = req.query as FilterType;
+    const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
     if (isNaN(parsedPage)) parsedPage = DEFAULT_PAGE;
 
-    this.service.findByFilter(parsedLimit, Math.max(1, parsedPage), filters)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesService.get: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.UsersService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }
 
   @DELETE('api/users')
@@ -85,13 +73,6 @@ export default class UsersController extends BaseController {
       res.status(500).send('Invalid id');
     }
 
-    this.service.delete(id)
-      .then(results => {
-        res.status(200).send(results);
-      })
-      .catch(e => {
-        console.error("Error in ClassesController.delete: ", e);
-        res.status(500).send(e);
-      });
+    return this.di.UsersService.delete(id);
   }
 }

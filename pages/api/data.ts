@@ -1,4 +1,4 @@
-
+"use client"
 
 export type Location = {
   title: string;
@@ -143,7 +143,7 @@ const DallasLoc: Location = {
   ]
 }
 
-export async function getHousesData(): Promise<Location[]> {
+export function getHousesData(): Location[] {
 
   const data: Location[] = [
     LosAngelesLoc,

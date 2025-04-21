@@ -1,6 +1,7 @@
 import { useState } from "react"
 import clsx from "clsx";
 import Dropdown from "./Dropdown";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
   const [isNavOpen, setNavOpen] = useState(false);
@@ -35,6 +36,7 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
         <a href="" className="block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:text-sm sm:px-2 xl:text-gray-900">List your property</a>
         <a href="" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Trips</a>
         <a href="" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Messages</a>
+        <a href="/admin" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Admin</a>
       </div>
       <div className="relative px-5 py-5 sm:py-0 sm:ml-4 sm:px-0">
         <div className="flex items-center sm:hidden">
@@ -45,7 +47,7 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
         <div className="mt-5 sm:hidden">
           <a href="#account" className="mt-3 block text-gray-400 hover:text-white">Account settings</a>
           <a href="#support" className="mt-3 block text-gray-400 hover:text-white">Support</a>
-          <a href="#sign-out" className="mt-3 block text-gray-400 hover:text-white">Sign out</a>
+          <a href="/signIn" onClick={()=>signOut()} className="mt-3 block text-gray-400 hover:text-white">Sign out</a>
         </div>
         <Dropdown className="hidden sm:block"
           content={<div className="mt-3 bg-white xl:border rounded-lg w-48 py-2 shadow-xl">
@@ -53,7 +55,7 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
               className="block hover:text-white text-gray-800 px-4 py-2 hover:bg-indigo-500">Account Settings</a>
             <a href=""
               className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500">Support</a>
-            <a href=""
+            <a href="/signIn" onClick={()=>signOut()}
               className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500">Sign Out</a>
           </div>}
           trigger={<span className="block h-8 w-8 overflow-hidden rounded-full border-2 border-white xl:border-indigo-500">
