@@ -18,13 +18,8 @@ export default class ClassesController extends BaseController {
 
   @POST('api/classes')
   @POST('api/classes/[id]')
-  public save(req: NextApiRequest, res: NextApiResponse) {
-    this.di.ClassesService.save(req.body)
-      .catch(e => {
-        console.error("save classes ", e);
-        res.status(500).send(e);
-      })
-      .then(x => res.status(200).send(x));
+  public save(req: NextApiRequest) {
+    return this.di.ClassesService.save(req.body);
   }
 
 
@@ -57,11 +52,8 @@ export default class ClassesController extends BaseController {
   }
 
   @DELETE('api/classes/[i]')
-  public deleteById(req: NextApiRequest, res: NextApiResponse) {
+  public deleteById(req: NextApiRequest) {
     const id = Number(req.query.id);
-    if (isNaN(id)) {
-      res.status(500).send('Invalid id');
-    }
 
     return this.di.ClassesService.delete(id);
   }

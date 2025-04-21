@@ -14,23 +14,19 @@ export default class SubjectsController extends BaseController {
   
   @POST('api/subjects')
   @POST('api/subjects/[id]')
-  public save(req: NextApiRequest, res: NextApiResponse) {
+  public save(req: NextApiRequest) {
     return this.di.SubjectsService.save(req.body);
   }
 
   @GET('api/subjects/[id]')
-  public findById(req: NextApiRequest, res: NextApiResponse) {
+  public findById(req: NextApiRequest) {
     const { id } = req.query;
     const numId = Number(id);
-    if (isNaN(numId) || numId <= 0) {
-      res.status(500).send("Invalid id");
-      return;
-    }
     return this.di.SubjectsService.findById(numId);
   }
 
   @GET('api/subjects')
-  public findByFilter(req: NextApiRequest, res: NextApiResponse) {
+  public findByFilter(req: NextApiRequest) {
     const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
@@ -41,11 +37,8 @@ export default class SubjectsController extends BaseController {
   }
 
   @DELETE('api/subjects')
-  public deleteById(req: NextApiRequest, res: NextApiResponse) {
+  public deleteById(req: NextApiRequest) {
     const id = Number(req.query.id);
-    if (isNaN(id)) {
-      res.status(500).send('Invalid id');
-    }
 
     return this.di.SubjectsService.delete(id);
   }

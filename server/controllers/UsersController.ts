@@ -45,18 +45,14 @@ export default class UsersController extends BaseController {
   }
 
   @GET('api/users/[id]')
-  public findById(req: NextApiRequest, res: NextApiResponse) {
+  public findById(req: NextApiRequest) {
     const { id } = req.query;
     const numId = Number(id);
-    if (isNaN(numId) || numId <= 0) {
-      res.status(500).send("Invalid id");
-      return;
-    }
     return this.di.UsersService.findById(numId);
   }
 
   @GET('api/users')
-  public findByFilter(req: NextApiRequest, res: NextApiResponse) {
+  public findByFilter(req: NextApiRequest) {
     const { limit, page, ...filters } = req.query as StringMap;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
@@ -67,12 +63,8 @@ export default class UsersController extends BaseController {
   }
 
   @DELETE('api/users')
-  public deleteById(req: NextApiRequest, res: NextApiResponse) {
+  public deleteById(req: NextApiRequest) {
     const id = Number(req.query.id);
-    if (isNaN(id)) {
-      res.status(500).send('Invalid id');
-    }
-
     return this.di.UsersService.delete(id);
   }
 }
