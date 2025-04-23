@@ -1,9 +1,9 @@
 import { IService } from ".";
 import BaseContext from "../BaseContext";
-import { StringMap } from "../utils/constants";
+import { StringRecord } from "../utils/constants";
 
 export default class UserClassesService extends BaseContext implements IService {
-  public async save(body:StringMap) {
+  public async save(body:StringRecord<string>) {
     const Model = this.di.UserClassesModel;
     const {id,...fields} = body;
     let model = Model.build();
@@ -33,7 +33,7 @@ export default class UserClassesService extends BaseContext implements IService 
       },
     });
   }
-  public findByFilter(limit: number, page: number, filters?: StringMap) {
+  public findByFilter(limit: number, page: number, filters?: StringRecord<string>) {
     return this.di.UserClassesModel.findAll(filters);
   }
   public delete(id: number) {

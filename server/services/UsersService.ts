@@ -1,6 +1,6 @@
 import { IService } from ".";
 import BaseContext from "../BaseContext";
-import { StringMap } from "../utils/constants";
+import { StringRecord } from "../utils/constants";
 
 export default class UsersService extends BaseContext implements IService  {
   signIn(email: string, password: string) {
@@ -11,7 +11,7 @@ export default class UsersService extends BaseContext implements IService  {
       }
     })
   }
-  public async save(body:StringMap) {
+  public async save(body:StringRecord<string>) {
     const Model = this.di.UsersModel;
     const {id,...fields} = body;
     let model = Model.build();
@@ -32,14 +32,14 @@ export default class UsersService extends BaseContext implements IService  {
   public findById(id: number) {
     return this.di.UsersModel.findByPk(id);
   }
-  public findByFilter(limit: number, page: number, filters?: StringMap) {
+  public findByFilter(limit: number, page: number, filters?: StringRecord<string>) {
     return this.di.UsersModel.findAll({
       where: filters,
       limit,
       offset: limit*(page-1),
     });
   }
-  public getOneByFilter(filters?: StringMap) {
+  public getOneByFilter(filters?: StringRecord<string>) {
     return this.di.UsersModel.findOne({
       where: filters,
     });

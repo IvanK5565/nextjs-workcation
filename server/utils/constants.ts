@@ -28,7 +28,7 @@ export enum LectureStatus{
 
 export const SALT_ROUNDS = 10
 
-export type StringMap = Record<string,string>
+export type StringRecord<T> = Record<string,T>
 export const DEFAULT_LIMIT = 100;
 export const DEFAULT_PAGE = 1;
 

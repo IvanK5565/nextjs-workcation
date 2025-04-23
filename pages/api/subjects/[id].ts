@@ -22,4 +22,4 @@ router
 //   },
 // });
 
-export default controller.handler('api/subjects/[id]');
+export default controller.handler('/api/subjects/[id]');

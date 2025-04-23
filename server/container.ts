@@ -5,7 +5,7 @@ import models, { Associations } from './models'
 import controllers from './controllers';
 import services from './services';
 import IContextContainer from './IContextContainer';
-import getServerSidePropsContainer from './utils/getServerSideProps';
+import getServerSidePropsContainer from './SSR/getServerSideProps';
 import authOptions from '@/server/API/authOptions'
 
 const container = createContainer<IContextContainer>({

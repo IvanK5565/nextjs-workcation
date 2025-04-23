@@ -1,10 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import BaseContext from "../BaseContext";
-import { Op } from "sequelize";
+import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
-import IContextContainer from "../IContextContainer";
 import { DELETE, GET, POST, USE } from "./decorators";
-import { StringMap, DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
+import { StringRecord, DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
 import { IService } from "../services";
 
 @USE((req,res,next)=>next())
@@ -12,22 +9,22 @@ export default class SubjectsController extends BaseController {
 
   protected getService(): IService { return this.di.SubjectsService }
   
-  @POST('api/subjects')
-  @POST('api/subjects/[id]')
+  @POST('/api/subjects')
+  @POST('/api/subjects/[id]')
   public save(req: NextApiRequest) {
     return this.di.SubjectsService.save(req.body);
   }
 
-  @GET('api/subjects/[id]')
+  @GET('/api/subjects/[id]')
   public findById(req: NextApiRequest) {
     const { id } = req.query;
     const numId = Number(id);
     return this.di.SubjectsService.findById(numId);
   }
 
-  @GET('api/subjects')
+  @GET('/api/subjects')
   public findByFilter(req: NextApiRequest) {
-    const { limit, page, ...filters } = req.query as StringMap;
+    const { limit, page, ...filters } = req.query as StringRecord<string>;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
@@ -36,7 +33,7 @@ export default class SubjectsController extends BaseController {
     return this.di.SubjectsService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }
 
-  @DELETE('api/subjects')
+  @DELETE('/api/subjects')
   public deleteById(req: NextApiRequest) {
     const id = Number(req.query.id);
 

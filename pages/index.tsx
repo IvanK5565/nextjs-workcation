@@ -24,25 +24,3 @@ export default function Home({ data, user }: { data: Location[], user: any }) {
 export const getServerSideProps = ctx.resolve('getServerSideProps')(
   '/',
   ['UsersController'])
-
-// export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-//   // const session = await getServerSession(ctx.req, ctx.res, container.resolve('authOptions'))
-//   // if (!session) {
-//   //   return {
-//   //     redirect: {
-//   //       destination: "/signIn",
-//   //       permanent: false,
-//   //     },
-//   //   }
-//   // }
-//   // console.log(session)
-//   console.log('URL ', ctx.req.url)
-//   const data = getHousesData();
-//   return {
-//     props: {
-//       data,
-//       // user:session.user,
-//       // session: JSON.parse(JSON.stringify(session)),
-//     },
-//   }
-// }

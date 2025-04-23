@@ -22,4 +22,4 @@ router
 //   },
 // });
 
-export default controller.handler('api/users')
+export default controller.handler('/api/users')

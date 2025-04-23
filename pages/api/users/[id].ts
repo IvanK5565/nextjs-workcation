@@ -23,4 +23,4 @@ router
 //   },
 // });
 
-export default controller.handler('api/users/[id]')
+export default controller.handler('/api/users/[id]')

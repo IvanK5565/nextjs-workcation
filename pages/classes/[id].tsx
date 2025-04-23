@@ -1,10 +1,8 @@
 import ctx from "@/server/container";
-import { IncomingMessage } from "http";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { FormEvent } from "react";
 import 'reflect-metadata';
-import { Classes as Class } from "@/server/models/classes";
-import { Users as User } from "@/server/models/users";
+import type { Classes as Class } from "@/server/models/classes";
+import type { Users as User } from "@/server/models/users";
 import Button from "@/components/ui/button";
 
 
@@ -14,13 +12,14 @@ export default function Home({
 }: { teachers: User[], _class: Class }) {
   const handleSubmit = async (e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const id = data.get('class_id')?.toString();
-    console.log(id);
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+    const id = formData.get('class_id')?.toString();
+    console.log(JSON.parse(JSON.stringify(data)));
     
     await fetch(`/api/classes/${id}`,{
       method:'POST',
-      body:data,
+      body:JSON.parse(JSON.stringify(data)),
     })
   }
   return <>
@@ -49,18 +48,6 @@ export default function Home({
   </>
 }
 
-
-
-// export const getServerSideProps = (async (context:GetServerSidePropsContext) => {
-//   const { res, query } = context
-//   const req = context.req as SSRRequest;
-//   req.query = query;
-  
-//   const handler = ctx.resolve('ClassesController').handlerSSR('classes/[id]');
-//   const result = await handler(req as any,res as any) as {props:any};
-//   return result;
-// })satisfies GetServerSideProps;
-
 export const getServerSideProps = ctx.resolve('getServerSideProps')(
-  'classes/[id]',
+  '/classes/[id]',
   ['ClassesController', 'UsersController'])

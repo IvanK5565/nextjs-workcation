@@ -21,4 +21,4 @@ router
 //   },
 // });
 
-export default controller.handler('api/subjects');
+export default controller.handler('/api/subjects');

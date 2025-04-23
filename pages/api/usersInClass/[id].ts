@@ -23,4 +23,4 @@ const controller = ctx.resolve("UserClassesController");
 //   },
 // });
 
-export default controller.handler('api/usersInClass/[id]');
+export default controller.handler('/api/usersInClass/[id]');

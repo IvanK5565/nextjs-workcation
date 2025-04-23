@@ -1,10 +1,10 @@
 import { IService } from ".";
 import BaseContext from "../BaseContext";
-import { StringMap } from "../utils/constants";
+import { StringRecord } from "../utils/constants";
 
 export default class SubjectsService extends BaseContext implements IService {
   
-  public async save(body:StringMap) {
+  public async save(body:StringRecord<string>) {
     const subjects = this.di.SubjectsModel;
     const {id,...fields} = body;
     let model = subjects.build();
@@ -25,7 +25,7 @@ export default class SubjectsService extends BaseContext implements IService {
   public findById(id: number) {
     return this.di.SubjectsModel.findByPk(id);
   }
-  public findByFilter(limit: number, page: number, filters?: StringMap) {
+  public findByFilter(limit: number, page: number, filters?: StringRecord<string>) {
     return this.di.SubjectsModel.findAll({where:filters, limit:limit, offset:limit*(page-1)});
   }
   public delete(id: number) {
