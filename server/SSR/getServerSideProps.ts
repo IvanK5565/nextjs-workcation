@@ -1,14 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import IContextContainer from "../IContextContainer";
 import { IControllerContainer } from "../controllers";
-import { IncomingMessage } from "http";
 
 type RouterRun = ((req: NextApiRequest, res: NextApiResponse) => Promise<any>)
-// type SSRRequest = IncomingMessage &
-// {
-//   query?: Partial<{ [key: string]: string | string[]; }>,
-//   body?: Partial<{ [key: string]: string | string[]; }>,
-// }
 
 export default function getServerSidePropsContainer(ctx: IContextContainer) {
   return <K extends keyof IControllerContainer>(route: string, controllersNames: K[]): GetServerSideProps => {
@@ -18,9 +12,9 @@ export default function getServerSidePropsContainer(ctx: IContextContainer) {
       let props = {};
 
       try {
-        const promises = controllersNames.map((name) => {
+            const promises = controllersNames.map((name) => {
           let ctrl = ctx[name];
-          let handler:RouterRun = ctrl.handler(route, true);
+          let handler:RouterRun = ctrl.handler();
           return handler(req, context.res as NextApiResponse);
         })
         let results = await Promise.all(promises)

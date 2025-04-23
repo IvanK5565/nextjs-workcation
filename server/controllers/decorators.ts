@@ -1,11 +1,11 @@
 import { Endpoint, Middleware } from "./BaseController";
 
-const getMetadata = (key: string, target: any, propertyKey?: string) => propertyKey ?
-  Reflect.getMetadata(key, target, propertyKey)
-  : Reflect.getMetadata(key, target.prototype);
-const setMetadata = (key: string, value: any, target: any, propertyKey?: string) => propertyKey ?
-  Reflect.defineMetadata(key, value, target, propertyKey)
-  : Reflect.defineMetadata(key, value, target.prototype);
+// const getMetadata = (key: string, target: any, propertyKey?: string) => propertyKey ?
+//   Reflect.getMetadata(key, target, propertyKey)
+//   : Reflect.getMetadata(key, target.prototype);
+// const setMetadata = (key: string, value: any, target: any, propertyKey?: string) => propertyKey ?
+//   Reflect.defineMetadata(key, value, target, propertyKey)
+//   : Reflect.defineMetadata(key, value, target.prototype);
 
 const createEndpointDecorator = (route: string, method: string) => (target: any, propertyKey: string) => {
   let endpoints: Endpoint[] = Reflect.getMetadata(route, target) ?? [];
@@ -21,7 +21,16 @@ export const DELETE = (route: string) => createEndpointDecorator(route, 'delete'
 export const PUT = (route: string) => createEndpointDecorator(route, 'put');
 
 export const USE = (middleware: Middleware) => (target: any, propertyKey?: string) => {
-  let middlewares: Middleware[] = getMetadata('middlewares', target, propertyKey) ?? [];
+  let middlewares: Middleware[] = Reflect.getMetadata(
+    'middlewares', 
+    propertyKey ? target : target.prototype, 
+    propertyKey ?? '') ?? [];
+
   middlewares.push(middleware);
-  setMetadata('middlewares', middlewares, target, propertyKey)
+
+  Reflect.defineMetadata(
+    'middlewares',
+    middlewares,
+    propertyKey ? target : target.prototype, 
+    propertyKey ?? '')
 }
