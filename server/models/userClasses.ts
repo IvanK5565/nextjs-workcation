@@ -1,8 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
 
-class UserClasses extends Model {
-  declare user_class_id: number;
+export class UserClasses extends Model {
+  declare id: number;
   declare class_id: number;
   declare student_id: number;
   declare createdAt: Date;
@@ -15,7 +15,7 @@ export default (ctx: IContextContainer) => {
 
   UserClasses.init(
     {
-      user_class_id: {
+      id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -26,7 +26,7 @@ export default (ctx: IContextContainer) => {
         allowNull: false,
         references: {
           model: 'Classes',
-          key: 'class_id', // Assuming Classes has a 'class_id' column as the primary key
+          key: 'id', // Assuming Classes has a 'id' column as the primary key
         },
       },
       student_id: {

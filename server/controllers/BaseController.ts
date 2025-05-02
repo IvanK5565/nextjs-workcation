@@ -1,114 +1,102 @@
-import BaseContext from "../BaseContext";
-import { createRouter, NextHandler } from "next-connect";
-import { NextApiRequest, NextApiResponse } from "next";
-import { StringRecord } from "../utils/constants";
-import { Model } from "sequelize";
-import { IncomingMessage } from "http";
-
-type ApiResult = any;
-export type Middleware = (
-	req: NextApiRequest,
-	res: NextApiResponse,
-	next: NextHandler,
-) => ApiResult | Promise<ApiResult>;
-export type Endpoint = {
-	method: string;
-	handler: string;
-};
-type ActionAdapter = (
-	req: NextApiRequest,
-	res: NextApiResponse,
-) => Promise<any>;
-type Action = (
-	req: NextApiRequest,
-) => Promise<StringRecord<string> | Model | Model[]>;
-
-class ApiError extends Error {
-	public code: number;
-	constructor(mess: string, code: number) {
-		super(mess);
-		this.code = code;
-	}
-}
+import BaseContext from "@/server/BaseContext";
+import { createRouter } from "next-connect";
+import { NextApiRequest,NextApiResponse } from "next";
+import { ActionError, ApiError, NotAllowedError } from "@/server/exceptions";
+import { StatusCodes } from "http-status-codes";
+import {
+	ActionAdapter,
+	Action,
+	Middleware,
+	AnswerType,
+	MethodHandler,
+	Handler,
+	ActionResult,
+	Response,
+	ActionProps,
+} from "@/types";
+import { getServerSession } from "next-auth";
+import { onSuccessResponse, onErrorResponse } from "@/server/utils";
 
 export default abstract class BaseController extends BaseContext {
 	private createAction(handler: string): ActionAdapter {
-		return (req: NextApiRequest, _res: NextApiResponse) => {
+		return (req, res) => {
 			const fn: Action = (this as any)[handler].bind(this);
-			return fn(req)
+			return this.getActionProps(req, res)
+				.then((props) => fn(props))
 				.then((results) => JSON.parse(JSON.stringify(results)))
 				.catch((error) => {
-					let mess = `Error in action: ${handler}\n\t${error.message}`;
-					console.error(mess);
-					throw new ApiError(mess, 500);
+					console.error(`Error in action: ${handler}. ${error}`);
+					throw error;
 				});
 		};
 	}
 
-	private getInvokeOutput(req: IncomingMessage) {
+	private async getActionProps(req: NextApiRequest, res: NextApiResponse): Promise<ActionProps> {
+		return {
+			query: req.query,
+			body: req.body,
+			session: await getServerSession(req, res, this.di.authOptions),
+		};
+	}
+
+	private getInvokeOutput(req: NextApiRequest) {
 		const symbols = Object.getOwnPropertySymbols(req);
 		const metaSymbol = symbols.find(
-			(sym) => sym.toString() === "Symbol(NextInternalRequestMeta)",
+			(sym) => sym.toString() === "Symbol(NextInternalRequestMeta)"
 		);
 		if (!metaSymbol) return null;
 
 		const meta = (req as any)[metaSymbol];
-		return meta?.invokeOutput || null;
+		if (!meta?.invokeOutput)
+			throw new ApiError(
+				"Path is UNKNOWN",
+				StatusCodes.INTERNAL_SERVER_ERROR,
+				AnswerType.Log
+			);
+		return meta.invokeOutput;
 	}
 
-	private createRouter(path: string, ssr?: boolean) {
+	private createRouter(path: string) {
 		const router = createRouter<NextApiRequest, NextApiResponse>();
-		router.use(async (_req, res, next) => {
-		 	try {
-				const data = await next();
-				return ssr ? data : res.status(200).json(data);
-			} catch (error) {
-				return ssr
-					? (error as ApiError)
-					: res
-							.status((error as ApiError).code)
-							.json((error as ApiError).message);
-			}
-		});
-		const globalUses: Middleware[] = (Reflect.getMetadata("middlewares", this, "") ?? []).reverse();
-		globalUses.forEach((middleware) => router.use(middleware));
 
-		const endpoints: Endpoint[] = Reflect.getMetadata(path, this) ?? [];
+		const globalUses: Middleware[] = (
+			Reflect.getMetadata("middlewares", this, "") ?? []
+		).reverse();
+		router.use("/", ...globalUses);
+
+		const endpoints: MethodHandler[] = Reflect.getMetadata(path, this) ?? [];
 		endpoints.forEach((e) => {
-			const middlewares = (Reflect.getMetadata("middlewares", this, e.handler || "") ?? []).reverse();
+			const middlewares = (
+				Reflect.getMetadata("middlewares", this, e.handler) ?? []
+			).reverse();
 			(router as any)[e.method](...middlewares, this.createAction(e.handler));
 		});
 
 		router.all((_req, _res) => {
-			throw new ApiError(`Method not allowed for path: ${path}`, 405);
+			throw new NotAllowedError();
 		});
 		return router;
 	}
 
-	public handler(): (
-		req: NextApiRequest,
-		res: NextApiResponse,
-	) => Promise<unknown>;
-	public handler(path?: string) {
-		if (path) {
+	public handler(): Handler;
+	public handler(_path: string): Handler;
+	public handler(_path?: string): Handler {
+		return async (req, res) => {
+			const path = _path ?? this.getInvokeOutput(req);
 			const ssr = !path.startsWith("/api/");
-			const router = this.createRouter(path, ssr);
-			return ssr
-				? router.run.bind(router)
-				: router.handler({
-						onError: (err, _req, res) => {
-							console.error("Error in handler: ", err);
-							res.status(500).json({
-								error: (err as Error).message,
-							});
-						},
-					});
-		}
-		return (req: NextApiRequest, res: NextApiResponse) => {
-			const path = this.getInvokeOutput(req);
-			const ssr = !path.startsWith("/api/");
-			const router = this.createRouter(path, ssr);
-			return router.run(req, res);
+			console.log('handler')
+			let response: Response;
+			try {
+				const router = this.createRouter(path);
+				const data = (await router.run(req, res)) as ActionResult;
+				response = onSuccessResponse(data);
+			} catch (e) {
+				console.log("API ERROR: ", e);
+				response = onErrorResponse(e as Error);
+			}
+
+			console.log("response ", response);
+			return ssr ? response : res.status(response.code).json(response);
 		};
 	}
 }

@@ -3,7 +3,7 @@ import { MouseEventHandler } from "react"
 
 
 type ButtonProps = {
-  children?: any,
+  children?: React.ReactNode|string,
   type?: "button" | "submit" | "reset",
   className?: string,
   onClick?: MouseEventHandler<HTMLButtonElement>,

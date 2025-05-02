@@ -3,12 +3,11 @@ import UsersService from "./UsersService";
 import ClassesService from "./ClassesService";
 import SubjectsService from "./SubjectsService";
 import UserClassesService from "./UserClassesService";
-import { StringRecord } from "../utils/constants";
 
 export interface IService {
-  save(body:StringRecord<string>):Promise<any>;
+  save(body:Record<string,string>):Promise<any>;
   findById(id:Number):Promise<any>;
-  findByFilter(limit: number, page: number, filters?: StringRecord<string>):Promise<any>;
+  findByFilter(limit: number, page: number, filters?: Record<string,string>):Promise<any>;
   delete(id: Number):Promise<any>;
 }
 

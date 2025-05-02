@@ -17,7 +17,7 @@ module.exports = {
       return Math.floor(Math.random() * max);
     }
     const results = (await queryInterface.sequelize.query(`
-        SELECT user_id FROM users
+        SELECT id FROM users
         WHERE role='teacher' AND status='active';
     `));
     const teachers = results[0];
@@ -25,7 +25,7 @@ module.exports = {
     await queryInterface.sequelize.query(`INSERT INTO classes
      (teacher_id, title, year, status)
      VALUES
-     ('${teachers[12].user_id}', 
+     ('${teachers[12].id}', 
      '11', 
      '2013', 
      'closed'
@@ -33,7 +33,7 @@ module.exports = {
      `);
 
     for (let i = 0; i < 12; i++) {
-      const teacher_id = teachers[rand(12)].user_id;
+      const teacher_id = teachers[rand(12)].id;
       const title = (i+1).toString();
       const year = 2025;
       const status = 'active';

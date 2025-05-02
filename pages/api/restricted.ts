@@ -1,7 +1,9 @@
+import container from "@/server/container"
+import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "./auth/[...nextauth]"
 
-export default async (req:any, res:any) => {
+export default async (req:NextApiRequest, res:NextApiResponse) => {
+  const authOptions = container.resolve('authOptions');
   const session = await getServerSession(req, res, authOptions)
 
   if (session) {

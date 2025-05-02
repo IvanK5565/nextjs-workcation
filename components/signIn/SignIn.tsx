@@ -1,14 +1,13 @@
 'use client'
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
 import Button from "../ui/button";
 import clsx from "clsx";
-import { Form, Formik, useFormik } from 'formik'
+import { Form, Formik } from 'formik'
 import MyTextInput from "../ui/textInput";
 import * as Yup from 'yup'
 
-export default function SignIn({ className, onRegister }: { className?: string, onRegister: Function }) {
+export default function SignIn({ className, onRegister }: { className?: string, onRegister: ()=>void }) {
   // const credentialsAction = (formData: FormData) => {
   //   signIn('credentials', { email, password });
   // }

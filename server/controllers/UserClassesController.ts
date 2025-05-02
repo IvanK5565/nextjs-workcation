@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
 import { DELETE, POST, GET } from "./decorators";
-import { StringRecord, DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
 
 export default class UserClassesController extends BaseController {
 
@@ -22,7 +22,7 @@ export default class UserClassesController extends BaseController {
 
   @GET('/api/usersInClass')
   public findByFilter(req: NextApiRequest) {
-    const { limit, page, ...filters } = req.query as StringRecord<string>;
+    const { limit, page, ...filters } = req.query as Record<string,string>;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;

@@ -1,8 +1,8 @@
-import { authOptions } from "@/pages/api/auth/[...nextauth]"
 import { GetServerSidePropsContext } from "next"
 import { getServerSession } from "next-auth"
 import { About, SignIn, Register } from "@/components/signIn";
 import { useState } from "react"
+import container from "@/server/container";
 
 enum Landing {
   About,
@@ -10,7 +10,7 @@ enum Landing {
   Register,
 }
 export default function Home() {
-  const [landing, setLanding] = useState(Landing.About);
+  const [landing, setLanding] = useState(Landing.Login);
   return <div className="bg-gray-100">
     <div className="px-8 py-8 max-w-xl mx-auto lg:max-w-full lg:px-0 lg:py-20 lg:relative lg:min-h-screen">
       <div className="xl:max-w-6xl lg:mx-auto">
@@ -37,9 +37,9 @@ export default function Home() {
 
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, authOptions);
-  console.log('redirect')
+  const session = await getServerSession(context.req, context.res, container.resolve('authOptions'));
   if (session) {
+    console.log('redirect from signIn to /');
     return {
       redirect: {
         destination: "/",

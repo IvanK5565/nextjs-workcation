@@ -1,9 +1,9 @@
-import { asFunction } from "awilix";
-import UsersModel,{ UsersType } from './users'
-import ClassesModel, { ClassesType } from './classes'
-import SubjectsModel, { SubjectsType } from './subjects'
-import UserClassesModel, { UserClassesType } from './userClasses'
-import JournalModel, { JournalType } from './journal'
+import { asFunction, AwilixContainer } from "awilix";
+import UsersModel,{ Users, UsersType } from './users'
+import ClassesModel, { Classes, ClassesType } from './classes'
+import SubjectsModel, { Subjects, SubjectsType } from './subjects'
+import UserClassesModel, { UserClasses, UserClassesType } from './userClasses'
+import JournalModel, { Journal, JournalType } from './journal'
 import IContextContainer from "../IContextContainer";
 
 export interface IModelContainer {
@@ -14,6 +14,14 @@ export interface IModelContainer {
   JournalModel: JournalType;
 }
 
+export {
+  Users,
+  Classes,
+  Subjects,
+  UserClasses,
+  Journal,
+}
+
 export default {
   UsersModel: asFunction(UsersModel).singleton(),
   ClassesModel: asFunction(ClassesModel).singleton(),
@@ -22,20 +30,14 @@ export default {
   JournalModel: asFunction(JournalModel).singleton(),
 };
 
-export function Associations(container: IContextContainer) {
+export function associateModels(container: AwilixContainer<IContextContainer>) {
   // Associations
 
-  // const Users = container.resolve("UsersModel");
-  // const Classes = container.resolve("ClassesModel");
-  // const Subjects = container.resolve("SubjectsModel");
-  // const UserClasses = container.resolve("UserClassesModel");
-  // const Journal = container.resolve("JournalModel");
-
-  const Users = container.UsersModel;
-  const Classes = container.ClassesModel;
-  const Subjects = container.SubjectsModel;
-  const UserClasses = container.UserClassesModel;
-  const Journal = container.JournalModel;
+  const Users = container.resolve('UsersModel');
+  const Classes = container.resolve('ClassesModel');
+  const Subjects = container.resolve('SubjectsModel');
+  const UserClasses = container.resolve('UserClassesModel');
+  const Journal = container.resolve('JournalModel');
 
   Users.hasMany(Classes, { foreignKey: 'teacher_id', as: 'classes' }); // Assuming `teacher_id` exists in Classes table
   Users.belongsToMany(Classes, { through: UserClasses, foreignKey: 'student_id', as: 'student_classes' });
@@ -45,9 +47,9 @@ export function Associations(container: IContextContainer) {
   Classes.belongsToMany(Users, { through: UserClasses, foreignKey: 'class_id', as: 'studentsInClass' });
   Classes.belongsTo(Users, { foreignKey: 'teacher_id', as: 'teacher' });
   Classes.hasMany(Journal, { foreignKey: 'class_id', as: 'class_marks', });
-
+  
   Subjects.hasMany(Journal, { foreignKey: 'subject_id', as: 'subjects_marks' });
-
+  
   Journal.belongsTo(Users, { foreignKey: 'student_id', as: 'student' });
   Journal.belongsTo(Subjects, { foreignKey: 'subject_id', as: 'subject' });
   Journal.belongsTo(Classes, { foreignKey: 'class_id', as: '_class' });

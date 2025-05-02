@@ -2,6 +2,7 @@
 
 //import { faker } from "@faker-js/faker";
 const { faker } = require('@faker-js/faker');
+const bcrypt = require('bcrypt');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -46,22 +47,32 @@ module.exports = {
       '${status}'
       );
       `
-      // console.log(sql);
       await queryInterface.sequelize.query(sql);
     }
-    const sql = `INSERT INTO users
+    
+    const adminPass = await bcrypt.hash('admin', 10);
+    await queryInterface.sequelize.query(`INSERT INTO users
     (first_name, last_name, email, password, role, status)
     VALUES
     ('ivan', 
     'admin', 
     'admin@admin.com', 
-    'admin', 
+    '${adminPass}', 
     'admin',
     'active'
     );
-    `
-    // console.log(sql);
-    await queryInterface.sequelize.query(sql);
+    `);
+    await queryInterface.sequelize.query(`INSERT INTO users
+    (first_name, last_name, email, password, role, status)
+    VALUES
+    ('Ivan', 
+    'Kozlovsky', 
+    'ivan.kz5565@gmail.com', 
+    '${adminPass}', 
+    'admin',
+    'active'
+    );
+    `);
   },
 
   async down(queryInterface, Sequelize) {

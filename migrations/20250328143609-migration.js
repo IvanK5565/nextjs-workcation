@@ -13,7 +13,7 @@ module.exports = {
       \`first_name\` varchar(45) NOT NULL,
       \`last_name\` varchar(45) NOT NULL,
       \`email\` varchar(45) NOT NULL,
-      \`password\` varchar(45) NOT NULL,
+      \`password\` varchar(100) NOT NULL,
       \`role\` enum('admin','teacher','student') NOT NULL,
       \`status\` enum('active','banned','graduated','fired') DEFAULT NULL,
       \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -28,6 +28,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.sequelize.query(`DROP TABLE users`)
+    await queryInterface.sequelize.query(`DROP TABLE USERS`)
   }
 };

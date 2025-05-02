@@ -1,8 +1,8 @@
 import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
 
-class Subjects extends Model {
-  declare subject_id: number;
+export class Subjects extends Model {
+  declare id: number;
   declare name: string;
   declare description: string;
   declare createdAt: Date;
@@ -14,7 +14,7 @@ export type SubjectsType = typeof Subjects;
 export default (ctx: IContextContainer) => {
   Subjects.init(
     {
-      subject_id: {
+      id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

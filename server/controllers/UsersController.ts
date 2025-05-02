@@ -1,12 +1,13 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
-import { DEFAULT_LIMIT, DEFAULT_PAGE, StringRecord, UserRole } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole } from "../utils/constants";
 import { IService } from "../services";
-import { DELETE, GET, POST, USE/*, SSR*/ } from "@/server/controllers/decorators";
-import type { SSRRequest } from "../SSR/getServerSideProps";
+import { BODY, DELETE, GET, POST, USE/*, SSR*/ } from "@/server/controllers/decorators";
 import { getHousesData } from "@/pages/api/data";
+import type { ActionProps } from "@/types";
+import { hashPassword } from "../utils";
 
-// @USE((req, res, next) => next())
+// @USE(authMiddleware)
 export default class UsersController extends BaseController {
 
   protected getService(): IService {
@@ -15,7 +16,7 @@ export default class UsersController extends BaseController {
 
   // @SSR('/')
   @GET('/')
-  public async getData(_req: SSRRequest) {
+  public async getData() {
     const data = getHousesData();
     console.log("USERS SSR getData ", data)
     return {data}
@@ -23,15 +24,29 @@ export default class UsersController extends BaseController {
 
   // @SSR('/classes/[id]')
   @GET('/classes/[id]')
-  public getTeachersSSR(req: NextApiRequest){
+  public getTeachersSSR(){
     return this.di.UsersService.findByFilter(100, 1, { role: UserRole.TEACHER })
     .then(teachers => ({teachers}))
   }
 
-  @GET('/api/register')
-  public actionRegister(req: NextApiRequest) {
-    console.log("ACTION REGISTER");
-    return "ACTION REGISTER";
+  @BODY({
+    type: "object",
+    properties: {
+      id: {type:'integer', nullable:true},
+      first_name: { type: "string" },
+      last_name: { type: "string" },
+      email: { type: "string", format: "email" },
+      password: { type: "string", format: "password"  },
+      role: {type:'string'},
+      status:{type:'string'},
+    },
+    required:['first_name', 'last_name', 'email', 'password', 'role', 'status']
+  })
+  @POST('/api/register')
+  public async actionRegister({body}: ActionProps) {
+    const hPass = await hashPassword(body.password)
+    console.log({...body, password:hPass});
+    return this.di.UsersService.save({...body, password:hPass});
   }
 
   @GET('/api/login')
@@ -42,20 +57,20 @@ export default class UsersController extends BaseController {
 
   @POST('/api/users')
   @POST('/api/users/[id]')
-  public save(req: NextApiRequest) {
-    return this.di.UsersService.save(req.body);
+  public save({body}: ActionProps) {
+    return this.di.UsersService.save(body);
   }
 
   @GET('/api/users/[id]')
-  public findById(req: NextApiRequest) {
-    const { id } = req.query;
+  public findById({query}: ActionProps) {
+    const { id } = query!;
     const numId = Number(id);
     return this.di.UsersService.findById(numId);
   }
 
   @GET('/api/users')
-  public findByFilter(req: NextApiRequest) {
-    const { limit, page, ...filters } = req.query as StringRecord<string>;
+  public findByFilter({query}: ActionProps) {
+    const { limit, page, ...filters } = query as Record<string,string>;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
@@ -65,8 +80,8 @@ export default class UsersController extends BaseController {
   }
 
   @DELETE('/api/users')
-  public deleteById(req: NextApiRequest) {
-    const id = Number(req.query.id);
+  public deleteById({query}: ActionProps) {
+    const id = Number(query!.id);
     return this.di.UsersService.delete(id);
   }
 }

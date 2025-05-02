@@ -2,7 +2,7 @@ import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
 import { LectureStatus, LectureType } from '../utils/constants';
 
-class Journal extends Model{
+export class Journal extends Model{
   declare id: number;
   declare student_id: number;
   declare subject_id: number;
@@ -48,7 +48,7 @@ export default (ctx: IContextContainer) => {
       allowNull: false,
       references: {
         model: 'Classes',
-        key: 'class_id', // assuming Classes has a 'class_id' column as the primary key
+        key: 'id', // assuming Classes has a 'class_id' column as the primary key
       },
     },
     teacher_id: {

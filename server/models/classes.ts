@@ -2,8 +2,16 @@ import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
 import { ClassStatus } from '../utils/constants';
 
+export interface IClass{
+  id?: number,
+  teacher_id: number,
+  title: string,
+  year: number,
+  status: ClassStatus,
+}
+
 export class Classes extends Model {
-  declare class_id: number;
+  declare id: number;
   declare teacher_id: number;
   declare title: string;
   declare year: number;
@@ -18,7 +26,7 @@ export default (ctx: IContextContainer) => {
 
   Classes.init(
     {
-      class_id: {
+      id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

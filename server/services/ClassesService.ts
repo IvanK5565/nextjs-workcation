@@ -1,13 +1,12 @@
 import { Op } from "sequelize";
 import BaseContext from "../BaseContext";
-import { StringRecord } from "../utils/constants";
 import { IService } from ".";
 
 export default class ClassesService extends BaseContext implements IService {
-	public async save(body: StringRecord<string>) {
+	public async save(body: Record<string,string>) {
 		console.log("save: ");
-		console.log(body.class_id);
-		const { id: class_id, ...fields } = body;
+		const { class_id } = body;
+		console.log(class_id);
 		let model = this.di.ClassesModel.build();
 		if (class_id) {
 			let finded = await this.di.ClassesModel.findByPk(Number(class_id));
@@ -18,7 +17,8 @@ export default class ClassesService extends BaseContext implements IService {
 		}
 
 		/**********************/
-		model.set(fields);
+		model.set({...body, year:Number(body.year), teacher_id:Number(body.teacher_id)});
+		console.log(model)
 		return await model
 			.validate()
 			.catch((e) => Error(`Non-valid model: ${e}`))
@@ -33,7 +33,7 @@ export default class ClassesService extends BaseContext implements IService {
 	public findByFilter(
 		limit: number,
 		page: number,
-		filters?: StringRecord<string>,
+		filters?: Record<string, string>,
 	) {
 		if (filters && filters.title) {
 			const title = { [Op.like]: `%${filters.title}%` };

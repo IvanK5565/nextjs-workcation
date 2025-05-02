@@ -2,9 +2,9 @@ import Header from "@/components/Header";
 import LocationCards from "@/components/LocationCards";
 import SearchBar from "@/components/SearchBar";
 import { getHousesData, Location } from "@/pages/api/data";
+import container from "@/server/container";
 import { GetServerSidePropsContext } from "next";
 import { Session } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getServerSession } from "next-auth/next"
 
 export default function Home({ data, session }: { data: Location[], session:Session }) {
@@ -23,7 +23,7 @@ export default function Home({ data, session }: { data: Location[], session:Sess
 }
 
 export async function getServerSideProps(ctx:GetServerSidePropsContext) {
-  const session = await getServerSession(ctx.req, ctx.res, authOptions)
+  const session = await getServerSession(ctx.req, ctx.res, container.resolve('authOptions'))
   // if (!session) {
   //   return {
   //     redirect: {

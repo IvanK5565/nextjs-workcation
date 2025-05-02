@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize-typescript";
+import { Sequelize } from "sequelize";
 import IContextContainer from "./IContextContainer";
 
 function getSequelizeConnect(ctx: IContextContainer): Sequelize {

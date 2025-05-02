@@ -1,6 +1,6 @@
 import Button from "../ui/button";
 
-export default function About({className, onLogin}:{className?:string, onLogin:Function}) {
+export default function About({className, onLogin}:{className?:string, onLogin:()=>void}) {
   return <div className={className?className:""}>
     <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
       You can work from anywhere.
