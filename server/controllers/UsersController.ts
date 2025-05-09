@@ -1,11 +1,12 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
-import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole } from "@/constants";
 import { IService } from "../services";
-import { BODY, DELETE, GET, POST, USE/*, SSR*/ } from "@/server/controllers/decorators";
+import { BODY, DELETE, GET, POST, USE/*, SSR*/ } from "./decorators";
 import { getHousesData } from "@/pages/api/data";
 import type { ActionProps } from "@/types";
-import { hashPassword } from "../utils";
+import { GRANT, ROLE } from "@/acl/types";
+import { AccessDeniedError } from "../exceptions";
 
 // @USE(authMiddleware)
 export default class UsersController extends BaseController {
@@ -18,7 +19,6 @@ export default class UsersController extends BaseController {
   @GET('/')
   public async getData() {
     const data = getHousesData();
-    console.log("USERS SSR getData ", data)
     return {data}
   }
 
@@ -33,24 +33,26 @@ export default class UsersController extends BaseController {
     type: "object",
     properties: {
       id: {type:'integer', nullable:true},
-      first_name: { type: "string" },
-      last_name: { type: "string" },
+      firstName: { type: "string" },
+      lastName: { type: "string" },
       email: { type: "string", format: "email" },
       password: { type: "string", format: "password"  },
       role: {type:'string'},
       status:{type:'string'},
     },
-    required:['first_name', 'last_name', 'email', 'password', 'role', 'status']
+    required:['firstName', 'lastName', 'email', 'password', 'role', 'status']
   })
-  @POST('/api/register')
-  public async actionRegister({body}: ActionProps) {
-    const hPass = await hashPassword(body.password)
-    console.log({...body, password:hPass});
-    return this.di.UsersService.save({...body, password:hPass});
+  @POST('/api/register', {
+    allow: {
+      [ROLE.GUEST]:[GRANT.WRITE]
+    }
+  })
+  public async signUp({body}: ActionProps) {
+    return this.di.UsersService.save(body);
   }
 
   @GET('/api/login')
-  public actionLogin(req: NextApiRequest) {
+  public signIn(req: NextApiRequest) {
     const { email, password } = req.query;
     return this.di.UsersService.signIn(email as string, password as string);
   }
@@ -68,13 +70,19 @@ export default class UsersController extends BaseController {
     return this.di.UsersService.findById(numId);
   }
 
-  @GET('/api/users')
-  public findByFilter({query}: ActionProps) {
+  @GET('/api/users', {
+    allow: {
+      [ROLE.GUEST]:[GRANT.READ]
+    }
+  })
+  public findByFilter({query, guard}: ActionProps) {
     const { limit, page, ...filters } = query as Record<string,string>;
     let parsedLimit = Number(limit);
     let parsedPage = Number(page);
     if (isNaN(parsedLimit)) parsedLimit = DEFAULT_LIMIT;
     if (isNaN(parsedPage)) parsedPage = DEFAULT_PAGE;
+
+    if(!guard.allow(GRANT.READ)) throw new AccessDeniedError();
 
     return this.di.UsersService.findByFilter(parsedLimit, Math.max(1, parsedPage), filters);
   }

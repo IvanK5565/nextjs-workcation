@@ -1,48 +1,56 @@
 import { Model, DataTypes } from "sequelize";
-import IContextContainer from "../IContextContainer";
-import { UserStatus, UserRole } from "../utils/constants";
+import IContextContainer from "@/server/context/IContextContainer";
+import { UserStatus, UserRole } from "@/constants";
+import bcrypt from 'bcrypt';
 
 export interface IUser {
 	id?: number;
-	first_name: string;
-	last_name: string;
+	firstName: string;
+	lastName: string;
 	email: string;
 	password: string;
 	status: UserStatus;
 	role: UserRole;
 }
 
-export class Users extends Model {
+export class User extends Model {
 	declare id: number;
-	declare first_name: string;
-	declare last_name: string;
+	declare firstName: string;
+	declare lastName: string;
 	declare email: string;
 	declare emailVerified: Date;
 	declare password: string;
 	declare status: UserStatus;
 	declare role: UserRole;
-	declare createdAt: Date;
-	declare updatedAt: Date;
+	// declare createdAt: Date;
+	// declare updatedAt: Date;
+
+	public verifyPassword(plainPassword: string){
+		return bcrypt.compare(plainPassword, this.password);
+	}
 }
 
-export type UsersType = typeof Users;
+export type UserType = typeof User;
 
 export default (ctx: IContextContainer) => {
-	Users.init(
+	User.init(
 		{
 			id: {
 				type: DataTypes.INTEGER,
 				primaryKey: true,
 				autoIncrement: true,
 				allowNull: false,
+				field:'id',
 			},
-			first_name: {
+			firstName: {
 				type: DataTypes.STRING,
 				allowNull: false,
+				field:'firstName'
 			},
-			last_name: {
+			lastName: {
 				type: DataTypes.STRING,
 				allowNull: false,
+				field:'lastName'
 			},
 			email: {
 				type: DataTypes.STRING,
@@ -57,14 +65,15 @@ export default (ctx: IContextContainer) => {
 				validate: {
 					isDate: true, // Validates email format
 				},
+				field: 'emailVerified',
 			},
 			password: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				validate: {
 					len: {
-						args: [5, 100],
-						msg: "Password must be at least 5 characters.",
+						args: [4, 100],
+						msg: "Password must be at least 4 characters.",
 					},
 				},
 			},
@@ -105,11 +114,25 @@ export default (ctx: IContextContainer) => {
 		},
 		{
 			sequelize: ctx.db,
-			modelName: "Users",
+			modelName: "User",
 			tableName: "users",
 			timestamps: true,
 			underscored: true,
+			hooks:{
+				beforeCreate: async (user) => {
+					if (user.password) {
+						const salt = await bcrypt.genSalt(10);
+						user.password = await bcrypt.hash(user.password, salt);
+					}
+				},
+				beforeUpdate: async (user) => {
+					if (user.changed('password')) {
+						const salt = await bcrypt.genSalt(10);
+						user.password = await bcrypt.hash(user.password, salt);
+					}
+				}
+			}
 		}
 	);
-	return Users;
+	return User;
 };

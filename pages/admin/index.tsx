@@ -1,20 +1,35 @@
 import { useState } from "react";
-import NavBar from "./navbar";
+import NavBar from "@/components/admin/navbar";
 import Header from "@/components/Header";
 import { useSession } from "next-auth/react";
 import { Response } from "@/types";
+import { xRead } from "./xFetch";
+import { useDispatch, useSelector } from "react-redux";
+import { AddUsers } from "../store/action";
+import { User } from "@/server/models";
+import { State } from "../store/types";
 
 export default function Home() {
 	const [data, setData] = useState({});
 	const session = useSession();
+	const store = useSelector((state) => state as State);
+	const dispatch = useDispatch();
+	const [URL, setURL] = useState("NONE");
 
 	function onClick(url: string) {
-		console.log(url);
-		fetch(url, {
-			method: "GET",
-		})
-			.then((data) => data.json())
-			.then((data) => setData(data));
+		console.log("admin url:", url);
+		// fetch(url, {
+		// 	method: "GET",
+		// })
+		// 	.then((data) => data.json())
+		setURL(url);
+		xRead(url).then((data) => {
+			setData(data);
+			if (data.data && url.startsWith("/api/users")){
+				console.log('dispatch')
+				dispatch(AddUsers(data.data as User[]));
+			}
+		});
 	}
 	return (
 		<div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
@@ -23,9 +38,10 @@ export default function Home() {
 				<NavBar onClick={onClick} />
 				<main className="py-6 px-2 xl:flex-1 xl:overflow-x-hidden">
 					<p>{session.data?.user?.email}</p>
+					<p>{URL}</p>
 					<ResponseHeader res={data as Response} />
-					<DataBody data={(data as Response).data ?? null} />
-					{/* <pre className="border mt-1">{JSON.stringify(data, null, 2)}</pre> */}
+						{/* <DataBody data={(data as Response).data ?? null} /> */}
+						<DataBody data={store.classes ?? null} />
 				</main>
 			</div>
 		</div>

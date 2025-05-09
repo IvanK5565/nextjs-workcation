@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
-import { LectureStatus, LectureType } from '../utils/constants';
+import { LectureStatus, LectureType } from '@/constants';
 
 export class Journal extends Model{
   declare id: number;

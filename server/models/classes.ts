@@ -1,6 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
 import IContextContainer from '../IContextContainer';
-import { ClassStatus } from '../utils/constants';
+import { ClassStatus } from '@/constants';
 
 export interface IClass{
   id?: number,

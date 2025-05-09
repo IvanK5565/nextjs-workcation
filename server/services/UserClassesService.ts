@@ -1,5 +1,5 @@
 import { IService } from ".";
-import BaseContext from "../BaseContext";
+import BaseContext from "../context/BaseContext";
 
 export default class UserClassesService extends BaseContext implements IService {
   public async save(body:Record<string,string>) {
@@ -26,7 +26,7 @@ export default class UserClassesService extends BaseContext implements IService 
         class_id: id,
       },
       include: {
-        model: this.di.UsersModel,
+        model: this.di.UserModel,
         as: 'studentsInClass',
         // through: { attributes: [] },//hide junction table userClasses
       },

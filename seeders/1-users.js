@@ -16,10 +16,10 @@ module.exports = {
     */
     const seed_count = 200;
     for (let i = 0; i < seed_count; i++) {
-      const first_name = faker.person.firstName().replace('\'', '');
-      const last_name = faker.person.lastName().replace('\'', '');
-      const email = faker.internet.email({ firstName: first_name, lastName: last_name });
-      const password = faker.internet.password();
+      const firstName = faker.person.firstName().replace('\'', '');
+      const lastName = faker.person.lastName().replace('\'', '');
+      const email = faker.internet.email({ firstName: firstName, lastName: lastName });
+      const password = await bcrypt.hash(faker.internet.password(),10);
       const role = i % 10 > 0 ? 'student' : 'teacher';
       const status = (() => {
         if (i % 40 == 0) {
@@ -37,10 +37,10 @@ module.exports = {
       })()
       
       const sql = `INSERT INTO users
-      (first_name, last_name, email, password, role, status)
+      (firstName, lastName, email, password, role, status)
       VALUES
-      ('${first_name}', 
-      '${last_name}', 
+      ('${firstName}', 
+      '${lastName}', 
       '${email}', 
       '${password}', 
       '${role}',
@@ -52,7 +52,7 @@ module.exports = {
     
     const adminPass = await bcrypt.hash('admin', 10);
     await queryInterface.sequelize.query(`INSERT INTO users
-    (first_name, last_name, email, password, role, status)
+    (firstName, lastName, email, password, role, status)
     VALUES
     ('ivan', 
     'admin', 
@@ -63,7 +63,7 @@ module.exports = {
     );
     `);
     await queryInterface.sequelize.query(`INSERT INTO users
-    (first_name, last_name, email, password, role, status)
+    (firstName, lastName, email, password, role, status)
     VALUES
     ('Ivan', 
     'Kozlovsky', 

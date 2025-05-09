@@ -1,5 +1,5 @@
 import { IService } from ".";
-import BaseContext from "../BaseContext";
+import BaseContext from "../context/BaseContext";
 
 export default class SubjectsService extends BaseContext implements IService {
   

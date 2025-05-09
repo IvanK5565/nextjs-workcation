@@ -33,7 +33,7 @@ export default (ctx: IContextContainer) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: ctx.UsersModel,
+          model: ctx.UserModel,
           key: 'id', // Assuming Users has an 'id' column as the primary key
         },
       },

@@ -44,7 +44,7 @@ export default function Register({
 			<form className="flex flex-col" onSubmit={handleSubmit}>
 				<TextInput
 					type="text"
-					name="first_name"
+					name="firstName"
 					placeholder="John"
 					onChange={handleChange}
 				>
@@ -52,7 +52,7 @@ export default function Register({
 				</TextInput>
 				<TextInput
 					type="text"
-					name="last_name"
+					name="lastName"
 					placeholder="Doe"
 					onChange={handleChange}
 				>

@@ -5,6 +5,7 @@ export enum UserStatus{
   FIRED = 'fired',
 };
 export enum UserRole{
+  GUEST = 'guest',
   ADMIN = "admin",
   TEACHER = "teacher",
   STUDENT = "student",

@@ -1,4 +1,5 @@
 import merge from "lodash/merge";
+import { Logger } from "./server/logger";
 
 if (typeof document !== "undefined") {
 	throw new Error(
@@ -26,8 +27,8 @@ if (isDev) {
 	try {
 		localConfig = require("./config.local.ts");
 	} catch (ex) {
-		console.log("ex", ex);
-		console.log("config.local does not exist.");
+		Logger.error(ex);
+		Logger.error("config.local does not exist.");
 	}
 }
 

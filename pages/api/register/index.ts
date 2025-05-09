@@ -1,4 +1,4 @@
-import ctx from "@/server/container"
+import ctx from "@/server/context/container"
 
 const controller = ctx.resolve('UsersController');
 

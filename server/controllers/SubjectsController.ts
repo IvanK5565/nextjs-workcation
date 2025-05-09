@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
 import { DELETE, GET, POST, USE } from "./decorators";
-import { DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 import { IService } from "@/server/services";
 import { authMiddleware } from "@/server/lib/authMiddleware";
 

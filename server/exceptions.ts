@@ -1,3 +1,4 @@
+import i18 from "@/public/locales/en-US";
 import { AnswerType } from "@/types";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
@@ -23,7 +24,7 @@ class InternalError extends ApiError {
 
 class ValidateError extends ApiError {
 	constructor() {
-		super("Invalid data", StatusCodes.BAD_REQUEST, AnswerType.Toast);
+		super(i18.ValidateErrorMessage, StatusCodes.BAD_REQUEST, AnswerType.Toast);
 	}
 }
 
@@ -47,10 +48,32 @@ class ActionError extends ApiError {
 	}
 }
 
+class UnauthorizedError extends ApiError {
+	constructor() {
+		super(
+			ReasonPhrases.UNAUTHORIZED,
+			StatusCodes.UNAUTHORIZED,
+			AnswerType.Toast
+		);
+	}
+}
+
+class AccessDeniedError extends ApiError{
+	constructor(){
+		super(
+			'Access Denied',
+			StatusCodes.FORBIDDEN,
+			AnswerType.Toast,
+		)
+	}
+}
+
 export {
 	ApiError,
 	ValidateError,
 	NotAllowedError,
 	ActionError,
   InternalError,
+	UnauthorizedError,
+	AccessDeniedError,
 };

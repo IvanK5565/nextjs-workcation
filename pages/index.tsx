@@ -3,18 +3,18 @@ import LocationCards from "@/components/LocationCards";
 import NoData from "@/components/NoData";
 import SearchBar from "@/components/SearchBar";
 import type { Location } from "@/pages/api/data";
-import ctx from "@/server/container";
+import ctx from "@/server/context/container";
 import { User } from "next-auth";
 
 export default function Home({
-	data,
+	data: { data },
 	user,
 	...props
 }: {
-	data: Location[];
+	data: { data: Location[] };
 	user: User | undefined;
 }) {
-	console.log('Other props: ', props)
+	console.log("Other props: ", props);
 	return (
 		<div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
 			<Header />
@@ -22,7 +22,7 @@ export default function Home({
 				<SearchBar />
 				<main className="py-6 xl:flex-1 xl:overflow-x-hidden">
 					<p>{user?.email}</p>
-					{data ? (
+					{data && Array.isArray(data) ? (
 						data.map((d, i) => <LocationCards data={d} key={i} />)
 					) : (
 						<NoData />

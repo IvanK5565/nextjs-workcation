@@ -1,6 +1,6 @@
 // import { NextApiRequest, NextApiResponse } from 'next'
 // import { createRouter } from "next-connect";
-import ctx from '@/server/container'
+import ctx from '@/server/context/container'
 
 const controller = ctx.resolve("UserClassesController");
 

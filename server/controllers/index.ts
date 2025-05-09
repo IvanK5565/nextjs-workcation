@@ -1,4 +1,4 @@
-import { asClass } from "awilix";
+import { asClass, asFunction } from "awilix";
 import UsersController from "./UsersController";
 import ClassesController from "./ClassesController";
 import SubjectsController from "./SubjectsController";

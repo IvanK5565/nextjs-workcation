@@ -11,7 +11,7 @@ module.exports = {
      */
     await queryInterface.sequelize.query(`ALTER TABLE users 
     ADD UNIQUE INDEX email_UNIQUE (email ASC) VISIBLE;
-    ;`)
+    `)
   },
 
   async down (queryInterface, Sequelize) {
@@ -22,7 +22,7 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
      await queryInterface.sequelize.query(`ALTER TABLE users 
-     DROP INDEX email_UNIQUE ;
-     ;`)
+     DROP INDEX email_UNIQUE;
+     `)
   }
 };

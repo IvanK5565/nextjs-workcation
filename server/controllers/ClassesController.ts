@@ -1,8 +1,10 @@
-import { DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 import BaseController from "./BaseController";
 import type { ActionProps } from "@/types";
 import { BODY, DELETE, GET, POST, QUERY, USE /*,SSR*/ } from "./decorators";
 import { authMiddleware } from "../lib/authMiddleware";
+import { GRANT, ROLE } from "@/acl/types";
+import { AccessDeniedError } from "../exceptions";
 
 @USE((_req, _res, next) => {
 	console.log("CLASSES USE 1");
@@ -16,13 +18,21 @@ export default class ClassesController extends BaseController {
 	@QUERY({
 		type: "object",
 		properties: {
-			id: { type: "string", pattern:'^\\d+$' },
+			id: { type: "string", pattern: "^\\d+$" },
+		},
+	})
+	@GET("/classes/[id]", {
+		allow:{
+			[ROLE.ADMIN]:[GRANT.READ]
 		}
 	})
-	@GET("/classes/[id]")
 	@USE(authMiddleware)
-	public getEditClassDataSSR(props: ActionProps) {
-		const { id } = props.query!;
+	public getEditClassDataSSR({query, guard}: ActionProps) {
+		const { id } = query!;
+		if (!guard.allow(GRANT.READ)) {
+			throw new AccessDeniedError();
+		}
+
 		return this.di.ClassesService.findById(Number(id)).then((res) => ({
 			_class: res,
 		}));
@@ -37,13 +47,13 @@ export default class ClassesController extends BaseController {
 	@BODY({
 		type: "object",
 		properties: {
-			id: { type: "integer", nullable:true },
+			id: { type: "integer", nullable: true },
 			teacher_id: { type: "integer" },
 			title: { type: "string" },
 			year: { type: "integer" },
 			status: { type: "string" },
 		},
-		required:['teacher_id', 'title', 'year', 'status']
+		required: ["teacher_id", "title", "year", "status"],
 	})
 	public save({ body }: ActionProps) {
 		return this.di.ClassesService.save(JSON.parse(body!));
@@ -64,8 +74,8 @@ export default class ClassesController extends BaseController {
 	@QUERY({
 		type: "object",
 		properties: {
-			id: { type: "string", pattern:'^\\d+$' },
-		}
+			id: { type: "string", pattern: "^\\d+$" },
+		},
 	})
 	@GET("/api/classes/[id]")
 	public findById({ query }: ActionProps) {

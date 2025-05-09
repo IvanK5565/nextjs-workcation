@@ -1,12 +1,12 @@
 import { Op } from "sequelize";
-import BaseContext from "../BaseContext";
+import BaseContext from "../context/BaseContext";
 import { IService } from ".";
 
 export default class ClassesService extends BaseContext implements IService {
 	public async save(body: Record<string,string>) {
 		console.log("save: ");
 		const { class_id } = body;
-		console.log(class_id);
+		console.log('save id', class_id);
 		let model = this.di.ClassesModel.build();
 		if (class_id) {
 			let finded = await this.di.ClassesModel.findByPk(Number(class_id));
@@ -18,7 +18,7 @@ export default class ClassesService extends BaseContext implements IService {
 
 		/**********************/
 		model.set({...body, year:Number(body.year), teacher_id:Number(body.teacher_id)});
-		console.log(model)
+		console.log('save model:', model)
 		return await model
 			.validate()
 			.catch((e) => Error(`Non-valid model: ${e}`))

@@ -5,16 +5,19 @@ import {
 	NextApiRequest,
 	NextApiResponse,
 } from "next/types";
-import Model from "sequelize/types/model";
 import { IControllerContainer } from "./server/controllers";
 import { StatusCodes } from "http-status-codes";
+import Guard from "./acl/Guard";
+import { Classes, Subjects, User, UserClasses } from "./server/models";
 
 export type RouterRun = (
 	req: NextApiRequest,
 	res: NextApiResponse
 ) => Promise<any>;
 
-export type ActionResult = Model | Model[];
+export type Entity = User | Classes | Subjects | UserClasses;
+
+export type ActionResult = Entity | Entity[];
 
 export type Middleware = (
 	req: NextApiRequest,
@@ -35,6 +38,7 @@ export type ActionAdapter = (
 export type Action = (props: ActionProps) => Promise<ActionResult>;
 
 export enum AnswerType {
+	Data = 'data',
 	Log = "log",
 	Toast = "toast",
 }
@@ -49,11 +53,12 @@ export type Response = {
 export type Handler = (
 	req: NextApiRequest,
 	res: NextApiResponse
-) => Promise<Response | void>;
+) => Promise<ActionResult | void>;
 export type ActionProps = {
 	query?: Partial<{ [key: string]: string | string[] }>;
 	body?: any;
 	session: Session | null;
+	guard:Guard;
 };
 export type GSSPFactory = <K extends keyof IControllerContainer>(
 	controllersNames: K[],

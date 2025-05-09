@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import LocationCards from "@/components/LocationCards";
 import SearchBar from "@/components/SearchBar";
 import { getHousesData, Location } from "@/pages/api/data";
-import container from "@/server/container";
+import container from "@/server/context/container";
 import { GetServerSidePropsContext } from "next";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"

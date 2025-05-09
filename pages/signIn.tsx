@@ -2,7 +2,7 @@ import { GetServerSidePropsContext } from "next"
 import { getServerSession } from "next-auth"
 import { About, SignIn, Register } from "@/components/signIn";
 import { useState } from "react"
-import container from "@/server/container";
+import container from "@/server/context/container";
 
 enum Landing {
   About,
@@ -38,6 +38,7 @@ export default function Home() {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, container.resolve('authOptions'));
+  console.log('signIn session', session);
   if (session) {
     console.log('redirect from signIn to /');
     return {

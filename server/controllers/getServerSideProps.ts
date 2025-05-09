@@ -1,8 +1,10 @@
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
-import IContextContainer from "@/server/IContextContainer";
+import IContextContainer from "@/server/context/IContextContainer";
 import { IControllerContainer } from ".";
-import { AnswerType, Handler, Response } from "@/types";
+import { ActionResult, Handler } from "@/types";
 import { StatusCodes } from "http-status-codes";
+import { ApiError } from "../exceptions";
+import { onErrorResponse, onSuccessResponse } from "../utils";
 
 type GSSPFactory = <K extends keyof IControllerContainer>(
 	controllersNames: K[],
@@ -12,59 +14,50 @@ type GSSPFactory = <K extends keyof IControllerContainer>(
 export default function getServerSidePropsContainer(
 	ctx: IContextContainer
 ): GSSPFactory {
-	return (controllersNames, route?) =>
-		(async (context) => {
-			const req: NextApiRequest = Object.assign(context.req, {
-				query: context.query,
-				body: {},
-				env: {},
-			});
-			let props = {};
-			console.log("GSSP enter", context.resolvedUrl)
-			const promises = controllersNames.map((name) => {
-				let ctrl = ctx[name];
-				let handler: Handler = ctrl.handler();
-				return handler(req, context.res as NextApiResponse);
-			});
-			let results: (Response | void)[] = [];
-			try {
-				results = await Promise.all(promises);
-			} catch (error) {
-				console.error("GSSP ERROR: ", error);
-				return {
-					props: {
-						error: (error as Error).message,
-					},
-				};
-			}
+	return (controllersNames, route?) => async (context) => {
+		const req: NextApiRequest = Object.assign(context.req, {
+			query: context.query,
+			body: {},
+			env: {},
+		});
+		let props = {};
+		ctx.Logger.log("GSSP enter", context.resolvedUrl);
+		const promises = controllersNames.map((name) => {
+			let ctrl = ctx[name];
+			let handler: Handler = ctrl.handler(route);
+			return handler(req, context.res as NextApiResponse);
+		});
+		let results: (ActionResult | void)[] = [];
+		try {
+			results = await Promise.all(promises);
+		} catch (error) {
+			ctx.Logger.error("GSSP ERROR: ", error);
 
-			results = results.filter((v) => {
-				if (!v)
-					console.error(
-						"The handler did not respond. Maybe you need an API request instead?"
-					);
-				return !!v;
-			});
-
-			for (let i = 0; i < results.length; i++) {
-				let r = results[i];
-				if (r) {
-					if (r.code === StatusCodes.UNAUTHORIZED) {
-						return {
-							redirect: {
-								destination: "/signIn",
-								permanent: true,
-							},
-						};
-					}
-					if (!r.success) {
-						return { props: { error: r!.message } };
-					}
-					props = { ...props, ...r!.data };
+			if (error instanceof ApiError) {
+				if (error.code === StatusCodes.UNAUTHORIZED) {
+					return { redirect: { destination: "/signIn", permanent: true } };
 				}
 			}
+			const r = onErrorResponse(error as Error)
+			
 			return {
-				props,
+				props: r,
 			};
-		}) satisfies GetServerSideProps;
+		}
+
+		for (let i = 0; i < results.length; i++) {
+			let r = results[i];
+			if (r) {
+				props = { ...props, ...r };
+			} else {
+				ctx.Logger.error(
+					"The handler did not respond. Maybe you need an API request instead?"
+				);
+			}
+		}
+		props = onSuccessResponse(props);
+		return {
+			props,
+		};
+	};
 }

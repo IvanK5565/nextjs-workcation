@@ -27,7 +27,7 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           .required('Required'),
         password: Yup.string()
           .max(20, 'Must be 20 characters or less')
-          .min(5, 'Must be 5 characters or more')
+          .min(4, 'Must be 4 characters or more')
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting }) => {

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import clsx from "clsx";
 import Dropdown from "./Dropdown";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function Header() {
@@ -25,6 +25,7 @@ export default function Header() {
 }
 
 function Navigation({ isOpen }: { isOpen: boolean }) {
+  const session = useSession();
   return <nav className={clsx("sm:flex sm:items-center sm:px-4 xl:flex-1 xl:justify-between", { "hidden": !isOpen }, { "block": isOpen })}>
     <div className="hidden xl:block xl:relative xl:max-w-xs xl:w-full">
       <div className="absolute inset-y-0 left-0 flex items-center pl-2">
@@ -34,9 +35,9 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
     </div>
     <div className="sm:flex sm:items-center">
       <div className="px-2 pt-2 pb-5 border-b border-gray-800 sm:flex sm:border-b-0 sm:py-0 sm:px-0">
-        <Link href="" className="block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:text-sm sm:px-2 xl:text-gray-900">List your property</Link>
-        <Link href="" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Trips</Link>
-        <Link href="" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Messages</Link>
+        <Link href="/" className="block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:text-sm sm:px-2 xl:text-gray-900">List your property</Link>
+        <Link href="/" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Trips</Link>
+        <Link href="/" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Messages</Link>
         <Link href="/admin" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Admin</Link>
         <Link href="/classes/1" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Classes/1</Link>
       </div>
@@ -47,17 +48,18 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
           <span className="ml-4 font-semibold text-gray-200 sm:hidden">Isla Schoger</span>
         </div>
         <div className="mt-5 sm:hidden">
-          <Link href="#account" className="mt-3 block text-gray-400 hover:text-white">Account settings</Link>
-          <Link href="#support" className="mt-3 block text-gray-400 hover:text-white">Support</Link>
-          <Link href="/signIn" onClick={()=>signOut()} className="mt-3 block text-gray-400 hover:text-white">Sign out</Link>
+          <Link href="/" className="mt-3 block text-gray-400 hover:text-white">Account settings</Link>
+          <Link href="/" className="mt-3 block text-gray-400 hover:text-white">Support</Link>
+          <Link href="/signIn" onClick={()=>signOut({redirect:false})} className="mt-3 block text-gray-400 hover:text-white">Sign out</Link>
         </div>
         <Dropdown className="hidden sm:block"
           content={<div className="mt-3 bg-white xl:border rounded-lg w-48 py-2 shadow-xl">
+            <label className="block text-gray-800 px-4 pb-2 border-b">{session.data?.user.email}</label>
             <Link href=""
               className="block hover:text-white text-gray-800 px-4 py-2 hover:bg-indigo-500">Account Settings</Link>
             <Link href=""
               className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500">Support</Link>
-            <Link href="/signIn" onClick={()=>signOut()}
+            <Link href="/signIn" onClick={()=>signOut({redirect:false})}
               className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500">Sign Out</Link>
           </div>}
           trigger={<span className="block h-8 w-8 overflow-hidden rounded-full border-2 border-white xl:border-indigo-500">

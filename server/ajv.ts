@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import IContextContainer from "./IContextContainer";
+import IContextContainer from "@/server/context/IContextContainer";
 import addFormats from 'ajv-formats'
 
 export function getAjv(context: IContextContainer){

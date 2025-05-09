@@ -1,5 +1,5 @@
 import { asFunction, AwilixContainer } from "awilix";
-import UsersModel,{ Users, UsersType } from './users'
+import UserModel,{ User, UserType } from './users'
 import ClassesModel, { Classes, ClassesType } from './classes'
 import SubjectsModel, { Subjects, SubjectsType } from './subjects'
 import UserClassesModel, { UserClasses, UserClassesType } from './userClasses'
@@ -7,7 +7,7 @@ import JournalModel, { Journal, JournalType } from './journal'
 import IContextContainer from "../IContextContainer";
 
 export interface IModelContainer {
-  UsersModel: UsersType;
+  UserModel: UserType;
   ClassesModel: ClassesType;
   SubjectsModel: SubjectsType;
   UserClassesModel: UserClassesType;
@@ -15,7 +15,7 @@ export interface IModelContainer {
 }
 
 export {
-  Users,
+  User,
   Classes,
   Subjects,
   UserClasses,
@@ -23,7 +23,7 @@ export {
 }
 
 export default {
-  UsersModel: asFunction(UsersModel).singleton(),
+  UserModel: asFunction(UserModel).singleton(),
   ClassesModel: asFunction(ClassesModel).singleton(),
   SubjectsModel: asFunction(SubjectsModel).singleton(),
   UserClassesModel: asFunction(UserClassesModel).singleton(),
@@ -33,25 +33,25 @@ export default {
 export function associateModels(container: AwilixContainer<IContextContainer>) {
   // Associations
 
-  const Users = container.resolve('UsersModel');
+  const User = container.resolve('UserModel');
   const Classes = container.resolve('ClassesModel');
   const Subjects = container.resolve('SubjectsModel');
   const UserClasses = container.resolve('UserClassesModel');
   const Journal = container.resolve('JournalModel');
 
-  Users.hasMany(Classes, { foreignKey: 'teacher_id', as: 'classes' }); // Assuming `teacher_id` exists in Classes table
-  Users.belongsToMany(Classes, { through: UserClasses, foreignKey: 'student_id', as: 'student_classes' });
-  Users.hasMany(Journal, { foreignKey: 'teacher_id', as: 'teachers_marks' });
-  Users.hasMany(Journal, { foreignKey: 'student_id', as: 'students_marks' });
+  User.hasMany(Classes, { foreignKey: 'teacher_id', as: 'classes' }); // Assuming `teacher_id` exists in Classes table
+  User.belongsToMany(Classes, { through: UserClasses, foreignKey: 'student_id', as: 'userClasses' });
+  User.hasMany(Journal, { foreignKey: 'teacher_id', as: 'teachers_marks' });
+  User.hasMany(Journal, { foreignKey: 'student_id', as: 'students_marks' });
 
-  Classes.belongsToMany(Users, { through: UserClasses, foreignKey: 'class_id', as: 'studentsInClass' });
-  Classes.belongsTo(Users, { foreignKey: 'teacher_id', as: 'teacher' });
-  Classes.hasMany(Journal, { foreignKey: 'class_id', as: 'class_marks', });
+  Classes.belongsToMany(User, { through: UserClasses, foreignKey: 'class_id', as: 'studentsInClass' });
+  Classes.belongsTo(User, { foreignKey: 'teacher_id', as: 'teacher' });
+  Classes.hasMany(Journal, { foreignKey: 'class_id', as: 'classMarks', });
   
-  Subjects.hasMany(Journal, { foreignKey: 'subject_id', as: 'subjects_marks' });
+  Subjects.hasMany(Journal, { foreignKey: 'subject_id', as: 'subjectsMarks' });
   
-  Journal.belongsTo(Users, { foreignKey: 'student_id', as: 'student' });
+  Journal.belongsTo(User, { foreignKey: 'student_id', as: 'student' });
   Journal.belongsTo(Subjects, { foreignKey: 'subject_id', as: 'subject' });
   Journal.belongsTo(Classes, { foreignKey: 'class_id', as: '_class' });
-  Journal.belongsTo(Users, { foreignKey: 'teacher_id', as: 'teacher' });
+  Journal.belongsTo(User, { foreignKey: 'teacher_id', as: 'teacher' });
 }

@@ -1,5 +1,5 @@
 import type { Middleware } from "@/types";
-import container from "@/server/container";
+import container from "@/server/context/container";
 import { ValidateError } from "@/server/exceptions";
 
 function validateIt(value: object, schema: object) {

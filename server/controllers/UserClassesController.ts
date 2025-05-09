@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
 import { DELETE, POST, GET } from "./decorators";
-import { DEFAULT_LIMIT, DEFAULT_PAGE } from "../utils/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 
 export default class UserClassesController extends BaseController {
 
