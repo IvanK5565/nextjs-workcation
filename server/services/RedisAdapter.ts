@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Guard from "@/acl/Guard";
+import Guard from "@/acl/Guard.old";
 import { Adapter, AdapterUser } from "next-auth/adapters";
-import { v4 as uuidv4 } from "uuid";
-import IContextContainer from "./interfaces/IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
+import { randomUUID } from "crypto";
 
 export const createRedisAdapter = (di: IContextContainer): Adapter => {
   const redis = di.redis;
 
   return {
     async createSession(session: any) {
-      const sessionId = session.sessionToken || uuidv4();
+      const sessionId = session.sessionToken || randomUUID();
       if (!session?.auth?.identity?.id && session?.userId) {
         const guard = new Guard(di.roles, di.rules);
         const res = await di.Identity.preparedUser(session?.userId);

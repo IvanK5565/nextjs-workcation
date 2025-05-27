@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Button from "../ui/button";
 import type { Response } from "@/types";
+import { Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+
+
 
 export default function Register({
 	className,
@@ -83,15 +87,16 @@ export default function Register({
 					defaultValue="active"
 					hidden={true}
 				/>
-				<span
-					onClick={() => {
-						onLogin();
-					}}
-					className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
-				>
-					Already have an account?
-				</span>
-
+        <div>
+					<span
+						onClick={() => {
+							onLogin();
+						}}
+						className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
+					>
+						Already have an account?
+					</span>
+				</div>
 				<div className="flex flex-row-reverse justify-between">
 					<Button type="submit">Confirm</Button>
 				</div>
@@ -158,3 +163,4 @@ function RoleSelect({
 		</>
 	);
 }
+

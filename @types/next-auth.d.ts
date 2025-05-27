@@ -7,7 +7,6 @@ declare module "next-auth" {
 		acl?: any;
 		accessToken:any;
 		user:IIdentity;
-		guard?:Guard;
 	}
 }
 declare module "next-auth/jwt" {

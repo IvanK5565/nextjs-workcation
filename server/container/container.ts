@@ -12,6 +12,7 @@ import { roles, rules } from '@/config.acl';
 import getServerSidePropsContainer from "@/server/controllers/getServerSideProps";
 import { DatabaseAdapter } from '@/server/lib/DatabaseAdapter';
 import { Logger } from "@/server/logger";
+import { Cleaner } from '@/acl/cleaner';
 
 const container = createContainer<IContextContainer>({
   injectionMode: InjectionMode.PROXY,
@@ -32,6 +33,7 @@ container.register({
   roles: asValue(roles),
   adapter: asFunction(DatabaseAdapter).singleton(),
   Logger: asClass(Logger).singleton(),
+  cleaner: asClass(Cleaner).singleton(),
 })
 
 associateModels(container);

@@ -1,17 +1,7 @@
 import { Model, DataTypes } from "sequelize";
-import IContextContainer from "@/server/context/IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 import { UserStatus, UserRole } from "@/constants";
 import bcrypt from 'bcrypt';
-
-export interface IUser {
-	id?: number;
-	firstName: string;
-	lastName: string;
-	email: string;
-	password: string;
-	status: UserStatus;
-	role: UserRole;
-}
 
 export class User extends Model {
 	declare id: number;
@@ -69,7 +59,7 @@ export default (ctx: IContextContainer) => {
 			},
 			password: {
 				type: DataTypes.STRING,
-				allowNull: false,
+				allowNull: true,
 				validate: {
 					len: {
 						args: [4, 100],
@@ -99,24 +89,24 @@ export default (ctx: IContextContainer) => {
 					},
 				},
 			},
-			createdAt: {
-				type: DataTypes.DATE,
-				allowNull: false,
-				defaultValue: DataTypes.NOW,
-				field: "createdAt",
-			},
-			updatedAt: {
-				type: DataTypes.DATE,
-				allowNull: false,
-				defaultValue: DataTypes.NOW,
-				field: "updatedAt",
-			},
+			// createdAt: {
+			// 	type: DataTypes.DATE,
+			// 	allowNull: false,
+			// 	defaultValue: DataTypes.NOW,
+			// 	field: "createdAt",
+			// },
+			// updatedAt: {
+			// 	type: DataTypes.DATE,
+			// 	allowNull: false,
+			// 	defaultValue: DataTypes.NOW,
+			// 	field: "updatedAt",
+			// },
 		},
 		{
 			sequelize: ctx.db,
 			modelName: "User",
 			tableName: "users",
-			timestamps: true,
+			timestamps: false,
 			underscored: true,
 			hooks:{
 				beforeCreate: async (user) => {

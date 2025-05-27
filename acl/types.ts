@@ -44,7 +44,7 @@ export interface IIdentity  {
     firstName?: string;
     lastName?: string;
     role: ROLE;
-    email?: string;
+    email: string;
     token?: string;
     secret?: string;
     locale?: string;

@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import IContextContainer from '../IContextContainer';
+import IContextContainer from '@/server/container/IContextContainer';
 import { LectureStatus, LectureType } from '@/constants';
 
 export class Journal extends Model{
@@ -12,8 +12,6 @@ export class Journal extends Model{
   declare lecture_type: LectureType;
   declare lecture_status: LectureStatus;
   declare mark_val: number;
-  declare createdAt: Date;
-  declare updatedAt: Date;
 }
 
 export type JournalType = typeof Journal;
@@ -77,24 +75,12 @@ export default (ctx: IContextContainer) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-      field: 'createdAt',
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-      field: 'updatedAt',
-    },
   },
   {
     sequelize: ctx.db,
     modelName: 'Journal',
     tableName: 'journal',
-    timestamps: true,
+    timestamps: false,
     underscored: true,
   }
   );

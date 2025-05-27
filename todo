@@ -1,7 +1,0 @@
-xFetch -> xSave,xRead,xDelete
-fetch -> xFetch
-
-Redux : reduce, action, dispatch
-not redux-kit!!!
-
-redux-saga

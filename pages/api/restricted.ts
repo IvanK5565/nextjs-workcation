@@ -1,4 +1,4 @@
-import container from "@/server/context/container"
+import container from "@/server/container/container"
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next"
 

@@ -1,6 +1,6 @@
 import i18 from "@/public/locales/en-US";
 import { IService } from ".";
-import BaseContext from "../context/BaseContext";
+import BaseContext from "../container/BaseContext";
 import { ValidateError } from "../exceptions";
 
 export default class UsersService extends BaseContext implements IService {
@@ -12,27 +12,31 @@ export default class UsersService extends BaseContext implements IService {
 			},
 		});
 	}
-	private validateUser(body: Record<string, string>){
-		if(!body.password || body.password.length < 5 || body.password.length > 20){
+	private validateUser(body: Record<string, string>) {
+		if (
+			!body.password ||
+			body.password.length < 5 ||
+			body.password.length > 20
+		) {
 			throw new ValidateError();
 		}
 	}
-	public signUp(body: Record<string, string>){
+	public signUp(body: Record<string, string>) {
 		this.validateUser(body);
-		return this.save(body)
+		return this.save(body);
 	}
 	public async save(body: Record<string, string>) {
 		// const [existingUser, created] = await User.findOrCreate({
-    //   where: { email: user.email },
-    //   defaults: {
-    //     id: user.id,
-    //     name: user.name,
-    //     email: user.email,
-    //     image: user.image,
-    //     username: profile.login,          // From GitHub profile
-    //     role: "user",                     // Default role
-    //     phone: null,                      // Set later via onboarding if needed
-    //   },
+		//   where: { email: user.email },
+		//   defaults: {
+		//     id: user.id,
+		//     name: user.name,
+		//     email: user.email,
+		//     image: user.image,
+		//     username: profile.login,          // From GitHub profile
+		//     role: "user",                     // Default role
+		//     phone: null,                      // Set later via onboarding if needed
+		//   },
 		// });
 		const Model = this.di.UserModel;
 		const { id, ...fields } = body;
@@ -70,10 +74,13 @@ export default class UsersService extends BaseContext implements IService {
 			offset: limit * (page - 1),
 		});
 	}
-	public getOneByFilter(filters?: Record<string, string>) {
+	public findOneByFilter(filters?: Record<string, string>) {
 		return this.di.UserModel.findOne({
 			where: filters,
 		});
+	}
+	public findByEmail(email: string) {
+		return this.di.UserModel.findOne({ where: { email } });
 	}
 	public delete(id: number) {
 		return this.di.UserModel.destroy({

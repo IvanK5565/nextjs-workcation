@@ -6,10 +6,11 @@ import { AwilixContainer } from "awilix";
 import { NextAuthOptions } from "next-auth";
 import type Ajv from "ajv";
 import { RedisClientType } from "redis";
-import { IRoles, IRules } from "@/acl/types";
+import { IRoles, IRules, ROLE } from "@/acl/types";
 import { GSSPFactory } from "@/types";
 import { Adapter } from "next-auth/adapters";
 import { Logger } from "@/server/logger";
+import { Cleaner } from "@/acl/cleaner";
 
 export default interface IContextContainer extends AwilixContainer, IModelContainer, IServicesContainer, IControllerContainer{
   config: any;
@@ -22,4 +23,5 @@ export default interface IContextContainer extends AwilixContainer, IModelContai
   getServerSideProps: GSSPFactory;
   adapter:Adapter;
   Logger:Logger;
+  cleaner:Cleaner;
 }

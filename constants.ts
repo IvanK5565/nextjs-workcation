@@ -32,3 +32,12 @@ export const SALT_ROUNDS = 10
 export const DEFAULT_LIMIT = 100;
 export const DEFAULT_PAGE = 1;
 
+export enum TimesInMS{
+  SECOND=1000,
+  MINUTE=SECOND*60,
+  HOUR=MINUTE*60,
+  DAY=HOUR*24,
+  WEEK=DAY*DAY, 
+  YEAR=DAY*365,
+  LAEPYEAR=YEAR+1,
+}

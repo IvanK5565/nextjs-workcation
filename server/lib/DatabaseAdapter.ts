@@ -1,17 +1,19 @@
-import { 
-  Adapter,
-  AdapterUser,
-  AdapterAccount,
-  AdapterSession,
-  VerificationToken,
+import {
+	Adapter,
+	AdapterUser,
+	AdapterAccount,
+	AdapterSession,
+	VerificationToken,
 } from "next-auth/adapters";
 import { RedisClientType } from "redis";
-import IContextContainer from "@/server/context/IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 import { isDate } from "util/types";
 import { ROLE } from "@/acl/types";
 import { UserStatus } from "@/constants";
 import { ApiError } from "../exceptions";
 import { AnswerType } from "@/types";
+import Guard from "@/acl/Guard";
+import Acl from "@/acl/Acl";
 
 const options = {
 	accountKeyPrefix: "user:account:",
@@ -25,11 +27,10 @@ const options = {
 
 function hydrateDates(json: object) {
 	return Object.entries(json).reduce((acc, [key, val]) => {
-		acc[key] = key === 'expires' ? new Date(val) : val;
+		acc[key] = key === "expires" ? new Date(val) : val;
 		return acc;
 	}, {} as any);
 }
-
 
 export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 	const client: RedisClientType = ctx.redis;
@@ -55,16 +56,15 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 		const accountKey = accountKeyPrefix + id;
 		await setObjectAsJson(accountKey, account);
 		await client.set(accountByUserIdPrefix + account.userId, accountKey);
-		ctx.Logger.log('setAccount id', id)
-		ctx.Logger.log('setAccount account', account)
+		ctx.Logger.log("setAccount id account", id, account);
 		return account;
 	};
-	
+
 	const getAccount = async (id: string) => {
 		const sAccount = await client.get(accountKeyPrefix + id);
 		const account: AdapterAccount = JSON.parse(sAccount!);
 		if (!account) return null;
-		ctx.Logger.log('getAccount', account)
+		ctx.Logger.log("getAccount", account);
 		return hydrateDates(account);
 	};
 
@@ -73,7 +73,11 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 		session: any
 	): Promise<AdapterSession> => {
 		const sessionKey = sessionKeyPrefix + id;
-		await setObjectAsJson(sessionKey, session);
+		const user = await ctx.UserModel.findByPk(session.userId);
+		if (user) {
+			const acl = ctx.cleaner.cleanRolesAndRules(new Acl(ctx.roles, ctx.rules), user.role);
+			await setObjectAsJson(sessionKey, { ...session, acl });
+		}
 		await client.set(sessionByUserIdKeyPrefix + session.userId, sessionKey);
 		ctx.Logger.log("adapter:setsession: ", await client.get(sessionKey));
 		return session;
@@ -81,7 +85,6 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 
 	const getSession = async (id: string) => {
 		const session = await getObject<AdapterSession>(sessionKeyPrefix + id);
-		ctx.Logger.log("adapter:getsession: ", session);
 		if (!session) return null;
 		return hydrateDates(session);
 	};
@@ -90,35 +93,46 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 		id: string,
 		user: AdapterUser
 	): Promise<AdapterUser> => {
-		ctx.Logger.log('setUser:', user)
+		ctx.Logger.log("setUser:", id, user);
 		await setObjectAsJson(userKeyPrefix + id, user);
 		await client.set(`${emailKeyPrefix}${user.email}`, id);
-		return user;
+		return { ...user, id };
 	};
 
 	const getUser = async (id: string) => {
 		const userAdapter = await getObject<AdapterUser>(userKeyPrefix + id);
 		if (!userAdapter) return null;
-		const user = await ctx.UserModel.findByPk(userAdapter.id)
+		const user = await ctx.UserModel.findByPk(userAdapter.id);
+		ctx.Logger.log("getUserById", id, userAdapter, user);
 		return user?.get();
 	};
 
 	return {
-		createUser: async(user:any) => {
-			
-			let id = await ctx.UserModel.findOne({where:{email:user.email}}).then(user => user?.id);
-			if(!id){
-				const names = user.name?.split(' ');
-				id = await ctx.UserModel.build().set({
-					firstName:names?.[0]??'Unknown',
-					lastName:names?.[1]??null,
-					email:user.email,
-					role:user.role??ROLE.GUEST,
-					emailVerified:user.emailVerified,
-					status:UserStatus.ACIVE,
-				}).save().then(user => user.id);
+		createUser: async (user: any) => {
+			ctx.Logger.log("createUser", user);
+			let id = await ctx.UserModel.findOne({
+				where: { email: user.email },
+			}).then((user) => user?.id);
+			if (!id) {
+				try {
+					const names = user.name?.split(" ");
+					id = await ctx.UserModel.build()
+						.set({
+							firstName: names?.[0] ?? "Unknown",
+							lastName: names?.[1] ?? null,
+							email: user.email,
+							role: user.role ?? ROLE.GUEST,
+							emailVerified: user.emailVerified,
+							status: UserStatus.ACIVE,
+						})
+						.save()
+						.then((user) => user.id);
+				} catch (e) {
+					ctx.Logger.error("Error saving user: ", (e as Error).message);
+					throw new ApiError("Error saving user", 500, AnswerType.Toast);
+				}
 			}
-			if(!id){
+			if (!id) {
 				throw new ApiError("Error saving user", 500, AnswerType.Toast);
 			}
 
@@ -130,14 +144,19 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 			if (!userId) {
 				return null;
 			}
+			ctx.Logger.log("getUserByEmail", email, userId, await getUser(userId));
 			return await getUser(userId);
 		},
 		async getUserByAccount(account) {
 			const dbAccount = await getAccount(
 				`${account.provider}:${account.providerAccountId}`
 			);
-			ctx.Logger.log('getuserbyaccount', dbAccount)
 			if (!dbAccount) return null;
+			ctx.Logger.log(
+				"getuserbyaccount",
+				dbAccount,
+				await getUser(dbAccount.userId)
+			);
 			return await getUser(dbAccount.userId);
 		},
 		async updateUser(updates) {
@@ -145,7 +164,7 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 			const user = await getUser(userId);
 			return await setUser(userId, { ...(user as AdapterUser), ...updates });
 		},
-		async linkAccount(account:AdapterAccount) {
+		async linkAccount(account: AdapterAccount) {
 			const id = `${account.provider}:${account.providerAccountId}`;
 			return await setAccount(id, { ...account, id });
 		},
@@ -157,10 +176,11 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 			if (!dbUser) return null;
 			const user = {
 				...dbUser.get(),
-				id:dbUser.id.toString(),
+				id: dbUser.id.toString(),
 			};
-			ctx.Logger.log('getSessionAndUser:',{ session, user })
-			return { session, user };
+			const acl = session.acl;
+			ctx.Logger.log('getSessionAndUser',session)
+			return { session, user:{...user, acl} };
 		},
 		async updateSession(updates) {
 			const session = await getSession(updates.sessionToken);
@@ -168,7 +188,7 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 			return await setSession(updates.sessionToken, { ...session, ...updates });
 		},
 		async deleteSession(sessionToken) {
-			ctx.Logger.log('deleteSession')
+			ctx.Logger.log("deleteSession");
 			await client.del(sessionKeyPrefix + sessionToken);
 		},
 		// async createVerificationToken(verificationToken) {

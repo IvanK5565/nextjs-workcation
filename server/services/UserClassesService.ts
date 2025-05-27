@@ -1,5 +1,5 @@
 import { IService } from ".";
-import BaseContext from "../context/BaseContext";
+import BaseContext from "../container/BaseContext";
 
 export default class UserClassesService extends BaseContext implements IService {
   public async save(body:Record<string,string>) {

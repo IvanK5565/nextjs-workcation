@@ -1,18 +1,18 @@
 import { createClient, RedisClientType } from "redis";
-import BaseContext from "@/server/context/BaseContext";
-import IContextContainer from "@/server/context/IContextContainer";
+import BaseContext from "@/server/container/BaseContext";
+import IContextContainer from "@/server/container/IContextContainer";
 
 export class RedisService extends BaseContext {
   private client: RedisClientType;
 
-  constructor(opts: IContextContainer) {
-    super(opts);
+  constructor(ctx: IContextContainer) {
+    super(ctx);
     this.client = createClient({ url: process.env.REDIS_URL });
-    this.client.on("error", (err) => opts.Logger.error("Redis Client Error", err));
+    this.client.on("error", (err) => ctx.Logger.error("Redis Client Error", err));
     try {
       this.client.connect();
     } catch (e) {
-      opts.Logger.error("Failed to connect to Redis:", e);
+      ctx.Logger.error("Failed to connect to Redis:", e);
     }
   }
 

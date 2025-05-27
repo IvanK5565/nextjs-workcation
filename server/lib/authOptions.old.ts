@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { UserStatus } from "@/constants";
-import IContextContainer from "@/server/context/IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 import i18 from "@/public/locales/en-US";
 import { IIdentity } from "@/acl/types";
 import { encode as defaultEncode } from "next-auth/jwt";

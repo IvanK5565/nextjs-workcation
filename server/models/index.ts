@@ -4,7 +4,7 @@ import ClassesModel, { Classes, ClassesType } from './classes'
 import SubjectsModel, { Subjects, SubjectsType } from './subjects'
 import UserClassesModel, { UserClasses, UserClassesType } from './userClasses'
 import JournalModel, { Journal, JournalType } from './journal'
-import IContextContainer from "../IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 
 export interface IModelContainer {
   UserModel: UserType;

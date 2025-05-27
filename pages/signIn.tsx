@@ -1,8 +1,10 @@
 import { GetServerSidePropsContext } from "next"
 import { getServerSession } from "next-auth"
-import { About, SignIn, Register } from "@/components/signIn";
+import { About, SignIn } from "@/components/signIn";
+
 import { useState } from "react"
-import container from "@/server/context/container";
+import container from "@/server/container/container";
+import Register from "@/components/signIn/Register2.0";
 
 enum Landing {
   About,

@@ -8,6 +8,7 @@ import RoleInterface from "./role/RoleInterface";
 import GenericRole from "./role/GenericRole";
 import ResourceInterface from "./resource/ResourceInterface";
 import GenericResource from "./resource/GenericResource";
+import { IRoles, IRules, ROLE } from "./types";
 
 export enum TYPE {
     ALLOW = "allow",
@@ -38,10 +39,19 @@ interface IVisitedStack {
     stack: any[];
 }
 
+interface Resources{
+    [id:string]:{
+        instance: ResourceInterface,
+        parent: ResourceInterface | null,
+        children: {[id:string]:ResourceInterface},
+    }
+}
+
 export default class Acl implements AclInterface {
     protected roleRegistry: Registry;
 
-    protected resources: any;
+    // protected resources: any;
+    protected resources: Resources;
 
     /**
      * ACL rules; whitelist (deny everything to all) by default
@@ -60,9 +70,71 @@ export default class Acl implements AclInterface {
         byResourceId: {},
     };
 
-    constructor() {
+    constructor(roles?:IRoles, rules?:IRules, secret?:string) {
         this.roleRegistry = new Registry();
         this.resources = {};
+        /**Added by Ivan Kozlovsky */
+        if(!!roles && !!rules){
+            this.addRolesAndRules(roles, rules);
+            if(!!secret){
+                this.addRolesAndRules(roles,rules,secret)
+            }
+        }
+    }
+
+    /**Added by Ivan Kozlovsky */
+    private addRolesAndRules(roles:IRoles, rules:IRules, secret?: string){
+        const s = secret ? secret + ":" : "";
+		for (const role in roles) {
+			if (roles.hasOwnProperty(role)) {
+				const item = roles[role];
+				const parentRoleId = item.parent ?? null;
+				let parentRole: string[] | string | null = null;
+				if (parentRoleId !== null) {
+					parentRole = [];
+					parentRole = parentRoleId.map((pRole) => s + pRole);
+				}
+				const pr: string[] | string | null =
+					!!secret && role === ROLE.GUEST ? ROLE.GUEST : parentRole;
+				this.addRole(s + role, pr);
+			}
+		}
+
+		for (const resource in rules) {
+			if (rules.hasOwnProperty(resource)) {
+				if (!secret) {
+					this.addResource(resource);
+				} else {
+					this.addResource(s + resource, resource);
+				}
+			}
+		}
+		for (const resource in rules) {
+			if (rules.hasOwnProperty(resource)) {
+				const grant = rules[resource];
+				const res = s + resource;
+				if (grant.hasOwnProperty("allow")) {
+					for (const role in grant.allow) {
+						if (grant.allow.hasOwnProperty(role)) {
+							const grants = grant.allow[role];
+							for (let i = 0, size = grants.length; i < size; i++) {
+								this.allow(s + role, res, grants[i]);
+							}
+						}
+					}
+				}
+				if (grant.hasOwnProperty("deny")) {
+					for (const role in grant.deny) {
+						if (grant.deny.hasOwnProperty(role)) {
+							const grants = grant.deny[role];
+							for (let i = 0, size = grants.length; i < size; i++) {
+								this.deny(s + role, res, grants[i]);
+							}
+						}
+					}
+				}
+			}
+		}
     }
 
     /**
@@ -270,7 +342,7 @@ export default class Acl implements AclInterface {
      *
      * @param  {ResourceInterface|string} resource
      * @throws {InvalidArgumentException}
-     * @return {Resource}
+     * @return {ResourceWrapper}
      */
     public getResource(
         resource: ResourceInterface | string
@@ -334,8 +406,12 @@ export default class Acl implements AclInterface {
             } else {
                 return false;
             }
-            while (this.resources[parentId]["parent"] !== null) {
-                const id = this.resources[parentId]["parent"].getResourceId();
+            /** Edited by Ivan */
+            const parent = this.resources[parentId]["parent"];
+            // while (this.resources[parentId]["parent"] !== null) {
+            //     const id = this.resources[parentId]["parent"].getResourceId();
+            while (parent !== null) {
+                const id = parent.getResourceId();
                 if (inheritId === id) {
                     return true;
                 }
@@ -595,7 +671,9 @@ export default class Acl implements AclInterface {
         // ensure that all specified Resources exist; normalize input to array of Resource objects or null
         let resources: any = pResources;
         if (!Array.isArray(resources)) {
-            if (resources === null && this.resources.length > 0) {
+            /** Edited by Ivan */
+            // if (resources === null && this.resources.length > 0) {
+            if (resources === null && Object.keys(this.resources).length > 0) {
                 resources = Object.keys(this.resources);
                 // Passing a null resource; make sure "global" permission is also set!
                 if (!resources.includes(null)) {
@@ -723,7 +801,8 @@ export default class Acl implements AclInterface {
     ): ResourceInterface[] {
         let result: ResourceInterface[] = [];
         const id = resource.getResourceId();
-        const children: ResourceInterface[] = this.resources[id]["children"];
+        /** Edited by Ivan */
+        const children = this.resources[id]["children"];
 
         for (const key in children) {
             const child: ResourceInterface = children[key];
@@ -769,7 +848,7 @@ export default class Acl implements AclInterface {
     ) {
         // reset role & resource to null
         let allowedRole: RoleInterface;
-        let allowedResource: ResourceInterface;
+        let allowedResource: ResourceInterface|null;
         // let allowedPrivilege:string = null;
         if (true||role !== null) {//Ivan: added true ||
             allowedRole =
@@ -817,8 +896,11 @@ export default class Acl implements AclInterface {
                     }
                 }
                 // try next Resource
-                allowedResource =
-                    this.resources[allowedResource.getResourceId()]["parent"];
+                /** Edited by Ivan */
+                // allowedResource = 
+                //     this.resources[allowedResource.getResourceId()]["parent"];
+                allowedResource = allowedResource ? 
+                    this.resources[allowedResource.getResourceId()]["parent"] : null;
             } while (true); // loop terminates at 'allResources' pseudo-parent
         } else {
             // allowedPrivilege = privilege;
@@ -855,8 +937,11 @@ export default class Acl implements AclInterface {
                     }
                 }
                 // try next Resource
-                allowedResource =
-                    this.resources[allowedResource.getResourceId()]["parent"];
+                /** Edited by Ivan */
+                // allowedResource =
+                //     this.resources[allowedResource.getResourceId()]["parent"];
+                allowedResource = allowedResource ? 
+                    this.resources[allowedResource.getResourceId()]["parent"] : null;
             } while (true); // loop terminates at 'allResources' pseudo-parent
         }
     }

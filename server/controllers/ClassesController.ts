@@ -33,9 +33,10 @@ export default class ClassesController extends BaseController {
 			throw new AccessDeniedError();
 		}
 
-		return this.di.ClassesService.findById(Number(id)).then((res) => ({
-			_class: res,
-		}));
+		return this.di.ClassesService.findById(Number(id))
+		// .then((res) => ({
+		// 	_class: res,
+		// }));
 	}
 
 	@USE((_req, _res, next) => {
@@ -43,20 +44,28 @@ export default class ClassesController extends BaseController {
 		return next();
 	})
 	@POST("/api/classes")
-	@POST("/api/classes/[id]")
-	@BODY({
-		type: "object",
-		properties: {
-			id: { type: "integer", nullable: true },
-			teacher_id: { type: "integer" },
-			title: { type: "string" },
-			year: { type: "integer" },
-			status: { type: "string" },
-		},
-		required: ["teacher_id", "title", "year", "status"],
+	@POST("/api/classes/[id]",{
+		allow:{
+			[ROLE.ADMIN]:[GRANT.WRITE]
+		}
 	})
-	public save({ body }: ActionProps) {
-		return this.di.ClassesService.save(JSON.parse(body!));
+	// @BODY({
+	// 	type: "object",
+	// 	properties: {
+	// 		id: { type: "integer", nullable: true },
+	// 		teacher_id: { type: "integer" },
+	// 		title: { type: "string" },
+	// 		year: { type: "integer" },
+	// 		status: { type: "string" },
+	// 	},
+	// 	required: ["teacher_id", "title", "year", "status"],
+	// })
+	public save({ body, guard }: ActionProps) {
+		if(!guard.allow(GRANT.WRITE)){
+			throw new AccessDeniedError();
+		}
+		// return this.di.ClassesService.save(body);
+		return {};
 	}
 
 	// @USE(

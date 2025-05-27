@@ -1,4 +1,4 @@
-import { asClass, asFunction } from "awilix";
+import { asClass } from "awilix";
 import UsersController from "./UsersController";
 import ClassesController from "./ClassesController";
 import SubjectsController from "./SubjectsController";
@@ -11,9 +11,11 @@ export interface IControllerContainer {
   UserClassesController: UserClassesController;
 }
 
-export default {
+const controllers = {
   UsersController: asClass(UsersController).singleton(),
   ClassesController: asClass(ClassesController).singleton(),
   SubjectsController: asClass(SubjectsController).singleton(),
   UserClassesController: asClass(UserClassesController).singleton(),
 };
+
+export default controllers;

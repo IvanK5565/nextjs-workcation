@@ -2,7 +2,7 @@ GET http://localhost:3000/api/login HTTP/1.1
 
 ###
 
-POST http://localhost:3000/api/classes/1 HTTP/1.1
+POST http://localhost:3000/api/echo HTTP/1.1
 content-type: application/json
 
 {

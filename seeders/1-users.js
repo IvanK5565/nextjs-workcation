@@ -50,18 +50,20 @@ module.exports = {
       await queryInterface.sequelize.query(sql);
     }
     
-    const adminPass = await bcrypt.hash('admin', 10);
-    await queryInterface.sequelize.query(`INSERT INTO users
-    (firstName, lastName, email, password, role, status)
-    VALUES
-    ('ivan', 
-    'admin', 
-    'admin@admin.com', 
-    '${adminPass}', 
-    'admin',
-    'active'
-    );
-    `);
+    ['admin', 'student', 'teacher'].forEach(async role => {
+      const pass = await bcrypt.hash(role, 10);
+      await queryInterface.sequelize.query(`INSERT INTO users
+      (firstName, lastName, email, password, role, status)
+      VALUES
+      ('ivan', 
+      '${role}', 
+      '${role}@mail.com', 
+      '${pass}', 
+      '${role}',
+      'active'
+      );
+      `);
+    })
     await queryInterface.sequelize.query(`INSERT INTO users
     (firstName, lastName, email, password, role, status)
     VALUES

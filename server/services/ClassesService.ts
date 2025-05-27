@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import BaseContext from "../context/BaseContext";
+import BaseContext from "../container/BaseContext";
 import { IService } from ".";
 
 export default class ClassesService extends BaseContext implements IService {
@@ -27,7 +27,16 @@ export default class ClassesService extends BaseContext implements IService {
 	}
 
 	public findById(id: number) {
-		return this.di.ClassesModel.findByPk(id);
+		return this.di.ClassesModel.findByPk(id, {
+			include: [{
+				model:this.di.UserModel,
+				as:'teacher',
+			},
+			{
+				model:this.di.UserModel,
+				as:'studentsInClass',
+			},]
+		});
 	}
 
 	public findByFilter(
@@ -41,11 +50,27 @@ export default class ClassesService extends BaseContext implements IService {
 				where: { ...filters, title },
 				limit: limit,
 				offset: limit * (page - 1),
+				include: [{
+					model:this.di.UserModel,
+					as:'teacher',
+				},
+				{
+					model:this.di.UserModel,
+					as:'studentsInClass',
+				},]
 			});
 		}
 		return this.di.ClassesModel.findAll({
 			limit: limit,
 			offset: limit * (page - 1),
+			include: [{
+				model:this.di.UserModel,
+				as:'teacher',
+			},
+			{
+				model:this.di.UserModel,
+				as:'studentsInClass',
+			},]
 		});
 	}
 

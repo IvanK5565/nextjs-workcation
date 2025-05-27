@@ -1,4 +1,5 @@
-import BaseContext from "@/server/context/BaseContext";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import BaseContext from "@/server/container/BaseContext";
 import { createRouter } from "next-connect";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
@@ -16,16 +17,27 @@ import {
 	Handler,
 	ActionResult,
 	Response,
-	ActionProps,
 } from "@/types";
-import { getServerSession } from "next-auth";
+import type { ActionProps } from "@/types";
+import { AuthOptions, getServerSession, Session } from "next-auth";
 import { onSuccessResponse, onErrorResponse } from "@/server/utils";
 import i18 from "@/public/locales/en-US";
+import { ROLE } from "@/acl/types";
+import { POST } from "./decorators";
+import { Logger } from "../logger";
 import Guard from "@/acl/Guard";
-import { IIdentity } from "@/acl/types";
+import { IControllerContainer } from ".";
+import { Routes } from "../utils/routes";
+import container from "../container/container";
 
 export default abstract class BaseController extends BaseContext {
-	private createAction(handler: string, route:string): ActionAdapter {
+	@POST("/api/echo")
+	public async echo({body}: ActionProps) {
+		Logger.info(body);
+		return body;
+	}
+
+	private createAction(handler: string, route: string): ActionAdapter {
 		return (req, res) => {
 			const fn: Action = (this as any)[handler].bind(this);
 			return this.getActionProps(req, res, route)
@@ -37,28 +49,28 @@ export default abstract class BaseController extends BaseContext {
 				});
 		};
 	}
-	private buildGuard(routeName: string, identity?: IIdentity) {
-		const { roles, rules } = this.di;
-		if (identity) {
-			return new Guard(roles, rules, identity, routeName);
-		}
-		return null;
-	}
 
 	private async getActionProps(
 		req: NextApiRequest,
 		res: NextApiResponse,
-		route: string,
+		route: string
 	): Promise<ActionProps> {
-		const session = await getServerSession(req, res, this.di.authOptions);
-		this.di.Logger.log('getActionProps session',session)
-		const guard = this.buildGuard(route, session?.user);
-		if(!guard) throw new AccessDeniedError();
+		const session = await getServerSession<AuthOptions, Session>(
+			req,
+			res,
+			this.di.authOptions
+		);
+		this.di.Logger.log("getActionProps method:", req.method, 'session:', session);
+		// const guard = this.di.buildGuard(route, session?.user.role);
+		const {roles,rules} = this.di;
+		const guard = new Guard(roles, rules, session?.user.role || ROLE.GUEST);
+		guard.resource = route;
+		if (!guard) throw new AccessDeniedError();
 		return {
 			query: req.query,
 			body: req.body,
 			session,
-			guard:guard,
+			guard: guard,
 		};
 	}
 
@@ -92,10 +104,13 @@ export default abstract class BaseController extends BaseContext {
 			const middlewares = (
 				Reflect.getMetadata("middlewares", this, e.handler) ?? []
 			).reverse();
-			(router as any)[e.method](...middlewares, this.createAction(e.handler, route));
+			(router as any)[e.method](
+				...middlewares,
+				this.createAction(e.handler, route)
+			);
 		});
 
-		router.all((_req, _res) => {
+		router.all(() => {
 			throw new NotAllowedError();
 		});
 		return router;
@@ -120,5 +135,23 @@ export default abstract class BaseController extends BaseContext {
 
 			return res.status(response.code).json(response);
 		};
+	}
+
+	public static getRoutes(){
+		const routes:[string, keyof IControllerContainer][] = Reflect.getMetadata('routes', BaseController) ?? [];
+		return routes;
+	}
+	public static handler():Handler{
+		const routesAndControlles = this.getRoutes()
+		const routes = Routes.fromStrings(...routesAndControlles.map(rc => rc[0]))
+		const findedRoute = routes.findRoute('')?.toString() ?? null;
+		if(findedRoute){
+			const controller = routesAndControlles.find(rc => rc[0]===findedRoute)?.[1];
+			if(controller)
+				return container.resolve(controller).handler();
+		}
+		return async (req, res) => {
+			res.status(404).json('Not Found');
+		}
 	}
 }

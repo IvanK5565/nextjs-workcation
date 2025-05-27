@@ -52,7 +52,9 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           placeholder="********"
           label='Password'
         />
-        <span onClick={() => { onRegister() }} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min text-right">Don`t have an account?</span>
+        <div className='text-right'>
+          <span onClick={() => { onRegister() }} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min text-right">Don`t have an account?</span>
+        </div>
         <div className="mt-1 flex justify-between">
           <Button type="submit" disabled={false} >Confirm</Button>
           <div className="flex">

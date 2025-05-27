@@ -3,8 +3,10 @@ import { validate } from "@/server/lib/validate";
 import { MethodHandler, Middleware } from "@/types";
 import "reflect-metadata";
 import { rules } from "@/config.acl";
+import { authMiddleware } from "../lib/authMiddleware";
+import BaseController from "./BaseController";
 
-type Decorator = (target: any, propertyKey: string) => void;
+type Decorator = (target: object, propertyKey: string) => void;
 type EndpointDecorator = (route: string, allow?: IAllowDeny) => Decorator;
 
 function addMethodToRouteRules(routeRules: IAllowDeny, method: GRANT) {
@@ -28,10 +30,13 @@ function addMethodToRouteRules(routeRules: IAllowDeny, method: GRANT) {
 	}
 	return routeRules;
 }
+type EDecoratorFactory = (
+	method: "get" | "post" | "put" | "delete"
+) => EndpointDecorator;
 
-function endpointDecorator(method: string): EndpointDecorator {
-	return (route, pRules) => (target, propertyKey) => {
-		let endpoints: MethodHandler[] = Reflect.getMetadata(route, target) ?? [];
+const endpointDecorator: EDecoratorFactory =
+	(method) => (route, pRules) => (target, propertyKey) => {
+		const endpoints: MethodHandler[] = Reflect.getMetadata(route, target) ?? [];
 		endpoints.push({ method, handler: propertyKey });
 		Reflect.defineMetadata(route, endpoints, target);
 		if (pRules) {
@@ -39,8 +44,12 @@ function endpointDecorator(method: string): EndpointDecorator {
 			const routePattern = route.replace(reg, "*");
 			rules[routePattern] = addMethodToRouteRules(pRules, GRANT.GET);
 		}
+		const routes:[string, string][] = BaseController.getRoutes();
+		if(!routes.find(rc => rc[0] === route && rc[1] === target.constructor.name))
+			routes.push([route, target.constructor.name])
+		Reflect.defineMetadata('routes', routes, BaseController);
 	};
-}
+
 export const GET = endpointDecorator("get");
 export const POST = endpointDecorator("post");
 export const PUT = endpointDecorator("put");
@@ -59,8 +68,8 @@ export const DELETE = endpointDecorator("delete");
 // export const PUT = (route: string, allow:IGrants) => endpointDecorator(route, "put", allow);
 
 export const USE = (middleware: Middleware) => {
-	return (target: any, propertyKey?: string) => {
-		let middlewares: Middleware[] =
+	return (target: object['constructor'], propertyKey?: string) => {
+		const middlewares: Middleware[] =
 			Reflect.getMetadata(
 				"middlewares",
 				propertyKey ? target : target.prototype,
@@ -77,6 +86,8 @@ export const USE = (middleware: Middleware) => {
 		);
 	};
 };
+
+export const AUTH = USE(authMiddleware);
 
 // export const QUERY = (schema: object) => USE(validate(schema, 'query'));
 // export const BODY = (schema: object) => USE(validate(schema, 'body'));

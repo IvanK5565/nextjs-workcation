@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import LocationCards from "@/components/LocationCards";
 import SearchBar from "@/components/SearchBar";
 import { getHousesData, Location } from "@/pages/api/data";
-import container from "@/server/context/container";
+import container from "@/server/container/container";
 import { GetServerSidePropsContext } from "next";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next"
@@ -14,7 +14,7 @@ export default function Home({ data, session }: { data: Location[], session:Sess
       <div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
         <SearchBar />
         <main className="py-6 xl:flex-1 xl:overflow-x-hidden">
-          <p>{session?.user?.name}</p>
+          <p>{session?.user?.firstName}</p>
           {data.map((d, i) => <LocationCards data={d} key={i} />)}
         </main>
       </div>

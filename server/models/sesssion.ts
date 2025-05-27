@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import IContextContainer from "../IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 
 export class Session extends Model {
   declare id: string;

@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from "redis";
-import IContextContainer from "./IContextContainer";
+import IContextContainer from "@/server/container/IContextContainer";
 
 function getRedisConnection(ctx:IContextContainer){
   const redis:RedisClientType = createClient();

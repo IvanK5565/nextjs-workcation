@@ -48,14 +48,14 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
           <span className="ml-4 font-semibold text-gray-200 sm:hidden">Isla Schoger</span>
         </div>
         <div className="mt-5 sm:hidden">
-          <Link href="/" className="mt-3 block text-gray-400 hover:text-white">Account settings</Link>
+          <Link href="/profile" className="mt-3 block text-gray-400 hover:text-white">Account settings</Link>
           <Link href="/" className="mt-3 block text-gray-400 hover:text-white">Support</Link>
           <Link href="/signIn" onClick={()=>signOut({redirect:false})} className="mt-3 block text-gray-400 hover:text-white">Sign out</Link>
         </div>
         <Dropdown className="hidden sm:block"
           content={<div className="mt-3 bg-white xl:border rounded-lg w-48 py-2 shadow-xl">
             <label className="block text-gray-800 px-4 pb-2 border-b">{session.data?.user.email}</label>
-            <Link href=""
+            <Link href="/profile"
               className="block hover:text-white text-gray-800 px-4 py-2 hover:bg-indigo-500">Account Settings</Link>
             <Link href=""
               className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500">Support</Link>

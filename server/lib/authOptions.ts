@@ -1,8 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
-import { UserStatus } from "@/constants";
-import IContextContainer from "@/server/context/IContextContainer";
+import { TimesInMS, UserStatus } from "@/constants";
+import IContextContainer from "@/server/container/IContextContainer";
 import i18 from "@/public/locales/en-US";
 import { IIdentity } from "@/acl/types";
 import { encode as defaultEncode } from "next-auth/jwt";
@@ -12,13 +12,15 @@ import { StatusCodes } from "http-status-codes";
 import { AnswerType } from "@/types";
 
 export default function authOptionsContainer(ctx: IContextContainer) {
+	const log = ctx.Logger.log;
 	const authOptions = {
+		debug:true,
 		adapter:ctx.adapter,
 		providers: [
-			// GitHub({
-			// 	clientId: process.env.AUTH_GITHUB_ID!,
-			// 	clientSecret: process.env.AUTH_GITHUB_SECRET!
-			// }),
+			GitHub({
+				clientId: process.env.AUTH_GITHUB_ID!,
+				clientSecret: process.env.AUTH_GITHUB_SECRET!
+			}),
 			Credentials({
 				credentials: {
 					email: { label: i18.EmailLabel, type: "email" },
@@ -43,8 +45,8 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			}),
 		],
 		callbacks: {
-			async signIn({ user, account, profile, email }) {
-				ctx.Logger.log("callback: signIn")
+			async signIn(params) {
+				log('signIn params', params)
 					// let exitingUser = await ctx.UserModel.findOne({
 					// 	where: {
 					// 		email: email,
@@ -57,7 +59,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 				return true;
 			},
 			async jwt({ account, token, user }) {
-				ctx.Logger.log("callback: jwt", user)
+				// log("callback: jwt", user)
 				if(account?.provider === 'credentials'){
 					token.credentials = true;
 				}
@@ -65,17 +67,19 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 				return token
 			},
 			async session({session, user}) {
-				ctx.Logger.log("callback: session", session)
 				session.user = user as unknown as IIdentity;
+				session.acl = (user as any).acl
+				log("callback: session", session)
 				return session
 			},
 		},
 		jwt:{
-			encode: async function(param){
-				ctx.Logger.log("jwt: encode")
+			encode: async (param)=>{
+				// log("jwt: encode")
 				if(param.token?.credentials){
 					const sessionToken = randomUUID();
 
+					log('param.token.sub',param.token.sub)
 					if(!param.token.sub){
 						throw new ApiError('No user ID found in token', StatusCodes.INTERNAL_SERVER_ERROR, AnswerType.Toast)
 					}
@@ -83,7 +87,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 					const createdSession = await ctx.adapter.createSession?.({
 						sessionToken:sessionToken,
 						userId: param.token.sub,
-						expires: new Date(Date.now() + 30*24*60*60*1000),
+						expires: new Date(Date.now() + TimesInMS.DAY*30),
 					})
 					if(!createdSession){
 						throw new ApiError('Failed to create session', StatusCodes.INTERNAL_SERVER_ERROR, AnswerType.Toast)

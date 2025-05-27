@@ -3,7 +3,7 @@ import LocationCards from "@/components/LocationCards";
 import NoData from "@/components/NoData";
 import SearchBar from "@/components/SearchBar";
 import type { Location } from "@/pages/api/data";
-import ctx from "@/server/context/container";
+import ctx from "@/server/container/container";
 import { User } from "next-auth";
 
 export default function Home({

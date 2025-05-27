@@ -1,14 +1,6 @@
 import { Model, DataTypes } from 'sequelize';
-import IContextContainer from '../IContextContainer';
+import IContextContainer from '@/server/container/IContextContainer';
 import { ClassStatus } from '@/constants';
-
-export interface IClass{
-  id?: number,
-  teacher_id: number,
-  title: string,
-  year: number,
-  status: ClassStatus,
-}
 
 export class Classes extends Model {
   declare id: number;
@@ -16,8 +8,8 @@ export class Classes extends Model {
   declare title: string;
   declare year: number;
   declare status: ClassStatus;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  // declare createdAt: Date;
+  // declare updatedAt: Date;
 }
 
 export type ClassesType = typeof Classes;
@@ -56,24 +48,24 @@ export default (ctx: IContextContainer) => {
           isIn: [Object.values(ClassStatus)as [string]],
         },
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: 'createdAt',
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: 'updatedAt',
-        defaultValue: DataTypes.NOW,
-      },
+      // createdAt: {
+      //   type: DataTypes.DATE,
+      //   allowNull: false,
+      //   field: 'createdAt',
+      //   defaultValue: DataTypes.NOW,
+      // },
+      // updatedAt: {
+      //   type: DataTypes.DATE,
+      //   allowNull: false,
+      //   field: 'updatedAt',
+      //   defaultValue: DataTypes.NOW,
+      // },
     },
     {
       sequelize: ctx.db,
       modelName: 'Classes',
       tableName: 'classes',
-      timestamps: true,
+      timestamps: false,
       underscored: true,
     });
   return Classes;
