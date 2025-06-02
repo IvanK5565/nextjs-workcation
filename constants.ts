@@ -1,5 +1,5 @@
 export enum UserStatus{
-  ACIVE = "active",
+  ACTIVE = "active",
   BANNED = "banned",
   GRADUATED = "graduated",
   FIRED = 'fired',
@@ -29,7 +29,7 @@ export enum LectureStatus{
 
 export const SALT_ROUNDS = 10
 
-export const DEFAULT_LIMIT = 100;
+export const DEFAULT_LIMIT = 1000;
 export const DEFAULT_PAGE = 1;
 
 export enum TimesInMS{
