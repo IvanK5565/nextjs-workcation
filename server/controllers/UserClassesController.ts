@@ -5,8 +5,6 @@ import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 
 export default class UserClassesController extends BaseController {
 
-  protected getService() { return this.di.UserClassesService }
-
   @POST('/api/usersInClass')
   @POST('/api/usersInClass/[id]')
   public save(req: NextApiRequest) {

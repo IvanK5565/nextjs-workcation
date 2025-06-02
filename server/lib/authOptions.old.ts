@@ -29,7 +29,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 					let user = await ctx.UserModel.findOne({
 						where: {
 							email: credentials.email,
-							status: UserStatus.ACIVE,
+							status: UserStatus.ACTIVE,
 						},
 					});
 					
@@ -53,7 +53,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 					let exitingUser = await ctx.UserModel.findOne({
 						where: {
 							email: profile?.email,
-							status: UserStatus.ACIVE,
+							status: UserStatus.ACTIVE,
 						},
 					});
 					return exitingUser != null;

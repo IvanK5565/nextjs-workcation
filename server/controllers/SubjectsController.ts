@@ -1,11 +1,12 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
-import { DELETE, GET, POST, USE } from "./decorators";
+import { DELETE, Entity, GET, POST, USE } from "./decorators";
 import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 import { IService } from "@/server/services";
 import { authMiddleware } from "@/server/lib/authMiddleware";
+import type { ActionProps } from "@/types";
 
-@USE((req, res, next) => next())
+@Entity('SubjectEntity')
 export default class SubjectsController extends BaseController {
 	protected getService(): IService {
 		return this.di.SubjectsService;
@@ -44,5 +45,10 @@ export default class SubjectsController extends BaseController {
 	public deleteById(req: NextApiRequest) {
 		const id = Number(req.query.id);
 		return this.di.SubjectsService.delete(id);
+	}
+
+	@GET('/api/not/exist')
+	public certain({}:ActionProps) {
+		return {certain: 'subjects'}
 	}
 }

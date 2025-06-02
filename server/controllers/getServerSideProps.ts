@@ -3,22 +3,15 @@ import IContextContainer from "@/server/container/IContextContainer";
 import { IControllerContainer } from ".";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../exceptions";
-import { onErrorResponse, onSuccessResponse } from "../utils";
+import { onSuccessResponse } from "../utils";
 import { redux } from "@/client/store";
-import BaseEntity from "@/client/entities/BaseEntity";
 import { addEntities } from "@/client/store/actions";
-import container from "@/client/context/container";
+import { Logger } from "../logger";
 
-type GSSPFactory = <K extends keyof IControllerContainer>(
-	controllersNames: K[],
+type GSSPFactory = (
+	controllersNames: (keyof IControllerContainer)[],
 	route?: string
 ) => GetServerSideProps;
-
-const entities: Record<string, BaseEntity> = {
-	UsersController: container.resolve("UserEntity"),
-	ClassesController: container.resolve("ClassEntity"),
-	SubjectsController: container.resolve("SubjectEntity"),
-};
 
 export default function getServerSidePropsContainer(
 	ctx: IContextContainer
@@ -36,9 +29,17 @@ export default function getServerSidePropsContainer(
 					.handler(route)(req, context.res as NextApiResponse)
 					.then((r) => {
 						if (r) {
-							const normal = entities[name].normalize(r);
-							store.dispatch(addEntities(normal.entities));
-							data = normal;
+							const entity = ctx[name].getEntityName();
+							if (entity) {
+								const normalize = redux.normalizer(entity);
+								const normal = normalize(r);
+								normal.result = normal.result ?? null;
+								store.dispatch(addEntities(normal.entities));
+								data = normal;
+							} else {
+								Logger.warn(`Controller ${name} does not have an entity associated with it.`);
+								data = r;
+							}
 						}
 					});
 			});
@@ -53,10 +54,13 @@ export default function getServerSidePropsContainer(
 							return { redirect: { destination: "/signIn", permanent: true } };
 						case StatusCodes.NOT_FOUND:
 							return { notFound: true };
+						case StatusCodes.METHOD_NOT_ALLOWED:
+							return { props: {} };
 					}
 				}
 				return {
-					props: onErrorResponse(error as Error),
+					// props: onErrorResponse(error as Error),
+					redirect: { destination: "/404", permanent: false },
 				};
 			}
 			return {

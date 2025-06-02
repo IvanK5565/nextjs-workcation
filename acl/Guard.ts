@@ -2,9 +2,6 @@ import { Logger } from "@/server/logger";
 import Acl from "./Acl";
 import { ROLE, IRoles, IRules, GRANT } from "./types";
 
-// Requires set-value@^2.0.1 !!!
-const set = require("set-value");
-
 class Guard {
 	private mAcl: Acl;
 	private mRoles: IRoles;
@@ -94,6 +91,7 @@ class Guard {
 				}
 			}
 		} catch (e) {
+			Logger.error((e as Error).message)
 			isRouter = false;
 		}
 		return isRouter;
@@ -131,112 +129,6 @@ class Guard {
 		}
 		return isAllowed;
 	}
-
-	// public build(identity: IIdentity) {
-	//     const acl = new Acl();
-	//     this.init(acl);
-	//     if (identity.secret && identity.secret.length > 0) {
-	//         this.init(acl, identity.secret);
-	//     }
-	//     this.acl = acl;
-	//     this.identity = identity;
-	//     return this;
-	// }
-
-	// private init(secret?: string) {
-	// 	const s = secret ? secret + ":" : "";
-	// 	for (const role in this.roles) {
-	// 		if (this.roles.hasOwnProperty(role)) {
-	// 			const item = this.roles[role];
-	// 			const parentRoleId = item.parent ?? null;
-	// 			let parentRole: string[] | string | null = null;
-	// 			if (parentRoleId !== null) {
-	// 				parentRole = [];
-	// 				parentRole = parentRoleId.map((pRole) => s + pRole);
-	// 			}
-	// 			const pr: string[] | string | null =
-	// 				!!secret && role === ROLE.GUEST ? ROLE.GUEST : parentRole;
-	// 			this.acl.addRole(s + role, pr);
-	// 		}
-	// 	}
-
-	// 	for (const resource in this.rules) {
-	// 		if (this.rules.hasOwnProperty(resource)) {
-	// 			if (!secret) {
-	// 				this.acl.addResource(resource);
-	// 			} else {
-	// 				this.acl.addResource(s + resource, resource);
-	// 			}
-	// 		}
-	// 	}
-	// 	for (const resource in this.rules) {
-	// 		if (this.rules.hasOwnProperty(resource)) {
-	// 			const grant = this.rules[resource];
-	// 			const res = s + resource;
-	// 			if (grant.hasOwnProperty("allow")) {
-	// 				for (const role in grant.allow) {
-	// 					if (grant.allow.hasOwnProperty(role)) {
-	// 						const grants = grant.allow[role];
-	// 						for (let i = 0, size = grants.length; i < size; i++) {
-	// 							this.acl.allow(s + role, res, grants[i]);
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			if (grant.hasOwnProperty("deny")) {
-	// 				for (const role in grant.deny) {
-	// 					if (grant.deny.hasOwnProperty(role)) {
-	// 						const grants = grant.deny[role];
-	// 						for (let i = 0, size = grants.length; i < size; i++) {
-	// 							this.acl.deny(s + role, res, grants[i]);
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// public getCleanRoles() {
-	// 	const result: IRoles = {};
-	// 	const roles = this.roles;
-	// 	for (const item in roles) {
-	// 		if (roles.hasOwnProperty(item)) {
-	// 			if (this.role === item || this.acl.inheritsRole(this.role, item)) {
-	// 				result[item] = roles[item];
-	// 			}
-	// 		}
-	// 	}
-	// 	return result;
-	// }
-
-	// public getCleanRules() {
-	// 	const result: IRules = {};
-	// 	for (const resource in this.rules) {
-	// 		if (this.rules.hasOwnProperty(resource)) {
-	// 			const grant = this.rules[resource];
-	// 			if (grant.hasOwnProperty("allow")) {
-	// 				for (const r in grant.allow) {
-	// 					if (grant.allow.hasOwnProperty(r)) {
-	// 						if (this.role === r || this.acl.inheritsRole(this.role, r)) {
-	// 							set(result, `${resource}.allow.${r}`, grant.allow[r]);
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 			if (grant.hasOwnProperty("deny")) {
-	// 				for (const r in grant.deny) {
-	// 					if (grant.deny.hasOwnProperty(r)) {
-	// 						if (this.role === r || this.acl.inheritsRole(this.role, r)) {
-	// 							set(result, `${resource}.deny.${r}`, grant.deny[r]);
-	// 						}
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	return result;
-	// }
 }
 
 export default Guard;

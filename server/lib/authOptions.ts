@@ -31,7 +31,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 					let user = await ctx.UserModel.findOne({
 						where: {
 							email: credentials.email,
-							status: UserStatus.ACIVE,
+							status: UserStatus.ACTIVE,
 						},
 					});
 					
@@ -69,7 +69,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			async session({session, user}) {
 				session.user = user as unknown as IIdentity;
 				session.acl = (user as any).acl
-				log("callback: session", session)
+				// log("callback: session", session)
 				return session
 			},
 		},

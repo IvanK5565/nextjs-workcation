@@ -1,59 +1,34 @@
 import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
-import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole } from "@/constants";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole, UserStatus } from "@/constants";
 import { IService } from "../services";
-import { AUTH, BODY, DELETE, GET, POST, USE /*, SSR*/ } from "./decorators";
-import { getHousesData } from "@/pages/api/data";
+import { Auth, Body, DELETE, Entity, GET, POST } from "./decorators";
 import { AnswerType } from "@/types";
 import type { ActionProps } from "@/types";
 import { GRANT, ROLE } from "@/acl/types";
 import { AccessDeniedError, ApiError } from "../exceptions";
+import { registerBodySchema } from "./schemas";
 
-// @USE(authMiddleware)
+@Entity('UserEntity')
 export default class UsersController extends BaseController {
 	protected getService(): IService {
 		return this.di.UsersService;
 	}
 
-	// @SSR('/')
-	@GET("/")
-	public async getData() {
-		const data = getHousesData();
-		return { data };
-	}
-
-	// @SSR('/classes/[id]')
 	@GET("/classes/[id]", {
 		allow: {
 			[ROLE.ADMIN]: [GRANT.WRITE],
 		},
 	})
-	public getTeachersSSR({guard}:ActionProps) {
-    if(!guard.allow(GRANT.READ)) throw new AccessDeniedError();
-		return this.di.UsersService.findByFilter(100, 1, {
+	public getTeachersSSR({ guard }: ActionProps) {
+		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
+		return this.di.UsersService.findByFilter(undefined, undefined, {
 			role: UserRole.TEACHER,
 		});
-		// .then(teachers => ({teachers}))
 	}
 
-	@BODY({
-		type: "object",
-		properties: {
-			id: { type: "integer", nullable: true },
-			firstName: { type: "string" },
-			lastName: { type: "string" },
-			email: { type: "string", format: "email" },
-			password: { type: "string", format: "password" },
-			role: { type: "string" },
-			status: { type: "string" },
-		},
-		required: ["firstName", "lastName", "email", "password", "role", "status"],
-	})
-	@POST("/api/register", {
-		allow: {
-			[ROLE.GUEST]: [GRANT.WRITE],
-		},
-	})
+	@Body(registerBodySchema)
+	@POST("/api/register", { allow: { [ROLE.GUEST]: [GRANT.WRITE] } })
 	public async signUp({ body }: ActionProps) {
 		return this.di.UsersService.save(body);
 	}
@@ -77,7 +52,7 @@ export default class UsersController extends BaseController {
 		return this.di.UsersService.findById(numId);
 	}
 
-	@AUTH
+	@Auth
 	@GET("/profile")
 	public profile({ session }: ActionProps) {
 		if (!session) {
@@ -111,9 +86,29 @@ export default class UsersController extends BaseController {
 		);
 	}
 
-	@DELETE("/api/users")
-	public deleteById({ query }: ActionProps) {
+	@DELETE("/api/users", { allow: { [ROLE.ADMIN]: [GRANT.EXECUTE] } })
+	public deleteById({ query, guard }: ActionProps) {
+		if (!guard.allow(GRANT.EXECUTE)) throw new AccessDeniedError();
 		const id = Number(query!.id);
 		return this.di.UsersService.delete(id);
 	}
+
+	@GET('/api/users/teachers', { allow: { [ROLE.TEACHER]: [GRANT.READ] } })
+	public getTeachers({ guard }: ActionProps) {
+		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
+		return this.di.UsersService.findByRole(UserRole.TEACHER)
+	}
+
+	@GET('/api/users/students', { allow: { [ROLE.TEACHER]: [GRANT.READ] } })
+	public getStudents({ guard }: ActionProps) {
+		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
+		return this.di.UsersService.findByRole(UserRole.STUDENT)
+	}
+
+	@GET("/api/users/active", { allow: { [ROLE.ADMIN]: [GRANT.READ] } })
+	public getActiveUsers({ guard }: ActionProps) {
+		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
+		return this.di.UsersService.findByStatus(UserStatus.ACTIVE);
+	}
+
 }

@@ -1,4 +1,6 @@
-export default function NoData({ message = "No Data Available", subMessage = "Please check back later." }) {
+export default function NoData() {
+  const message = "No Data Available"
+  const subMessage = "Please check back later."
 	return (
     <div className="flex flex-col items-center justify-center w-full h-full text-center p-6 bg-gray-50 rounded-md border border-dashed border-gray-300">
       <NoDataSVG width={800} height={800} className="w-12 h-12 text-gray-400 mb-3" />

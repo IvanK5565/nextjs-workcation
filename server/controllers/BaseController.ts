@@ -6,6 +6,7 @@ import {
 	AccessDeniedError,
 	ApiError,
 	NotAllowedError,
+	UnauthorizedError,
 } from "@/server/exceptions";
 import { StatusCodes } from "http-status-codes";
 import {
@@ -29,10 +30,41 @@ import Guard from "@/acl/Guard";
 import { IControllerContainer } from ".";
 import { Routes } from "../utils/routes";
 import container from "../container/container";
+import { IEntityContainer } from "@/client/entities";
+
+class Mutex {
+	private mutex = Promise.resolve();
+
+	async runCritical<T>(callback: () => Promise<T> | T): Promise<T> {
+		const unlock = await this.lock();
+		Logger.info('Start critical section');
+		try {
+			return await callback();
+		} finally {
+			unlock();
+			Logger.info('End critical section');
+		}
+	}
+
+	lock(): Promise<() => void> {
+		let begin: (unlock: () => void) => void = () => { };
+		this.mutex = this.mutex.then(() => new Promise(begin));
+		return new Promise(resolve => {
+			begin = resolve;
+		});
+	}
+}
+
+type ExtendedRequest = NextApiRequest & {
+	guard?: Guard;
+	session?: Session | null;
+};
 
 export default abstract class BaseController extends BaseContext {
+	private static mutex = new Mutex();
+
 	@POST("/api/echo")
-	public async echo({body}: ActionProps) {
+	public async echo({ body }: ActionProps) {
 		Logger.info(body);
 		return body;
 	}
@@ -50,31 +82,93 @@ export default abstract class BaseController extends BaseContext {
 		};
 	}
 
+	private async prepareRequest(
+		req: ExtendedRequest,
+		res: NextApiResponse,
+	) {
+
+		await BaseController.mutex.runCritical(async () => {
+			if (!req.session) {
+				req.session = await getServerSession<AuthOptions, Session>(
+					req,
+					res,
+					this.di.authOptions
+				);
+			}
+			if (!req.guard) {
+				req.guard = new Guard(
+					this.di.roles,
+					this.di.rules,
+					req.session?.user.role || ROLE.GUEST
+				);
+			}
+		});
+
+		// const unlock = await BaseController.mutex.lock();
+		// try {
+		// 	if (!req.session) {
+		// 		req.session = await getServerSession<AuthOptions, Session>(
+		// 			req,
+		// 			res,
+		// 			this.di.authOptions
+		// 		);
+		// 	}
+		// 	if (!req.guard) {
+		// 		req.guard = new Guard(
+		// 			this.di.roles,
+		// 			this.di.rules,
+		// 			req.session?.user.role || ROLE.GUEST
+		// 		);
+		// 	}
+		// } catch (error) {
+		// 	this.di.Logger.error("Error in prepareRequest:", error);
+		// 	throw error;
+		// } finally {
+		// 	unlock();
+		// }
+	}
+
 	private async getActionProps(
-		req: NextApiRequest,
+		req: ExtendedRequest,
 		res: NextApiResponse,
 		route: string
 	): Promise<ActionProps> {
-		const session = await getServerSession<AuthOptions, Session>(
-			req,
-			res,
-			this.di.authOptions
-		);
-		this.di.Logger.log("getActionProps method:", req.method, 'session:', session);
+		await BaseController.mutex.runCritical(async () => {
+			if (!req.session) {
+				Logger.log('get session in getActionProps for route:', route, 'in controller:', this.constructor.name);
+				req.session = await getServerSession<AuthOptions, Session>(
+					req,
+					res,
+					this.di.authOptions
+				);
+			} else {
+				Logger.log('session already exists in getActionProps for route:', route, 'in controller:', this.constructor.name);
+			}
+			if (!req.guard) {
+				Logger.log('create Guard in getActionProps for route:', route, 'in controller:', this.constructor.name);
+				req.guard = new Guard(
+					this.di.roles,
+					this.di.rules,
+					req.session?.user.role || ROLE.GUEST
+				);
+			} else {
+				Logger.log('Guard already exists in getActionProps for route:', route, 'in controller:', this.constructor.name);
+			}
+		})
+		if(!req.session) throw new UnauthorizedError();
+		// this.di.Logger.log("getActionProps method:", req.method, 'session:', session);
 		// const guard = this.di.buildGuard(route, session?.user.role);
-		const {roles,rules} = this.di;
-		const guard = new Guard(roles, rules, session?.user.role || ROLE.GUEST);
-		guard.resource = route;
-		if (!guard) throw new AccessDeniedError();
+		if (!req.guard) throw new AccessDeniedError();
+		req.guard.resource = route;
 		return {
 			query: req.query,
 			body: req.body,
-			session,
-			guard: guard,
+			session: req.session,
+			guard: req.guard,
 		};
 	}
 
-	private getInvokeOutput(req: NextApiRequest) {
+	public static getInvokeOutput(req: NextApiRequest) {
 		const error = new ApiError(
 			i18.UnknownRouteErrorMessage,
 			StatusCodes.INTERNAL_SERVER_ERROR,
@@ -118,7 +212,7 @@ export default abstract class BaseController extends BaseContext {
 
 	public handler(_route?: string): Handler {
 		return async (req, res) => {
-			const route = _route ?? this.getInvokeOutput(req);
+			const route = _route ?? BaseController.getInvokeOutput(req);
 			const ssr = !route.startsWith("/api/");
 			const router = this.createRouter(route);
 			const data = router.run(req, res).then((d) => d as ActionResult);
@@ -137,21 +231,27 @@ export default abstract class BaseController extends BaseContext {
 		};
 	}
 
-	public static getRoutes(){
-		const routes:[string, keyof IControllerContainer][] = Reflect.getMetadata('routes', BaseController) ?? [];
+	public static getRoutes() {
+		const routes: [string, keyof IControllerContainer][] = Reflect.getMetadata('routes', BaseController) ?? [];
 		return routes;
 	}
-	public static handler():Handler{
+	public static handler(): Handler {
 		const routesAndControlles = this.getRoutes()
 		const routes = Routes.fromStrings(...routesAndControlles.map(rc => rc[0]))
 		const findedRoute = routes.findRoute('')?.toString() ?? null;
-		if(findedRoute){
-			const controller = routesAndControlles.find(rc => rc[0]===findedRoute)?.[1];
-			if(controller)
+		if (findedRoute) {
+			const controller = routesAndControlles.find(rc => rc[0] === findedRoute)?.[1];
+			if (controller)
 				return container.resolve(controller).handler();
 		}
 		return async (req, res) => {
 			res.status(404).json('Not Found');
 		}
+	}
+
+	public getEntityName(): (keyof IEntityContainer) | null {
+		const entity = Reflect.getMetadata("entity", this);
+		if(!entity) return null;
+		return entity as keyof IEntityContainer;
 	}
 }

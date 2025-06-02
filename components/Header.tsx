@@ -40,6 +40,7 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
         <Link href="/" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Messages</Link>
         <Link href="/admin" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Admin</Link>
         <Link href="/classes/1" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Classes/1</Link>
+        <Link href="/test" className="mt-1 block px-3 py-1 rounded font-semibold text-white hover:bg-gray-800 sm:mt-0 sm:text-sm sm:px-2 sm:ml-2 xl:text-gray-900">Test</Link>
       </div>
       <div className="relative px-5 py-5 sm:py-0 sm:ml-4 sm:px-0">
         <div className="flex items-center sm:hidden">

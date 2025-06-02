@@ -7,10 +7,13 @@ import NoData from "@/components/NoData";
 import clsx from "clsx";
 import { AppState } from "@/client/store/ReduxStore";
 import { entitySelector } from "@/client/store/selectors";
+import { deleteEntities } from "@/client/store/actions";
 
-export default function Home() {
+const Home = () => {
 	const session = useSession();
 	const [entity, setEntity] = useState<keyof AppState["entities"]>("users");
+	const [direction, setDirection] =
+		useState<"straight" | "reverse">("straight");
 	const entities = useSelector(entitySelector(entity));
 	const response = useSelector<AppState, Response>(
 		(state) => state.latestResponse
@@ -21,7 +24,10 @@ export default function Home() {
 		<div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
 			<Header />
 			<div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
-				<NavBar onEntitySelect={(e) => setEntity(e)} />
+				<NavBar
+					onEntitySelect={(e) => setEntity(e)}
+					onDirectionSelect={(e) => setDirection(e)}
+				/>
 				<main className="py-6 px-2 xl:flex-1 xl:overflow-x-hidden">
 					<p>{session.data?.user?.email}</p>
 					<p>{entity}</p>
@@ -33,15 +39,23 @@ export default function Home() {
 						</div>
 					</div>
 					{entities && Object.keys(entities).length > 0 ? (
-						<DataBody data={entities} />
+						<DataBody
+							data={entities}
+							reverse={direction === "reverse"}
+							collection={entity}
+						/>
 					) : (
-						<NoData />
+						<div className="mt-4">
+							<NoData />
+						</div>
 					)}
 				</main>
 			</div>
 		</div>
 	);
 }
+export default Home;
+Home.getLayout = (page: React.ReactNode) => page;
 
 function ResponseHeader({
 	res: { code, success, type, message },
@@ -79,7 +93,14 @@ const buttonStyle =
 
 const Null = () => <span className="text-gray-400 italic">null</span>;
 
-function DataCard({ data }: { data: object | null }) {
+function DataCard({
+	data,
+	collection,
+}: {
+	data: (object & { id: string }) | null;
+	collection: string;
+}) {
+	const dispatch = useDispatch();
 	return data == null ? (
 		<Null />
 	) : (
@@ -87,22 +108,39 @@ function DataCard({ data }: { data: object | null }) {
 			{Object.entries(data).map(([key, value]) => (
 				<div key={key} className="flex gap-x-2 space-y-1 text-gray-700">
 					<div className="w-32 font-semibold">{key}:</div>
-					<div>{value === null ? <Null /> : String(value)}</div>
+					<div className="truncate">{value === null ? <Null /> : String(value)}</div>
 				</div>
 			))}
-			<button className={buttonStyle}>Click</button>
+			<button
+				className={buttonStyle}
+				onClick={() => {
+					dispatch(deleteEntities({ [collection]: { [data.id]: data } }));
+				}}
+			>
+				Delete
+			</button>
 		</div>
 	);
 }
 
-function DataBody({ data }: { data: object | null }) {
+function DataBody({
+	data,
+	reverse,
+	collection,
+}: {
+	data: object | null;
+	reverse?: boolean;
+	collection: string;
+}) {
 	if (data == null)
 		return <span className="font-medium text-gray-800">null</span>;
 
+	const entries = Object.entries(data);
+
 	return (
 		<section className="space-y-4 mt-4">
-			{Object.entries(data).map((item, index) => (
-				<DataCard key={index} data={item[1]} />
+			{(reverse ? entries.reverse() : entries).map((item, index) => (
+				<DataCard key={index} data={item[1]} collection={collection} />
 			))}
 		</section>
 	);
@@ -118,8 +156,10 @@ const NavButtonStyle =
 
 function NavBar({
 	onEntitySelect,
+	onDirectionSelect,
 }: {
 	onEntitySelect: (data: keyof AppState["entities"]) => void;
+	onDirectionSelect: (dir: "straight" | "reverse") => void;
 }) {
 	const [input, setInput] = useState("1");
 	const [entity, setEntity] = useState<keyof AppState["entities"]>("users");
@@ -173,6 +213,27 @@ function NavBar({
 									<option>users</option>
 									<option>classes</option>
 									<option>subjects</option>
+								</select>
+							</label>
+						</div>
+						<div className="flex flex-wrap -mx-2">
+							<label className="block w-full px-2 sm:mt-0 sm:w-1/2 lg:mt-4 lg:w-full">
+								<span className="text-sm font-semibold text-gray-500">
+									Direction
+								</span>
+								<select
+									className="mt-1 form-select rounded-lg block w-full text-white shadow"
+									onChange={(e) => {
+										if (
+											e.target.value === "straight" ||
+											e.target.value === "reverse"
+										) {
+											onDirectionSelect(e.target.value);
+										}
+									}}
+								>
+									<option>straight</option>
+									<option>reverse</option>
 								</select>
 							</label>
 						</div>

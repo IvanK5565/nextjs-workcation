@@ -11,61 +11,66 @@ import { entitySelector } from "@/client/store/selectors";
 import { UserRole } from "@/constants";
 import { IClass, IUser } from "@/client/store/types";
 
-function ClassEditForm({data, handleSubmit}:{data:{_class:IClass, teachers:IUser[]}, handleSubmit:(e: FormEvent<HTMLFormElement>) => Promise<void>}){
-return <div>
-<p className="pl-10">id:{data._class.id}</p>
-<form
-	onSubmit={handleSubmit}
-	className="flex flex-col w-min pl-10"
->
-	<input
-		type="hidden"
-		name="id"
-		className="block"
-		defaultValue={data._class.id}
-	/>
-	<input
-		type="text"
-		name="title"
-		className=""
-		defaultValue={data._class.title}
-		required
-	/>
-	<select
-		name="teacher_id"
-		id="teacher_id"
-		defaultValue={data._class.teacher_id}
-		required
-	>
-		<option value="">Teacher</option>
-		{data.teachers.map((t, i) => (
-			<option key={i} value={t.id}>
-				{t.lastName} {t.role}
-			</option>
-		))}
-	</select>
-	<select
-		name="status"
-		id="status"
-		defaultValue={data._class.status}
-		required
-	>
-		<option value="">Status</option>
-		<option value="active">Active</option>
-		<option value="closed">Closed</option>
-		<option value="draft">Draft</option>
-	</select>
-	<input
-		type="number"
-		name="year"
-		defaultValue={data._class.year}
-		required
-	/>
-	<Button type="submit" className="border mt-5">
-		Submit
-	</Button>
-</form>
-</div>
+function ClassEditForm({
+	data,
+	handleSubmit,
+}: {
+	data: { _class: IClass; teachers: IUser[] };
+	handleSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+}) {
+	return (
+		<div>
+			<p className="pl-10">id:{data._class.id}</p>
+			<form onSubmit={handleSubmit} className="flex flex-col w-min pl-10">
+				<input
+					type="hidden"
+					name="id"
+					className="block"
+					defaultValue={data._class.id}
+				/>
+				<input
+					type="text"
+					name="title"
+					className=""
+					defaultValue={data._class.title}
+					required
+				/>
+				<select
+					name="teacher_id"
+					id="teacher_id"
+					defaultValue={data._class.teacher_id}
+					required
+				>
+					<option value="">Teacher</option>
+					{data.teachers.map((t, i) => (
+						<option key={i} value={t.id}>
+							{t.lastName} {t.role}
+						</option>
+					))}
+				</select>
+				<select
+					name="status"
+					id="status"
+					defaultValue={data._class.status}
+					required
+				>
+					<option value="">Status</option>
+					<option value="active">Active</option>
+					<option value="closed">Closed</option>
+					<option value="draft">Draft</option>
+				</select>
+				<input
+					type="number"
+					name="year"
+					defaultValue={data._class.year}
+					required
+				/>
+				<Button type="submit" className="border mt-5">
+					Submit
+				</Button>
+			</form>
+		</div>
+	);
 }
 
 export default function Home({ code }: { code: number }) {
@@ -97,20 +102,14 @@ export default function Home({ code }: { code: number }) {
 		});
 	};
 	return (
-		<div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
-			<Header />
-			<div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
-				<SearchBar />
-				<main className="py-6 xl:flex-1 xl:overflow-x-hidden">
-					{code === 403 ? (
-						<AccessDenied />
-					) : !!data && data._class && data.teachers ? (
-						<ClassEditForm data={data} handleSubmit={handleSubmit} />
-					) : (
-						<NoData />
-					)}
-				</main>
-			</div>
+		<div>
+			{code === 403 ? (
+				<AccessDenied />
+			) : !!data && data._class && data.teachers ? (
+				<ClassEditForm data={data} handleSubmit={handleSubmit} />
+			) : (
+				<NoData />
+			)}
 		</div>
 	);
 }

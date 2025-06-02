@@ -1,11 +1,10 @@
 import { createWrapper } from "next-redux-wrapper";
-import { all } from "redux-saga/effects";
+import { all, fork } from "redux-saga/effects";
 import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import { latestResponseReducer } from "./latestResponse";
 import { combineReducers } from "redux";
 import BaseEntity from "../entities/BaseEntity";
-import logger from "redux-logger";
 import { errorReducer } from ".";
 import { BaseContext } from "../context/BaseContext";
 import { IClientContainer } from "../context/container";
@@ -20,6 +19,9 @@ import {
   REGISTER,
 } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
+import { Entities } from "./types";
+import baseReducer from "./baseReducer";
+import { IEntityContainer } from "../entities";
 
 export type AppStore = ReturnType<ReturnType<ReduxStore["getMakeStore"]>>;
 export type AppState = ReturnType<AppStore["getState"]>;
@@ -48,16 +50,39 @@ export class ReduxStore extends BaseContext {
 	public get getServerSideProps() {
 		return this._wrapper.getServerSideProps;
 	}
+	public normalizer(name: keyof IEntityContainer): BaseEntity['normalize'] {
+		const entity = this.di[name];
+		return entity.normalize.bind(entity);
+	}
+
+	private *rootSaga() {		
+		const sagas = BaseEntity.sagas(this.di).map(saga => fork(saga));
+		// entitiesKeys.map((name) => {
+		// 	const entity = this.di[name];
+		// 	return fork(entity.rootSaga.bind(entity))
+		// })
+		yield all(sagas);
+	}
+	private reducers() {
+		const names: (keyof Entities)[] =
+			Reflect.getMetadata("reducers", BaseEntity) ?? [];
+		const reducers = names.reduce(
+			(acc, name) => ({
+				...acc,
+				[name]: baseReducer(name),
+			}),
+			{} as Record<string, ReturnType<typeof baseReducer>>
+		);
+		return reducers;
+	}
 
 	private getMakeStore() {
-		const di = this.di;
+		const rootSaga = this.rootSaga.bind(this);
+		const reducers = this.reducers();
 		const makeStore = () => {
-			const rootSaga = function* () {
-				yield all(di.sagas);
-			};
 			const reducer = combineReducers({
 				latestResponse: latestResponseReducer,
-				entities: combineReducers(BaseEntity.reducers()),
+				entities: combineReducers(reducers),
 				error: errorReducer,
 			});
 			const persistedReducer = persistReducer(this.persistConfig, reducer);
@@ -77,7 +102,7 @@ export class ReduxStore extends BaseContext {
 								REGISTER,
 							],
 						},
-					}).concat(sagaMiddleware, logger),
+					}).concat(sagaMiddleware /*, logger*/),
 				devTools: true,
 			});
 			const saga = sagaMiddleware.run(rootSaga);

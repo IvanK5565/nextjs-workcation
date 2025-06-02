@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import BaseEntity, { ENTITIES, EntitiesName, EntityAction } from "./BaseEntity";
+import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../context/container";
+import { addEntities } from "../store/actions";
+import { put } from "redux-saga/effects";
 
 export type SubjectAction = EntityAction<SubjectEntity>;
 
 @reducer('subjects')
 export default class SubjectEntity extends BaseEntity {
 	protected schema;
-		protected name:EntitiesName;
+	protected name: EntitiesName;
 
-	constructor(di:IClientContainer) {
-    super(di);
+	constructor(di: IClientContainer) {
+		super(di);
 		this.schema = new schema.Entity("subjects");
 		this.name = 'SubjectEntity';
 	}
@@ -35,5 +37,12 @@ export default class SubjectEntity extends BaseEntity {
 		const id = payload.id;
 		if (!id) throw new Error("Id required");
 		yield this.xRead(`/subjects/${id}`);
+	}
+
+	@action
+	public *deleteSubject(payload: any) {
+		if (!payload.id) throw new Error("Id required");
+		const normalized = this.normalize(payload);
+		yield put({type:'DELETE', payload:{entities:normalized.entities}});
 	}
 }

@@ -123,7 +123,7 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 							email: user.email,
 							role: user.role ?? ROLE.GUEST,
 							emailVerified: user.emailVerified,
-							status: UserStatus.ACIVE,
+							status: UserStatus.ACTIVE,
 						})
 						.save()
 						.then((user) => user.id);
@@ -179,7 +179,7 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 				id: dbUser.id.toString(),
 			};
 			const acl = session.acl;
-			ctx.Logger.log('getSessionAndUser',session)
+			// ctx.Logger.log('getSessionAndUser',session)
 			return { session, user:{...user, acl} };
 		},
 		async updateSession(updates) {

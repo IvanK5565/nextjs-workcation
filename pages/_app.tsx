@@ -5,20 +5,29 @@ import { Provider } from "react-redux";
 import { redux } from "@/client/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { AppStore } from "@/client/store/ReduxStore";
+import Layout from "./layout";
 // import store from '../client/store'
+
+type AppPropsWithLayout = AppProps & {
+	Component: AppProps["Component"] & {
+		getLayout?: (page: React.ReactNode) => React.ReactNode;
+	};
+};
 
 export default function App({
 	Component,
 	// pageProps: { session, ...pageProps },
 	...rest
-}: AppProps) {
+}: AppPropsWithLayout ) {
+	const layout = Component.getLayout || ((page) => <Layout>{page}</Layout>);
 	const { store, props } = redux.useWrappedStore(rest);
 	// const { store, props } = wrapper.useWrappedStore(rest);
 	return (
 		<Provider store={store}>
 			<PersistGate persistor={(store as AppStore).__persistor}>
 				<SessionProvider session={props.session}>
-					<Component {...props.pageProps} />
+					{layout(<Component {...props.pageProps} />)}
+					{/* <Component {...props.pageProps} /> */}
 				</SessionProvider>
 			</PersistGate>
 		</Provider>

@@ -1,21 +1,14 @@
 import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 import BaseController from "./BaseController";
 import type { ActionProps } from "@/types";
-import { BODY, DELETE, GET, POST, QUERY, USE /*,SSR*/ } from "./decorators";
+import { DELETE, Entity, GET, POST, Query, USE } from "./decorators";
 import { authMiddleware } from "../lib/authMiddleware";
 import { GRANT, ROLE } from "@/acl/types";
 import { AccessDeniedError } from "../exceptions";
 
-@USE((_req, _res, next) => {
-	console.log("CLASSES USE 1");
-	return next();
-})
-@USE((_req, _res, next) => {
-	console.log("CLASSES USE 2");
-	return next();
-})
+@Entity('ClassEntity')
 export default class ClassesController extends BaseController {
-	@QUERY({
+	@Query({
 		type: "object",
 		properties: {
 			id: { type: "string", pattern: "^\\d+$" },
@@ -49,7 +42,7 @@ export default class ClassesController extends BaseController {
 			[ROLE.ADMIN]:[GRANT.WRITE]
 		}
 	})
-	// @BODY({
+	// @Body({
 	// 	type: "object",
 	// 	properties: {
 	// 		id: { type: "integer", nullable: true },
@@ -60,7 +53,7 @@ export default class ClassesController extends BaseController {
 	// 	},
 	// 	required: ["teacher_id", "title", "year", "status"],
 	// })
-	public save({ body, guard }: ActionProps) {
+	public save({ guard }: ActionProps) {
 		if(!guard.allow(GRANT.WRITE)){
 			throw new AccessDeniedError();
 		}
@@ -80,7 +73,7 @@ export default class ClassesController extends BaseController {
 	// 	})
 	// )
 	/////
-	@QUERY({
+	@Query({
 		type: "object",
 		properties: {
 			id: { type: "string", pattern: "^\\d+$" },

@@ -5,9 +5,9 @@ import "reflect-metadata";
 import { rules } from "@/config.acl";
 import { authMiddleware } from "../lib/authMiddleware";
 import BaseController from "./BaseController";
+import { IEntityContainer } from "@/client/entities";
 
-type Decorator = (target: object, propertyKey: string) => void;
-type EndpointDecorator = (route: string, allow?: IAllowDeny) => Decorator;
+type ActionDecorator = (route: string, allow?: IAllowDeny) => MethodDecorator;
 
 function addMethodToRouteRules(routeRules: IAllowDeny, method: GRANT) {
 	if (routeRules.allow) {
@@ -30,22 +30,22 @@ function addMethodToRouteRules(routeRules: IAllowDeny, method: GRANT) {
 	}
 	return routeRules;
 }
-type EDecoratorFactory = (
+type ActionDecoratorFactory = (
 	method: "get" | "post" | "put" | "delete"
-) => EndpointDecorator;
+) => ActionDecorator;
 
-const endpointDecorator: EDecoratorFactory =
+const endpointDecorator: ActionDecoratorFactory =
 	(method) => (route, pRules) => (target, propertyKey) => {
 		const endpoints: MethodHandler[] = Reflect.getMetadata(route, target) ?? [];
-		endpoints.push({ method, handler: propertyKey });
+		endpoints.push({ method, handler: propertyKey as string });
 		Reflect.defineMetadata(route, endpoints, target);
 		if (pRules) {
 			const reg = /\[([a-zA-Z0-9_-]+)\]/g;
 			const routePattern = route.replace(reg, "*");
 			rules[routePattern] = addMethodToRouteRules(pRules, GRANT.GET);
 		}
-		const routes:[string, string][] = BaseController.getRoutes();
-		if(!routes.find(rc => rc[0] === route && rc[1] === target.constructor.name))
+		const routes: [string, string][] = BaseController.getRoutes();
+		if (!routes.find(rc => rc[0] === route && rc[1] === target.constructor.name))
 			routes.push([route, target.constructor.name])
 		Reflect.defineMetadata('routes', routes, BaseController);
 	};
@@ -55,20 +55,9 @@ export const POST = endpointDecorator("post");
 export const PUT = endpointDecorator("put");
 export const DELETE = endpointDecorator("delete");
 
-// function endpointDecorator(route: string, method: string, allow:IGrants) {
-// 	return (target: any, propertyKey: string) => {
-// 		let endpoints: MethodHandler[] = Reflect.getMetadata(route, target) ?? [];
-// 		endpoints.push({ method, handler: propertyKey });
-// 		Reflect.defineMetadata(route, endpoints, target);
-// 	};
-// };
-// export const GET = (route: string, allow:IGrants) => endpointDecorator(route, "get", allow);
-// export const POST = (route: string, allow:IGrants) => endpointDecorator(route, "post", allow);
-// export const DELETE = (route: string, allow:IGrants) => endpointDecorator(route, "delete", allow);
-// export const PUT = (route: string, allow:IGrants) => endpointDecorator(route, "put", allow);
-
 export const USE = (middleware: Middleware) => {
-	return (target: object['constructor'], propertyKey?: string) => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return (target: any, propertyKey?: string) => {
 		const middlewares: Middleware[] =
 			Reflect.getMetadata(
 				"middlewares",
@@ -87,12 +76,15 @@ export const USE = (middleware: Middleware) => {
 	};
 };
 
-export const AUTH = USE(authMiddleware);
+export const Auth = USE(authMiddleware);
 
-// export const QUERY = (schema: object) => USE(validate(schema, 'query'));
-// export const BODY = (schema: object) => USE(validate(schema, 'body'));
-function validateDecorator(target: "body" | "query") {
-	return (schema: object) => USE(validate(schema, target));
+const validateDecorator = (target: "body" | "query") => (schema: object) => USE(validate(schema, target));
+
+export const Query = validateDecorator("query");
+export const Body = validateDecorator("body");
+
+export const Entity: (entity: keyof IEntityContainer) => ClassDecorator = (e) => {
+	return (target) => {
+		Reflect.defineMetadata("entity", e, target.prototype);
+	}
 }
-export const QUERY = validateDecorator("query");
-export const BODY = validateDecorator("body");

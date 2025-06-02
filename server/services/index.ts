@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { asClass } from "awilix";
 import UsersService from "./UsersService";
 import ClassesService from "./ClassesService";
@@ -6,9 +7,9 @@ import UserClassesService from "./UserClassesService";
 
 export interface IService {
   save(body:Record<string,string>):Promise<any>;
-  findById(id:Number):Promise<any>;
+  findById(id:number):Promise<any>;
   findByFilter(limit: number, page: number, filters?: Record<string,string>):Promise<any>;
-  delete(id: Number):Promise<any>;
+  delete(id: number):Promise<any>;
 }
 
 export interface IServicesContainer {
@@ -18,9 +19,10 @@ export interface IServicesContainer {
   UserClassesService: UserClassesService;
 }
 
-export default {
+const services = {
   UsersService: asClass(UsersService).singleton(),
   ClassesService: asClass(ClassesService).singleton(),
   SubjectsService: asClass(SubjectsService).singleton(),
   UserClassesService: asClass(UserClassesService).singleton(),
 };
+export default services;

@@ -2,6 +2,7 @@ import i18 from "@/public/locales/en-US";
 import { IService } from ".";
 import BaseContext from "../container/BaseContext";
 import { ValidateError } from "../exceptions";
+import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole, UserStatus } from "@/constants";
 
 export default class UsersService extends BaseContext implements IService {
 	public signIn(email: string, password: string) {
@@ -26,29 +27,17 @@ export default class UsersService extends BaseContext implements IService {
 		return this.save(body);
 	}
 	public async save(body: Record<string, string>) {
-		// const [existingUser, created] = await User.findOrCreate({
-		//   where: { email: user.email },
-		//   defaults: {
-		//     id: user.id,
-		//     name: user.name,
-		//     email: user.email,
-		//     image: user.image,
-		//     username: profile.login,          // From GitHub profile
-		//     role: "user",                     // Default role
-		//     phone: null,                      // Set later via onboarding if needed
-		//   },
-		// });
 		const Model = this.di.UserModel;
 		const { id, ...fields } = body;
 		let model = Model.build();
 		if (id) {
-			let finded = await Model.findByPk(Number(id));
+			const finded = await Model.findByPk(Number(id));
 			if (!finded) {
 				throw new Error(i18.InvalidIdErrorMessage);
 			}
 			model = finded;
 		} else {
-			let finded = await Model.findOne({ where: { email: fields.email } });
+			const finded = await Model.findOne({ where: { email: fields.email } });
 			if (finded) throw new Error(i18.ExistingAccountErrorMessage);
 		}
 
@@ -64,8 +53,8 @@ export default class UsersService extends BaseContext implements IService {
 		return this.di.UserModel.findByPk(id);
 	}
 	public findByFilter(
-		limit: number,
-		page: number,
+		limit: number = DEFAULT_LIMIT,
+		page: number = DEFAULT_PAGE,
 		filters?: Record<string, string>
 	) {
 		return this.di.UserModel.findAll({
@@ -73,6 +62,12 @@ export default class UsersService extends BaseContext implements IService {
 			limit,
 			offset: limit * (page - 1),
 		});
+	}
+	public findByRole(role: UserRole, limit?: number, page?: number,) {
+		return this.findByFilter(limit, page, { role })
+	}
+	public findByStatus(status:UserStatus, limit?: number, page?: number,) {
+		return this.findByFilter(limit, page, { status })
 	}
 	public findOneByFilter(filters?: Record<string, string>) {
 		return this.di.UserModel.findOne({

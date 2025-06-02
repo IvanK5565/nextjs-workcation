@@ -4,7 +4,7 @@ const enUS = {
 		ExistingAccountErrorMessage: "Account is already exist",
     EmailLabel: "Email",
     PasswordLabel: "Password",
-    UnknownRouteErrorMessage: "Unknown route"
+    UnknownRouteErrorMessage: "Unknown route",
 	}
 
 

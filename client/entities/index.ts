@@ -9,8 +9,11 @@ export interface IEntityContainer{
   SubjectEntity: SubjectEntity,
 }
 
-export const entities = {
+const entities = {
   UserEntity: asClass(UserEntity).singleton(),
   ClassEntity: asClass(ClassEntity).singleton(),
   SubjectEntity: asClass(SubjectEntity).singleton(),
 }
+
+
+export { entities };

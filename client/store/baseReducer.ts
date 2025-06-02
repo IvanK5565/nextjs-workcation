@@ -2,27 +2,46 @@ import { HYDRATE } from "next-redux-wrapper";
 import { Entities, EntitiesAction } from "./types";
 
 function baseReducer<K extends keyof Entities>(collectionName: K) {
-	return (state: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
-		if(action.type === 'DELETE_ALL') {
-			return {};
+
+	const onUpdate = (collection: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
+		if(!action.payload?.entities || !action.payload.entities[collectionName]) {
+			return collection
 		}
-		if (!action.payload?.entities || !action.payload?.entities[collectionName])
-			return state;
+		const updatedEntities = action.payload.entities[collectionName];
+		Object.entries(updatedEntities).forEach(([id, entity]) => {
+			if (!!entity) {
+				collection[id] = entity;
+				console.info(`Updated ${collectionName} with id ${id}`, entity);
+			}
+		});
+		return collection;
+	}
+
+	return (collection: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
+
+		switch (action.type) {
+			case 'DELETE_ALL': return {};
+			case 'UPDATE': return onUpdate(collection, action);
+		}
+
+
+		if (!action.payload?.entities || !action.payload?.entities[collectionName]) {
+			return collection;
+		}
 		const newEntities = action.payload.entities[collectionName];
+
 		switch (action.type) {
 			case HYDRATE:
-				return {...newEntities};
+				return { ...newEntities };
 			case "ADD":
-				return { ...state, ...newEntities };
+				return { ...collection, ...newEntities };
 			case "DELETE":
 				return Object.fromEntries(
-					Object.entries(state).filter((entry) => !(entry[0] in newEntities))
+					Object.entries(collection).filter((entry) => !Object.hasOwn(newEntities, entry[0]))
 				);
-			case "DELETE_ALL":
-				return {};
-			default:
-				return state;
 		}
+
+		return collection;
 	};
 }
 export default baseReducer;

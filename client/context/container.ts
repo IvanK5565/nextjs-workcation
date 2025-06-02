@@ -1,10 +1,10 @@
-import { asClass, asFunction, createContainer, InjectionMode } from "awilix";
+import { asClass, createContainer, InjectionMode } from "awilix";
 import { entities, IEntityContainer } from "../entities";
-import { sagas } from "./sagas";
+// import { sagas } from "./sagas";
 import { ReduxStore } from "../store/ReduxStore";
 
 export interface IClientContainer extends IEntityContainer{
-  sagas: ReturnType<typeof sagas>;
+  // sagas: ReturnType<typeof sagas>;
   store: ReduxStore;
 }
 
@@ -15,7 +15,7 @@ const container = createContainer<IClientContainer>({
 
 container.register({
   ...entities,
-  sagas: asFunction(sagas),
+  // sagas: asFunction(sagas),
   store: asClass(ReduxStore).singleton(),
 })
 
