@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import Link from "next/link";
+import { useTranslation } from "next-i18next";
 
 function NavButton({
 	href,
@@ -19,6 +20,7 @@ function NavButton({
 	);
 }
 export default function Navigation({ isHidden, onClose }: { isHidden: boolean, onClose:()=>void }) {
+	const {t} = useTranslation();
 	return (
 		<div
 			className={clsx(
@@ -28,11 +30,12 @@ export default function Navigation({ isHidden, onClose }: { isHidden: boolean, o
 		>
       <button onClick={onClose} type="button" className="z-30 block fixed inset-0 w-full h-full cursor-default xl:hidden"></button>
 			<div className="sm:absolute sm:z-40 sm:right-0 sm:rounded-lg lg:flex xl:block xl:overflow-y-auto xl:w-full">
-				<NavButton onClick={onClose} href="/classes/new">Create Class</NavButton>
-				<NavButton onClick={onClose} href="/users/new">Create User</NavButton>
-				<NavButton onClick={onClose} href="/classes">Classes</NavButton>
-				<NavButton onClick={onClose} href="/diary">Diary</NavButton>
-				<NavButton onClick={onClose} href="/admin">Admin</NavButton>
+				<NavButton onClick={onClose} href="/">{t('main')}</NavButton>
+				<NavButton onClick={onClose} href="/classes/new">{t('createClass')}</NavButton>
+				<NavButton onClick={onClose} href="/users/new">{t('createUser')}</NavButton>
+				<NavButton onClick={onClose} href="/classes">{t('classes')}</NavButton>
+				<NavButton onClick={onClose} href="/diary">{t('diary')}</NavButton>
+				<NavButton onClick={onClose} href="/admin">{t('admin')}</NavButton>
 			</div>
 			{/* <div className="bg-gray-900 px-4 py-4 sm:text-right">
       <button className={buttonStyle}>Update results</button>

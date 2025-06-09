@@ -23,3 +23,10 @@
 .form-radio{
   border-radius: 1.5em;
 }
+
+.navButton{
+  @apply block w-full sm:w-auto sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block xl:w-full xl:my-2;
+}
+.ui-button{
+  @apply px-5 py-3 inline-block rounded-lg text-white font-semibold tracking-wide uppercase w-full;
+}

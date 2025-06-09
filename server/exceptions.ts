@@ -1,4 +1,3 @@
-import i18 from "@/public/locales/en-US";
 import { AnswerType } from "@/types";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 
@@ -24,7 +23,7 @@ class InternalError extends ApiError {
 
 class ValidateError extends ApiError {
 	constructor() {
-		super(i18.ValidateErrorMessage, StatusCodes.BAD_REQUEST, AnswerType.Toast);
+		super('ValidateErrorMessage', StatusCodes.BAD_REQUEST, AnswerType.Toast);
 	}
 }
 

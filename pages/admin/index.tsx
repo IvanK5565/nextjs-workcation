@@ -8,6 +8,8 @@ import { entitySelector } from "@/client/store/selectors";
 import { deleteEntities } from "@/client/store/actions";
 import { useActions } from "@/client/hooks";
 import { Entities } from "@/client/store/types";
+import { useTranslation } from "next-i18next";
+import { t } from "i18next";
 
 const Home = () => {
 	const session = useSession();
@@ -63,6 +65,7 @@ function DataCard({
 	data: (object & { id: string }) | null;
 	onDelete: () => void;
 }) {
+	const { t } = useTranslation();
 	return data == null ? (
 		<Null />
 	) : (
@@ -76,7 +79,7 @@ function DataCard({
 				</div>
 			))}
 			<button className={buttonStyle} onClick={onDelete}>
-				Delete
+				{t('delete')}
 			</button>
 		</div>
 	);
@@ -114,9 +117,6 @@ function EntitiesExplorer({
 		</section>
 	);
 }
-
-const NavButtonStyle =
-	"block w-full sm:w-auto sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block xl:w-full xl:my-2";
 
 function GetEntityBar({ entity }: { entity: keyof Entities }) {
 	const [input, setInput] = useState("1");
@@ -175,11 +175,11 @@ function GetEntityBar({ entity }: { entity: keyof Entities }) {
 								}}
 							/>
 						</div>
-						<button className={NavButtonStyle} onClick={() => getById()}>
+						<button className='navButton' onClick={() => getById()}>
 							{baseUrl}/{input}
 						</button>
 						<button
-							className={NavButtonStyle}
+							className='navButton'
 							onClick={() => {
 								getData();
 							}}
@@ -187,16 +187,16 @@ function GetEntityBar({ entity }: { entity: keyof Entities }) {
 							{baseUrl}
 						</button>
 						<button
-							className={NavButtonStyle}
+							className='navButton'
 							onClick={() => dispatch({ type: "DELETE_ALL" })}
 						>
-							Delete all
+							{t('deleteAll')}
 						</button>
 						<button
-							className={NavButtonStyle}
+							className='navButton'
 							onClick={() => dispatch({ type: "getError" })}
 						>
-							Call Error
+							{t('callError')}
 						</button>
 					</div>
 				</div>
@@ -272,8 +272,8 @@ function Filter({
 								}
 							}}
 						>
-							<option>straight</option>
-							<option>reverse</option>
+							<option>{t('direction.straight')}</option>
+							<option>{t('direction.reverse')}</option>
 						</select>
 					</label>
 				</div>

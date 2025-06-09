@@ -3,7 +3,6 @@ import GitHub from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import { TimesInMS, UserStatus } from "@/constants";
 import IContextContainer from "@/server/container/IContextContainer";
-import i18 from "@/public/locales/en-US";
 import { IIdentity } from "@/acl/types";
 import { encode as defaultEncode } from "next-auth/jwt";
 import { randomUUID } from "crypto";
@@ -24,8 +23,8 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			}),
 			Credentials({
 				credentials: {
-					email: { label: i18.EmailLabel, type: "email" },
-					password: { label: i18.PasswordLabel, type: "password" },
+					email: { label: 'EmailLabel', type: "email" },
+					password: { label: 'PasswordLabel', type: "password" },
 				},
 				async authorize(credentials) {
 					if (!credentials) return null;

@@ -21,7 +21,6 @@ import {
 import type { ActionProps } from "@/types";
 import { AuthOptions, getServerSession, Session } from "next-auth";
 import { onSuccessResponse, onErrorResponse } from "@/server/utils";
-import i18 from "@/public/locales/en-US";
 import { ROLE } from "@/acl/types";
 import { POST } from "./decorators";
 import { Logger } from "../logger";
@@ -93,7 +92,7 @@ export default abstract class BaseController extends BaseContext {
 
 	public static getInvokeOutput(req: NextApiRequest) {
 		const error = new ApiError(
-			i18.UnknownRouteErrorMessage,
+			'UnknownRouteErrorMessage',
 			StatusCodes.INTERNAL_SERVER_ERROR,
 			AnswerType.Log
 		);

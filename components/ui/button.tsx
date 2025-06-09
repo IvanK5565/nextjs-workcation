@@ -18,7 +18,7 @@ export default function Button({ children, type, className, disabled, onClick }:
         className={clsx(
           { "bg-indigo-200": disabled },
           { "bg-indigo-500 cursor-pointer hover:bg-indigo-400 shadow-lg": !disabled },
-          "px-5 py-3 inline-block rounded-lg text-white font-semibold tracking-wide uppercase w-full",
+          "ui-button",
         )}
         onClick={onClick}
         disabled={disabled}

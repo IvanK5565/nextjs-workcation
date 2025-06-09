@@ -1,4 +1,3 @@
-import i18 from "@/public/locales/en-US";
 import { IService } from ".";
 import BaseContext from "../container/BaseContext";
 import { ValidateError } from "../exceptions";
@@ -33,12 +32,12 @@ export default class UsersService extends BaseContext implements IService {
 		if (id) {
 			const finded = await Model.findByPk(Number(id));
 			if (!finded) {
-				throw new Error(i18.InvalidIdErrorMessage);
+				throw new Error('InvalidIdErrorMessage');
 			}
 			model = finded;
 		} else {
 			const finded = await Model.findOne({ where: { email: fields.email } });
-			if (finded) throw new Error(i18.ExistingAccountErrorMessage);
+			if (finded) throw new Error('ExistingAccountErrorMessage');
 		}
 
 		model.set(fields);

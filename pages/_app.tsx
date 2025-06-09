@@ -9,6 +9,8 @@ import Layout from "../components/layout";
 import { ToastContainer } from "react-toastify";
 import ContainerContext from "@/client/ContainerContext";
 import container from "@/client/context/container";
+import { appWithTranslation } from "next-i18next";
+import nextI18nConfig from '@/next-i18next.config'
 // import store from '../client/store'
 
 export type GetLayout = (page: React.ReactNode) => React.ReactNode;
@@ -19,7 +21,7 @@ type AppPropsWithLayout = AppProps & {
 	};
 };
 
-export default function App({
+function App({
 	Component,
 	// pageProps: { session, ...pageProps },
 	...rest
@@ -41,6 +43,8 @@ export default function App({
 		</ContainerContext.Provider>
 	);
 }
+// export default App;
+export default appWithTranslation(App, nextI18nConfig)
 
 // export default function App({ Component, pageProps}: AppProps) {
 //   return <Component {...pageProps} />

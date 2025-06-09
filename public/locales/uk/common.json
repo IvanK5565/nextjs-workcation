@@ -1,0 +1,22 @@
+{
+  "ValidateErrorMessage": "Неправильні дані",
+  "InvalidIdErrorMessage": "Неправильний ідентифікатор",
+  "ExistingAccountErrorMessage": "Неправильний аккаунт",
+  "EmailLabel": "Пошта",
+  "PasswordLabel": "Пароль",
+  "UnknownRouteErrorMessage": "Неіснуючий шлях",
+  "delete":"Видалити",
+  "deleteAll":"Видалити все",
+  "callError":"Викликати помилку",
+  "direction":"Напрямок",
+  "direction.straight":"Прямий",
+  "direction.reverse":"Обернений",
+  "createClass":"Додати клас",
+  "createUser":"Додати користувача",
+  "classes":"Усі класи",
+  "diary":"Щоденник",
+  "admin":"Адмін",
+  "main":"Головна",
+  "submit":"Підтвердити",
+  "reset":"Скинути"
+}

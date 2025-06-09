@@ -1,0 +1,22 @@
+{
+  "ValidateErrorMessage": "Invalid data",
+  "InvalidIdErrorMessage": "Invalid id",
+  "ExistingAccountErrorMessage": "Account is already exist",
+  "EmailLabel": "Email",
+  "PasswordLabel": "Password",
+  "UnknownRouteErrorMessage": "Unknown route",
+  "delete":"Delete",
+  "deleteAll":"Delete all",
+  "callError":"Call Error",
+  "direction":"Direction",
+  "direction-straight":"Straight",
+  "direction-reverse":"Reverse",
+  "createClass":"Create Class",
+  "createUser":"Create User",
+  "classes":"Classes",
+  "diary":"Diary",
+  "admin":"Admin",
+  "main":"Main",
+  "submit":"Submit",
+  "reset":"Reset"
+}

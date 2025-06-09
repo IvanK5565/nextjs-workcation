@@ -7,6 +7,7 @@ import { redux } from "@/client/store";
 import { addEntities } from "@/client/store/actions";
 import { Logger } from "../logger";
 import { ExtendedRequest } from "./BaseController";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 type GSSPFactory = (
 	controllersNames: (keyof IControllerContainer)[],
@@ -18,6 +19,7 @@ export default function getServerSidePropsContainer(
 ): GSSPFactory {
 	return (controllersNames, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
+			const {locale} = context;
 			const req: ExtendedRequest = Object.assign(context.req, {
 				query: context.query,
 				body: {},
@@ -65,7 +67,9 @@ export default function getServerSidePropsContainer(
 				};
 			}
 			return {
-				props: {},
+				props: {
+					...( await serverSideTranslations(locale ?? 'en', ['common'])) 
+				},
 			};
 		});
 }

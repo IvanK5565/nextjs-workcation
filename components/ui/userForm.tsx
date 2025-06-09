@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { TextInput2 } from "./textInput";
 import Button from "./button";
 import * as Yup from "yup";
+import { useTranslation } from "next-i18next";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getField<T>(
@@ -24,6 +25,7 @@ function getField<T>(
 }
 
 export function UserForm({onSubmit,className}:{onSubmit?:(values:IUser)=>void,className?:string}) {
+	const {t} = useTranslation()
 	const schema = Yup.object({
 		email: Yup.string().email("Invalid email address").required("Required"),
 		password: Yup.string()
@@ -77,8 +79,8 @@ export function UserForm({onSubmit,className}:{onSubmit?:(values:IUser)=>void,cl
 					placeholder="********"
 				/>
 
-				<Button className="m-1" type="submit">Submit</Button>
-				<Button className="m-1" type="reset">Reset</Button>
+				<Button className="m-1" type="submit">{t('submit')}</Button>
+				<Button className="m-1" type="reset">{t('Reset')}</Button>
 			</Form>
 		</Formik>
     </div>
