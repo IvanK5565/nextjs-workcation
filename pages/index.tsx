@@ -1,10 +1,6 @@
-import Header from "@/components/Header";
-import LocationCards from "@/components/LocationCards";
+import LocationCards from "@/components/workcation/LocationCards";
 import NoData from "@/components/NoData";
-import SearchBar from "@/components/SearchBar";
 import { getHousesData } from "@/pages/api/data";
-import ctx from "@/server/container/container";
-import { User } from "next-auth";
 
 export default function Home() {
 	const data = getHousesData();
@@ -18,8 +14,3 @@ export default function Home() {
 		</div>
 	);
 }
-
-export const getServerSideProps = ctx.resolve("getServerSideProps")(
-	["UsersController"]
-	// '/',
-);

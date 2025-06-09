@@ -1,18 +1,26 @@
-import { GetServerSidePropsContext } from "next"
-import { getServerSession } from "next-auth"
+/* eslint-disable @next/next/no-img-element */
 import { About, SignIn } from "@/components/signIn";
 
 import { useState } from "react"
-import container from "@/server/container/container";
-import Register from "@/components/signIn/Register2.0";
+import Register from "@/components/signIn/Register";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 enum Landing {
   About,
   Login,
   Register,
 }
-export default function Home() {
+const Home = () => {
   const [landing, setLanding] = useState(Landing.Login);
+  const {status} = useSession();
+  const router = useRouter();
+  if(status === 'loading'){
+    return <p>Loading...</p>
+  }
+  if(status === 'authenticated') {
+    router.push('/')
+  }
   return <div className="bg-gray-100">
     <div className="px-8 py-8 max-w-xl mx-auto lg:max-w-full lg:px-0 lg:py-20 lg:relative lg:min-h-screen">
       <div className="xl:max-w-6xl lg:mx-auto">
@@ -36,19 +44,5 @@ export default function Home() {
     </div>
   </div>
 }
-
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerSession(context.req, context.res, container.resolve('authOptions'));
-  console.log('signIn session', session);
-  if (session) {
-    console.log('redirect from signIn to /');
-    return {
-      redirect: {
-        destination: "/",
-        permanent: true,
-      }
-    }
-  }
-  return {props:{}}
-}
+export default Home;
+Home.getLayout = (page: React.ReactNode) => page;

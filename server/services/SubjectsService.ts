@@ -8,7 +8,7 @@ export default class SubjectsService extends BaseContext implements IService {
     const {id,...fields} = body;
     let model = subjects.build();
     if(id){
-      let finded = await subjects.findByPk(Number(id));
+      const finded = await subjects.findByPk(Number(id));
       if(!finded){
         return Promise.reject(Error('Invalid id'))
       }

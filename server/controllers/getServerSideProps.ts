@@ -1,12 +1,12 @@
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { GetServerSideProps, NextApiResponse } from "next";
 import IContextContainer from "@/server/container/IContextContainer";
 import { IControllerContainer } from ".";
 import { StatusCodes } from "http-status-codes";
 import { ApiError } from "../exceptions";
-import { onSuccessResponse } from "../utils";
 import { redux } from "@/client/store";
 import { addEntities } from "@/client/store/actions";
 import { Logger } from "../logger";
+import { ExtendedRequest } from "./BaseController";
 
 type GSSPFactory = (
 	controllersNames: (keyof IControllerContainer)[],
@@ -18,16 +18,18 @@ export default function getServerSidePropsContainer(
 ): GSSPFactory {
 	return (controllersNames, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
-			const req: NextApiRequest = Object.assign(context.req, {
+			const req: ExtendedRequest = Object.assign(context.req, {
 				query: context.query,
 				body: {},
 				env: {},
+				// session: await getServerSession()
 			});
-			let data: object = {};
+			let auth:object= {};
 			const promises = controllersNames.map((name) => {
 				return ctx[name]
 					.handler(route)(req, context.res as NextApiResponse)
 					.then((r) => {
+						auth = {...req.session?.acl, identity:req.session?.user};
 						if (r) {
 							const entity = ctx[name].getEntityName();
 							if (entity) {
@@ -35,16 +37,15 @@ export default function getServerSidePropsContainer(
 								const normal = normalize(r);
 								normal.result = normal.result ?? null;
 								store.dispatch(addEntities(normal.entities));
-								data = normal;
 							} else {
 								Logger.warn(`Controller ${name} does not have an entity associated with it.`);
-								data = r;
 							}
 						}
 					});
 			});
 			try {
 				await Promise.all(promises);
+				store.dispatch({type:'setAuth', payload:{auth}})
 			} catch (error) {
 				ctx.Logger.error("GSSP ERROR: ", (error as Error).message);
 
@@ -64,7 +65,7 @@ export default function getServerSidePropsContainer(
 				};
 			}
 			return {
-				props: onSuccessResponse(data),
+				props: {},
 			};
 		});
 }

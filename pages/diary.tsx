@@ -1,8 +1,8 @@
 import { UserAction } from "@/client/entities/UserEntity";
 import { AppState } from "@/client/store/ReduxStore";
 import { IUser } from "@/client/store/types";
-import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/layout/Header";
+import SearchBar from "@/components/layout/SearchBar";
 import { useDispatch, useSelector } from "react-redux";
 
 type Lesson = {

@@ -10,9 +10,9 @@ export interface IEntityContainer{
 }
 
 const entities = {
-  UserEntity: asClass(UserEntity).singleton(),
-  ClassEntity: asClass(ClassEntity).singleton(),
-  SubjectEntity: asClass(SubjectEntity).singleton(),
+  [UserEntity.name]: asClass(UserEntity).singleton(),
+  [ClassEntity.name]: asClass(ClassEntity).singleton(),
+  [SubjectEntity.name]: asClass(SubjectEntity).singleton(),
 }
 
 

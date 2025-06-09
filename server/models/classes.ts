@@ -14,7 +14,7 @@ export class Classes extends Model {
 
 export type ClassesType = typeof Classes;
 
-export default (ctx: IContextContainer) => {
+const ModelContainer = (ctx: IContextContainer) => {
 
   Classes.init(
     {
@@ -70,3 +70,4 @@ export default (ctx: IContextContainer) => {
     });
   return Classes;
 }
+export default ModelContainer;

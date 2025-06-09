@@ -31,12 +31,8 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          // alert(JSON.stringify(values, null, 2));
-
-          signIn('credentials', values);
-          setSubmitting(false);
-        }, 400);
+        signIn('credentials', values);
+        setSubmitting(false);
       }}
     >
       <Form className="flex flex-col mt-2">

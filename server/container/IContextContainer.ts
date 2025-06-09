@@ -6,14 +6,15 @@ import { AwilixContainer } from "awilix";
 import { NextAuthOptions } from "next-auth";
 import type Ajv from "ajv";
 import { RedisClientType } from "redis";
-import { IRoles, IRules, ROLE } from "@/acl/types";
+import { IRoles, IRules } from "@/acl/types";
 import { GSSPFactory } from "@/types";
 import { Adapter } from "next-auth/adapters";
 import { Logger } from "@/server/logger";
 import { Cleaner } from "@/acl/cleaner";
+import { Mutex } from "../utils/Mutex";
 
 export default interface IContextContainer extends AwilixContainer, IModelContainer, IServicesContainer, IControllerContainer{
-  config: any;
+  config: object;
   db: Sequelize;
   authOptions:NextAuthOptions,
   ajv:Ajv,
@@ -24,4 +25,5 @@ export default interface IContextContainer extends AwilixContainer, IModelContai
   adapter:Adapter;
   Logger:Logger;
   cleaner:Cleaner;
+  mutex:Mutex;
 }

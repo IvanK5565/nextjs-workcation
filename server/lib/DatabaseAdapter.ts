@@ -1,18 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
 	Adapter,
 	AdapterUser,
 	AdapterAccount,
 	AdapterSession,
-	VerificationToken,
 } from "next-auth/adapters";
 import { RedisClientType } from "redis";
 import IContextContainer from "@/server/container/IContextContainer";
-import { isDate } from "util/types";
 import { ROLE } from "@/acl/types";
 import { UserStatus } from "@/constants";
 import { ApiError } from "../exceptions";
 import { AnswerType } from "@/types";
-import Guard from "@/acl/Guard";
 import Acl from "@/acl/Acl";
 
 const options = {
@@ -41,7 +39,6 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 		sessionKeyPrefix,
 		sessionByUserIdKeyPrefix,
 		userKeyPrefix,
-		verificationTokenKeyPrefix,
 	} = options;
 
 	const setObjectAsJson = (key: string, obj: any) =>
@@ -242,4 +239,69 @@ export function DatabaseAdapter(ctx: IContextContainer): Adapter {
 		// 	]);
 		// },
 	};
+}
+
+
+const adapter = ({redis:client}:IContextContainer):Adapter => {
+	const set = (key:string,value:object) => {
+		return client.set(key, JSON.stringify(value));
+	}
+	const get = <T>(key:string) => {
+		return client.get(key).then(str => str ? JSON.parse(str) as T : null);
+	}
+	return {
+		async createSession(session){
+			const done = await set('session:'+session.sessionToken, session);
+			if(!done) throw Error('creating session failed');
+			return session;
+		},
+		async getSessionAndUser(token:string){
+			const session = await get<AdapterSession>('session:'+token)
+			if(!session) return null;
+			session.expires = new Date(session.expires);
+			
+			const user = await get<AdapterUser>('user:'+session.userId);
+			if(!user) return null;
+
+			return {session,user};
+		},
+		async updateSession(session){
+			const _session = await get<AdapterSession>('session:'+session.sessionToken);
+			if(!_session) throw new Error('session not found');
+			const newSession: AdapterSession = {..._session, ...session};
+			await set('session:'+session.sessionToken, newSession)
+			return newSession;
+		},
+		async deleteSession(token:string){
+			const session = await get<AdapterSession>('session:'+token)
+			if(!session) return null;
+			client.del('session:'+token);
+			return session;
+		},
+		// User managment
+		async createUser(user:AdapterUser){
+			const done = await set('user:'+user.id, user);
+			await client.set('user:email:'+user.email, user.id);
+			return !done ? null : user;
+		},
+		async getUser(id){
+			const user = await get<AdapterUser>('user:'+id);
+			return user;
+		},
+		async updateUser(user){
+			const _user = await get<AdapterUser>('user:'+user.id);
+			if(!_user) throw new Error('user not found');
+			const newUser: AdapterUser = {..._user, ...user};
+			await set('user:'+user.id, newUser)
+			return newUser;	
+		},
+		async getUserByEmail(email){
+			const id = await client.get('user:email:'+email);
+			const user = await get<AdapterUser>('user:'+id);
+			return user;
+		},
+		async linkAccount(account:AdapterAccount){
+			await client.set('user:account:'+account.providerAccountId, account.userId);
+		}
+	}
 }

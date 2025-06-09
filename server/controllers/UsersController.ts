@@ -39,9 +39,10 @@ export default class UsersController extends BaseController {
 		return this.di.UsersService.signIn(email as string, password as string);
 	}
 
-	@POST("/api/users")
+	@POST("/api/users", {allow: { [ROLE.TEACHER]:[GRANT.WRITE]}})
 	@POST("/api/users/[id]")
-	public save({ body }: ActionProps) {
+	public save({ guard,body }: ActionProps) {
+		if(!guard.allow(GRANT.WRITE)) throw new AccessDeniedError();
 		return this.di.UsersService.save(body);
 	}
 
@@ -67,7 +68,7 @@ export default class UsersController extends BaseController {
 
 	@GET("/api/users", {
 		allow: {
-			[ROLE.GUEST]: [GRANT.READ],
+			[ROLE.ADMIN]: [GRANT.READ],
 		},
 	})
 	public findByFilter({ query, guard }: ActionProps) {

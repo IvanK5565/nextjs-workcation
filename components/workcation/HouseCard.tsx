@@ -1,4 +1,5 @@
-import Rating from "@/components/Rating";
+/* eslint-disable @next/next/no-img-element */
+import Rating from "@/components/workcation/Rating";
 import { HouseData } from "@/pages/api/data";
 
 function formattedPrice(price: number) {

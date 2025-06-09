@@ -2,6 +2,7 @@ import { Node } from "./Node";
 
 export class Route {
   private readonly nodes: Node[] = [];
+  public get length() {return this.nodes.length}
   constructor(route: string) {
     route = route.trim();
     this.nodes = route.trim().split('/')
@@ -43,5 +44,16 @@ export class Route {
       }
     }
     return dynamicValues; // Return collected dynamic values
+  }
+
+  public compare(route:Route){
+    if(this.length == route.length){
+      for(let i = 0; i < this.length; i++){
+        const l = this.nodes[i].isDynamic ? 0 : 1;
+        const r = route.nodes[i].isDynamic ? 0 : 1;
+        if(l != r) return r-l;
+      }
+    }
+    return route.length - this.length;
   }
 }

@@ -1,7 +1,8 @@
 import Acl from "./Acl";
-import { ROLE, IRoles, IRules, IIdentity, GRANT } from "./types";
+import { ROLE, IRoles, IRules, GRANT } from "./types";
 
 // Requires set-value@^2.0.1 !!!
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const set = require("set-value");
 
 class Guard {
@@ -84,6 +85,7 @@ class Guard {
 					}
 				}
 			}
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (e) {
 			isRouter = false;
 		}
@@ -123,6 +125,7 @@ class Guard {
 					}
 				}
 			}
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (e) {
 			isAllowed = false;
 		}

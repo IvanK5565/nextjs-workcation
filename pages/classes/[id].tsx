@@ -2,12 +2,9 @@ import ctx from "@/server/container/container";
 import { FormEvent } from "react";
 import Button from "@/components/ui/button";
 import NoData from "@/components/NoData";
-import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
-import AccessDenied from "@/components/AccessDenied";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import { entitySelector } from "@/client/store/selectors";
+import { classesSelector, usersSelector } from "@/client/store/selectors";
 import { UserRole } from "@/constants";
 import { IClass, IUser } from "@/client/store/types";
 
@@ -73,21 +70,20 @@ function ClassEditForm({
 	);
 }
 
-export default function Home({ code }: { code: number }) {
+export default function Home() {
 	const param = useParams();
-	console.log("code", code);
 	const id = param?.id as string;
-	const users = useSelector(entitySelector("users")) as Record<string, IUser>;
-	const _class = useSelector(entitySelector("classes"))[id] ?? null;
-	// if (!_class) dispatch<ClassAction>({ type: "getClassById", payload: { id } });
+	const users = useSelector(usersSelector) as Record<string, IUser>;
+	const state = useSelector(classesSelector);
+	const _class = state[id] ?? null;
+	if(!_class) console.error('no class', state)
+	if(!users) console.error('no users')
 
 	const teachers =
 		Object.entries(users)
 			.map((u) => u[1])
 			.filter((u) => u.role === UserRole.TEACHER) ?? null;
-	// if (!teachers) dispatch<UserAction>({ type: "getAllUsers" });
 	const data = { _class, teachers };
-	// code = useSelector((state: AppState) => state.latestResponse).code;
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -103,9 +99,7 @@ export default function Home({ code }: { code: number }) {
 	};
 	return (
 		<div>
-			{code === 403 ? (
-				<AccessDenied />
-			) : !!data && data._class && data.teachers ? (
+			{!!data && data._class && data.teachers ? (
 				<ClassEditForm data={data} handleSubmit={handleSubmit} />
 			) : (
 				<NoData />
@@ -118,28 +112,3 @@ export const getServerSideProps = ctx.resolve("getServerSideProps")(
 	["ClassesController", "UsersController"]
 	// "/classes/[id]"
 );
-
-// export const getServerSideProps = wrapper.getServerSideProps(store => async (context) => {
-// 	const log = ctx.resolve('Logger').log;
-// 	store.dispatch({type:''})
-// 	const gssp = ctx.resolve("getServerSideProps")(
-// 			["ClassesController", "UsersController"]
-// 			// "/classes/[id]"
-// 		);
-// 	const res = await gssp(context);
-// 	let code = 500;
-// 	if('props' in res){
-// 		const props = (await res.props)
-// 		const data = props.data;
-// 		const classEntity = new ClassEntity();
-// 		const userEntity = new UserEntity();
-// 		const dataSchema = new schema.Entity('data',{
-// 			_class: classEntity.getSchema(),
-// 			teachers: [userEntity.getSchema()],
-// 		})
-// 		const normalData = normalize(data, dataSchema)
-// 		store.dispatch(addEntities(normalData.entities))
-// 		code = props.code;
-// 	}
-// 	return {props:{code}}
-// })

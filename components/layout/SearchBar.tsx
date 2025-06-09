@@ -1,4 +1,4 @@
-import SearchFilters from "./SearchFilters"
+import Navigation from "./SearchFilters"
 import { useState } from "react"
 import clsx from "clsx";
 
@@ -24,6 +24,6 @@ export default function SearchBar() {
         <span className="ml-1 text-white font-medium">Filters</span>
       </button>
     </div>
-    <SearchFilters isHidden={filtersHidden} />
+    <Navigation onClose={() => {setFiltersHidden(!filtersHidden)}} isHidden={filtersHidden} />
   </section>
 }

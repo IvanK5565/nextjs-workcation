@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/layout/Header";
+import SearchBar from "@/components/layout/SearchBar";
 
 
 export default function Layout({ children }: { children: React.ReactNode }) {

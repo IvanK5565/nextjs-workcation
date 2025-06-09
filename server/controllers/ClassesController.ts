@@ -1,10 +1,11 @@
 import { DEFAULT_LIMIT, DEFAULT_PAGE } from "@/constants";
 import BaseController from "./BaseController";
-import type { ActionProps } from "@/types";
+import { AnswerType, type ActionProps } from "@/types";
 import { DELETE, Entity, GET, POST, Query, USE } from "./decorators";
 import { authMiddleware } from "../lib/authMiddleware";
 import { GRANT, ROLE } from "@/acl/types";
-import { AccessDeniedError } from "../exceptions";
+import { AccessDeniedError, ApiError } from "../exceptions";
+import { StatusCodes } from "http-status-codes";
 
 @Entity('ClassEntity')
 export default class ClassesController extends BaseController {
@@ -113,5 +114,10 @@ export default class ClassesController extends BaseController {
 		const id = Number(query!.id);
 
 		return this.di.ClassesService.delete(id);
+	}
+
+	@GET('/api/classes/error')
+	public error(){
+		throw new ApiError('Expected error', StatusCodes.INTERNAL_SERVER_ERROR, AnswerType.Toast);
 	}
 }

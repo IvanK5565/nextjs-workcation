@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UserRole as ROLE } from '@/constants'
 export { UserRole as ROLE } from '@/constants'
 // export enum ROLE {

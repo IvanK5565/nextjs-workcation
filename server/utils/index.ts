@@ -1,5 +1,6 @@
 
 // import bcrypt from "bcrypt"
+import { IRules, ROLE } from "@/acl/types";
 import { ApiError } from "@/server/exceptions";
 import { AnswerType, type Response } from "@/types";
 import { StatusCodes } from "http-status-codes";
@@ -10,7 +11,7 @@ import { StatusCodes } from "http-status-codes";
 //   return hash
 // }
 
-export function onSuccessResponse(data: any):Response {
+export function onSuccessResponse(data: Response['data']): Response {
 	return {
 		code: StatusCodes.OK,
 		success: true,
@@ -18,7 +19,7 @@ export function onSuccessResponse(data: any):Response {
 		type: AnswerType.Data,
 	};
 }
-export function onErrorResponse(error: Error):Response {
+export function onErrorResponse(error: Error): Response {
 	return {
 		code:
 			error instanceof ApiError
@@ -28,4 +29,17 @@ export function onErrorResponse(error: Error):Response {
 		type: AnswerType.Toast,
 		message: error.message,
 	};
+}
+
+export function guestRules(rules: IRules) {
+	return Object.fromEntries(
+		Object.entries(rules)
+			.filter((entry) =>
+				Object.hasOwn(entry[1].allow, ROLE.GUEST) && (entry[1].deny ? Object.hasOwn(entry[1].deny, ROLE.GUEST) : true))
+			.map(([res, grants]) => {
+				return [res, {
+					allow: { [ROLE.GUEST]: grants.allow[ROLE.GUEST] },
+					deny: grants.deny ? { [ROLE.GUEST]: grants.deny[ROLE.GUEST] } : undefined
+				}]
+			}))
 }

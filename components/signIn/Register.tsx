@@ -1,10 +1,43 @@
-import { useState } from "react";
-import Button from "../ui/button";
-import type { Response } from "@/types";
-import { Field, Form, Formik } from "formik";
+import {
+	ErrorMessage,
+	Field,
+	Form,
+	Formik,
+	FormikHelpers,
+} from "formik";
 import * as Yup from "yup";
+import Button from "../ui/button";
+import { useActions } from "@/client/hooks";
 
+interface IRegisterFormValues {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+	status: "active";
+	role: "admin" | "teacher" | "student"|'';
+}
 
+const validationSchema = Yup.object({
+	firstName: Yup.string().required("Required"),
+	lastName: Yup.string().required("Required"),
+	email: Yup.string().email("Invalid email address").required("Required"),
+	password: Yup.string()
+		.max(20, "Must be 20 characters or less")
+		.min(4, "Must be 4 characters or more")
+		.required("Required"),
+	role: Yup.string().oneOf(["admin", "teacher", "student"], "Required"),
+	status: Yup.string().equals(["active"]),
+});
+
+const initialValues: IRegisterFormValues = {
+	lastName: "",
+	firstName: "",
+	email: "",
+	password: "",
+	status: "active",
+	role: "",
+};
 
 export default function Register({
 	className,
@@ -13,111 +46,96 @@ export default function Register({
 	className?: string;
 	onLogin: () => void;
 }) {
-	const [formData, setFormData] = useState({
-		last_name: "",
-		first_name: "",
-		email: "",
-		password: "",
-		role: "",
-		status: "active",
-	});
-	function handleChange<T>(e: React.FormEvent<T>) {
-		const { name, value } = e.target as HTMLInputElement;
-
-		setFormData({ ...formData, [name]: value });
-	}
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const res = await fetch("/api/register", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(formData),
-		});
-		const data = (await res.json()) as Response;
-		if (data && data.success) {
-			alert("Registered! " + JSON.stringify(data.data, null, 2));
-		} else if (data) {
-			alert("Error! " + JSON.stringify(data, null, 2));
-		}
+	const { register } = useActions('UserEntity')
+	// const dispatch = useAppDispatch()
+	const handleSubmit = async (values: IRegisterFormValues, { resetForm }:FormikHelpers<IRegisterFormValues>) => {
+		console.log('submit')
+		// dispatch<UserAction>({type:'register', payload:values})
+		register(values);
+		resetForm();
+		// const res = await fetch("/api/register", {
+		// 	method: "POST",
+		// 	headers: { "Content-Type": "application/json" },
+		// 	body: JSON.stringify(values),
+		// });
+		// const data = (await res.json()) as Response;
+		// if (data && data.success) {
+		// 	alert("Registered! " + JSON.stringify(data.data, null, 2));
+			// resetForm();
+		// } else if (data) {
+		// 	alert("Error! " + JSON.stringify(data, null, 2));
+		// }
 	};
 	return (
-		<div className={className ? className : ""}>
+		<div className={className ?? ""}>
 			<h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
 				Create your account.
 			</h1>
-			<form className="flex flex-col" onSubmit={handleSubmit}>
-				<TextInput
-					type="text"
-					name="firstName"
-					placeholder="John"
-					onChange={handleChange}
-				>
-					First Name
-				</TextInput>
-				<TextInput
-					type="text"
-					name="lastName"
-					placeholder="Doe"
-					onChange={handleChange}
-				>
-					Last Name
-				</TextInput>
-				<TextInput
-					type="text"
-					name="email"
-					placeholder="example@email.com"
-					onChange={handleChange}
-				>
-					Email
-				</TextInput>
-				<TextInput
-					type="password"
-					name="password"
-					placeholder="Password"
-					onChange={handleChange}
-				>
-					Password
-				</TextInput>
-				<RoleSelect onChange={handleChange} />
-				<input
-					className="rounded-lg"
-					type="text"
-					name="status"
-					id="status"
-					defaultValue="active"
-					hidden={true}
-				/>
-        <div>
-					<span
-						onClick={() => {
-							onLogin();
-						}}
-						className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
-					>
-						Already have an account?
-					</span>
-				</div>
-				<div className="flex flex-row-reverse justify-between">
-					<Button type="submit">Confirm</Button>
-				</div>
-			</form>
+			<Formik
+				initialValues={initialValues}
+				onSubmit={handleSubmit}
+				validationSchema={validationSchema}
+			>
+				<Form className="flex flex-col">
+					<TextInput name="firstName" placeholder="John">
+						First Name
+					</TextInput>
+					<TextInput name="lastName" placeholder="Doe">
+						Last Name
+					</TextInput>
+					<EmailInput name="email" placeholder="example@email.com">
+						Email
+					</EmailInput>
+					<PasswordInput name="password" placeholder="Password">
+						Password
+					</PasswordInput>
+					<SelectInput name="role" />
+					<input
+						className="rounded-lg"
+						type="text"
+						name="status"
+						id="status"
+						defaultValue="active"
+						hidden={true}
+					/>
+					<div>
+						<span
+							onClick={() => {
+								onLogin();
+							}}
+							className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
+						>
+							Already have an account?
+						</span>
+					</div>
+					<div className="flex flex-row-reverse justify-between">
+						<Button type="submit">Confirm</Button>
+					</div>
+				</Form>
+			</Formik>
 		</div>
 	);
 }
 
-function TextInput({
-	children,
-	type,
-	name,
-	placeholder,
-	onChange,
-}: {
+const EmailInput = (props: ITypedTextInputProps) =>
+	TextInput({ ...props, type: "email" });
+const PasswordInput = (props: ITypedTextInputProps) =>
+	TextInput({ ...props, type: "password" });
+
+interface ITextInputProps {
 	children: string;
-	type: string;
+	type?: "text" | "password" | "email";
 	name: string;
 	placeholder: string;
-	onChange: <T>(e: React.FormEvent<T>) => void;
-}) {
+}
+type ITypedTextInputProps = Omit<ITextInputProps, "type">
+
+function TextInput({
+	children,
+	type = "text",
+	name,
+	placeholder,
+}: ITextInputProps) {
 	return (
 		<>
 			<label
@@ -126,41 +144,31 @@ function TextInput({
 			>
 				{children}
 			</label>
-			<input
+			<Field
 				className="rounded-lg"
 				type={type}
 				name={name}
 				id={name}
 				placeholder={placeholder}
-				onChange={onChange}
 				required={true}
 			/>
+			<ErrorMessage name={name} className="text-red-600" component="small" />
 		</>
 	);
 }
-
-function RoleSelect({
-	onChange,
-}: {
-	onChange: <T>(e: React.FormEvent<T>) => void;
-}) {
+function SelectInput({ name }: { name: string }) {
 	return (
 		<>
 			<label className="mt-4 text-2xl text-indigo-500 font-bold leading-tight">
-				Price Range
+				Role
 			</label>
-			<select
-				className="rounded-lg"
-				name="role"
-				onChange={onChange}
-				required={true}
-			>
+			<Field as="select" className="rounded-lg" name={name} required={true}>
 				<option value="">Select Role</option>
 				<option value="admin">Admin</option>
 				<option value="teacher">Teacher</option>
 				<option value="student">Student</option>
-			</select>
+			</Field>
+			<ErrorMessage name={name} className="text-red-600" component="small" />
 		</>
 	);
 }
-

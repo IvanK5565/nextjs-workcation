@@ -13,7 +13,7 @@ import { Classes, Subjects, User, UserClasses } from "./server/models";
 export type RouterRun = (
 	req: NextApiRequest,
 	res: NextApiResponse
-) => Promise<any>;
+) => Promise<ActionResult>;
 
 export type Entity = User | Classes | Subjects | UserClasses;
 
@@ -56,6 +56,7 @@ export type Handler = (
 ) => Promise<ActionResult | void>;
 export type ActionProps = {
 	query?: Partial<{ [key: string]: string | string[] }>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	body?: any;
 	session: Session | null;
 	guard:Guard;

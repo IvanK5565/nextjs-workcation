@@ -1,6 +1,6 @@
-import Header from "@/components/Header";
-import LocationCards from "@/components/LocationCards";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/layout/Header";
+import LocationCards from "@/components/workcation/LocationCards";
+import SearchBar from "@/components/layout/SearchBar";
 import { getHousesData, Location } from "@/pages/api/data";
 import container from "@/server/container/container";
 import { GetServerSidePropsContext } from "next";

@@ -3,32 +3,17 @@ import { Entities, EntitiesAction } from "./types";
 
 function baseReducer<K extends keyof Entities>(collectionName: K) {
 
-	const onUpdate = (collection: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
-		if(!action.payload?.entities || !action.payload.entities[collectionName]) {
-			return collection
-		}
-		const updatedEntities = action.payload.entities[collectionName];
-		Object.entries(updatedEntities).forEach(([id, entity]) => {
-			if (!!entity) {
-				collection[id] = entity;
-				console.info(`Updated ${collectionName} with id ${id}`, entity);
-			}
-		});
-		return collection;
-	}
-
 	return (collection: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
 
 		switch (action.type) {
 			case 'DELETE_ALL': return {};
-			case 'UPDATE': return onUpdate(collection, action);
 		}
 
 
-		if (!action.payload?.entities || !action.payload?.entities[collectionName]) {
+		if (!action.payload || !action.payload[collectionName]) {
 			return collection;
 		}
-		const newEntities = action.payload.entities[collectionName];
+		const newEntities = action.payload[collectionName];
 
 		switch (action.type) {
 			case HYDRATE:
@@ -36,6 +21,7 @@ function baseReducer<K extends keyof Entities>(collectionName: K) {
 			case "ADD":
 				return { ...collection, ...newEntities };
 			case "DELETE":
+				console.warn('DELETE action: ' + newEntities)
 				return Object.fromEntries(
 					Object.entries(collection).filter((entry) => !Object.hasOwn(newEntities, entry[0]))
 				);

@@ -81,6 +81,8 @@ export const rules: IRules = {
     '/': {
         allow: {
             [ROLE.GUEST]: [GRANT.READ, GRANT.GET],
+            [ROLE.TEACHER]: [GRANT.WRITE],
+            [ROLE.ADMIN]: [GRANT.EXECUTE],
         },
     },
 

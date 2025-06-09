@@ -5,14 +5,17 @@ if (typeof document !== "undefined") {
 }
 
 // Requires set-value@^2.0.1 !!!
-const set = require("set-value");
+import set from "set-value";
 
-import Guard from "./Guard";
 import { IRoles, ROLE, IRules } from "./types";
 import Acl from "./Acl";
 import BaseContext from "@/server/container/BaseContext";
 
 export class Cleaner extends BaseContext{
+    public guestRolesAndRules(){
+        const acl = new Acl(this.di.roles, this.di.rules);
+        return this.cleanRolesAndRules(acl, ROLE.GUEST);
+    }
     public cleanRolesAndRules(acl:Acl, role:ROLE){
         return {
             roles:this.cleanRoles(acl,role),

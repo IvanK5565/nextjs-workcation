@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Response } from "@/types";
+import { AnswerType, Response } from "@/types";
 import { normalize, Schema } from "normalizr";
 import {
 	actionChannel,
@@ -14,6 +14,7 @@ import { addEntities } from "../store/actions";
 import { IEntityContainer } from ".";
 import { BaseContext } from "../context/BaseContext";
 import { IClientContainer } from "../context/container";
+import { toast } from "react-toastify";
 
 export type EntityAction<E extends BaseEntity> = {
 	type: keyof Omit<E, keyof BaseEntity>;
@@ -32,6 +33,11 @@ export default abstract class BaseEntity extends BaseContext {
 	public normalize = (data: object) =>
 		normalize(data, Array.isArray(data) ? [this.schema] : this.schema);
 
+	public get actions() {
+		const actions: string[] = Reflect.getMetadata('actions', this) ?? []
+		return Object.fromEntries(actions.map(action => [action, (data?: any) => ({ type: action, payload: data })]))
+	}
+
 	protected watcher(name: string) {
 		if (!(name in this)) throw new Error("Action not found : " + name);
 		const worker = (this as any)[name].bind(this);
@@ -39,7 +45,12 @@ export default abstract class BaseEntity extends BaseContext {
 			const chan = yield actionChannel(name);
 			while (true) {
 				const { payload } = yield take(chan);
+				try {
 				yield call(worker, payload);
+				} catch (e) {
+					console.error('Error in saga Watcher', (e as Error).message);
+					throw e;
+				}
 			}
 		};
 	}
@@ -54,10 +65,25 @@ export default abstract class BaseEntity extends BaseContext {
 	public static sagas(di: IClientContainer) {
 		const actions: (keyof IClientContainer)[] =
 			Reflect.getMetadata("actions", BaseEntity) ?? [];
-		return actions
-		.map(name => di[name])
-		.filter(entity => entity instanceof BaseEntity)
-		.map(entity => entity.rootSaga.bind(entity));
+		// return actions
+		// 	.map(name => di[name])
+		// 	.filter(entity => entity instanceof BaseEntity)
+		// .map(entity => entity.rootSaga.bind(entity));
+		const res: (() => Generator<Effect>)[] = []
+		return res.concat(
+			...(actions
+				// .filter(name => Object.hasOwn(di, name))
+				.map(name => di[name])
+				.filter(entity => entity instanceof BaseEntity)
+				.map(entity => entity.sagas()))
+		)
+	}
+	public sagas() {
+		const actions: string[] = Reflect.getMetadata("actions", this) ?? [];
+		const sagas = actions
+			.filter((action) => action in this)
+			.map((action) => this.watcher(action));
+		return sagas;
 	}
 
 	private static async xFetch<TBody = unknown>(
@@ -71,6 +97,8 @@ export default abstract class BaseEntity extends BaseContext {
 			body: body ? JSON.stringify(body) : undefined,
 		}).then((data) => data.json());
 		if (!res.success) {
+			if (res.type && res.type === AnswerType.Toast) {
+			}
 			throw new Error("Request unsuccess: " + res.message);
 		} else {
 			return res;
@@ -87,25 +115,21 @@ export default abstract class BaseEntity extends BaseContext {
 			if (res) {
 				const normalData = this.normalize(res.data);
 				yield put(addEntities(normalData.entities));
-				res.data = normalData.result;
-				yield put({ type: "NEW_RESPONSE", payload: res });
 			}
+			toast.success(res.message ?? 'Request completed!')
 		} catch (e) {
-			console.error((e as Error).message ?? e);
-			yield put({ type: "Error", error: (e as Error).message });
+			toast.error((e as Error).message);
+			console.error('in actionRequest', (e as Error).message ?? e);
 		}
 	}
 
 	public xRead(url?: string, method: "GET" | "POST" = "GET") {
-		// return BaseEntity.xFetch(url, method);
 		return this.actionRequest(method, url);
 	}
 	public xSave(url: string, body: any = {}) {
-		// return BaseEntity.xFetch(url, method, body);
 		return this.actionRequest("POST", url, body);
 	}
 	public xDelete(url?: string, method: "GET" | "POST" = "GET") {
-		// return BaseEntity.xFetch(url, method);
 		return this.actionRequest(method, url);
 	}
 }

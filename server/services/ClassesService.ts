@@ -9,7 +9,7 @@ export default class ClassesService extends BaseContext implements IService {
 		console.log('save id', class_id);
 		let model = this.di.ClassesModel.build();
 		if (class_id) {
-			let finded = await this.di.ClassesModel.findByPk(Number(class_id));
+			const finded = await this.di.ClassesModel.findByPk(Number(class_id));
 			if (!finded) {
 				throw new Error("Invalid id");
 			}
@@ -35,6 +35,9 @@ export default class ClassesService extends BaseContext implements IService {
 			{
 				model:this.di.UserModel,
 				as:'studentsInClass',
+				through: {
+        attributes: [] // exclude all attributes from the join table
+      }
 			},]
 		});
 	}

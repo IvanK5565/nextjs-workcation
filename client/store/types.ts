@@ -30,9 +30,7 @@ export type Entities = {
 export type EntitiesAction = {
 	// type: "ADD"|"DELETE"|'DELETE_ALL';
 	type: string;
-	payload?: {
-		entities: Partial<Entities>;
-	};
+	payload?: Partial<Entities>;
 };
 
 /******** */

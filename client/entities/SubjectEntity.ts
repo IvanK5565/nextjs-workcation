@@ -21,19 +21,18 @@ export default class SubjectEntity extends BaseEntity {
 	}
 
 	@action
-	public *getAllSubjects(_payload: any) {
+	public *getAllSubjects() {
 		yield this.xRead("/subjects");
 	}
 
 	@action
 	public *saveSubject(payload: any) {
 		const id = payload.id;
-		yield;
-		this.xSave(id ? `/subjects/${id}` : "/subjects", payload);
+		yield this.xSave(id ? `/subjects/${id}` : "/subjects", payload);
 	}
 
 	@action
-	public *getSubjectById(payload: any) {
+	public *getSubjectById(payload: {id:string}) {
 		const id = payload.id;
 		if (!id) throw new Error("Id required");
 		yield this.xRead(`/subjects/${id}`);
@@ -43,6 +42,6 @@ export default class SubjectEntity extends BaseEntity {
 	public *deleteSubject(payload: any) {
 		if (!payload.id) throw new Error("Id required");
 		const normalized = this.normalize(payload);
-		yield put({type:'DELETE', payload:{entities:normalized.entities}});
+		yield put({type:'DELETE', payload:normalized.entities});
 	}
 }

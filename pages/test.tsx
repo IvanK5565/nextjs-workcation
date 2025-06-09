@@ -2,23 +2,28 @@
 import { ClassAction } from "@/client/entities/ClassEntity";
 import { SubjectAction } from "@/client/entities/SubjectEntity";
 import { UserAction } from "@/client/entities/UserEntity";
+import { useActions } from "@/client/hooks";
 import { deleteEntities } from "@/client/store/actions";
 import { AppState } from "@/client/store/ReduxStore";
-import { IClass, IUser } from "@/client/store/types";
+import {
+	classesSelector,
+	subjectsSelector,
+	usersSelector,
+} from "@/client/store/selectors";
+import { Entities, IClass, IUser } from "@/client/store/types";
 import NoData from "@/components/NoData";
+import { UserForm } from "@/components/ui/userForm";
 import { Response } from "@/types";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 export default function Home() {
-	// const response = useSelector<AppState, Response>(
-	// 	(state) => state.latestResponse
-	// );
-
-	console.warn("Page updated");
+	// toast.warn("Page updated");
+	const {saveUser} = useActions('UserEntity');
 	return (
-		<div className="flex w-full h-full justify-center items-center bg-gray-200 antialiased">
-			<div>
+		<div className="flex flex-col w-full h-full items-start bg-gray-200 antialiased">
+			<div className="w-full">
 				<div className="flex flex-col space-y-2 bg-gray-200 border border-gray-300 p-4 rounded-lg shadow-md">
 					<GetAllButton entity="users" />
 					<GetAllButton entity="classes" />
@@ -32,50 +37,54 @@ export default function Home() {
 			</div>
 			<UserCard />
 			<ClassCard />
-			{/* <ResponseHeader res={response} /> */}
-			<ResponseHeader />
+			<UserForm onSubmit={saveUser} className="p-5"/>
 		</div>
 	);
 }
-
-const actions: {
-	[key in keyof AppState["entities"]]: [string, string, string];
-} = {
-	users: ["getUserById", "getAllUsers", "deleteUser"],
-	classes: ["getClassById", "getAllClasses", "deleteClass"],
-	subjects: ["getSubjectById", "getAllSubjects", "deleteSubject"],
-};
 
 function Button({
 	action,
 	children,
 }: {
-	action: { type: string; payload?: any };
+	action: () => void;
 	children: React.ReactNode;
 }) {
-	const dispatch = useDispatch();
 	const NavButtonStyle =
 		"block w-full sm:w-auto sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block xl:w-full xl:my-2";
 
 	return (
 		<button
 			className={NavButtonStyle}
-			onClick={() => {
-				dispatch(action);
-			}}
+			onClick={action}
 		>
 			{children}
 		</button>
 	);
 }
 
-function GetAllButton({ entity }: { entity: keyof AppState["entities"] }) {
+function GetAllButton({ entity }: { entity: keyof Entities }) {
+	const { getAllUsers } = useActions("UserEntity");
+	const { getAllClasses } = useActions("ClassEntity");
+	const { getAllSubjects } = useActions("SubjectEntity");
+	const actions = {
+		["users"]: getAllUsers,
+		["classes"]: getAllClasses,
+		["subjects"]: getAllSubjects,
+	};
 	const baseUrl = `/api/${entity}`;
-	return <Button action={{ type: actions[entity][1] }}>{baseUrl}</Button>;
+	return <Button action={() => actions[entity]()}>{baseUrl}</Button>;
 }
-function GetByIdButton({ entity }: { entity: keyof AppState["entities"] }) {
+function GetByIdButton({ entity }: { entity: keyof Entities }) {
 	const baseUrl = `/api/${entity}`;
 	const [numberKey, setNumberKey] = useState<string>("1");
+	const { getUserById } = useActions("UserEntity");
+	const { getClassById } = useActions("ClassEntity");
+	const { getSubjectById } = useActions("SubjectEntity");
+	const actions = {
+		["users"]: getUserById,
+		["classes"]: getClassById,
+		["subjects"]: getSubjectById,
+	};
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -88,20 +97,16 @@ function GetByIdButton({ entity }: { entity: keyof AppState["entities"] }) {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
 	return (
-		<Button action={{ type: actions[entity][0], payload: { id: numberKey } }}>
+		<Button action={() => actions[entity]({ id: numberKey })}>
 			{baseUrl}/{numberKey}
 		</Button>
 	);
 }
 
 function UserCard() {
-	const dispatch = useDispatch();
-	const users = useSelector<AppState, Record<string, IUser>>(
-		(state) => state.entities.users as Record<string, IUser>
-	);
+	const users = useSelector(usersSelector);
 	console.warn("UserCard updated");
 	if (Object.keys(users).length < 1) {
-		dispatch<UserAction>({ type: "getAllUsers" });
 		return <NoData />;
 	}
 
@@ -109,15 +114,14 @@ function UserCard() {
 }
 
 function ClassCard() {
-	const dispatch = useDispatch();
-	const classes = useSelector<AppState, Record<string, IClass>>(
-		(state) => state.entities.classes as Record<string, IClass>
-	);
+	const classes = useSelector(classesSelector);
 
-	if (Object.keys(classes).length < 1) {
-		dispatch<ClassAction>({ type: "getAllClasses" });
-		return <NoData />;
-	}
+	// if (Object.keys(classes).length < 1) {
+	// 	return <div className="relative">
+	// 		<div className="h-100 w-100"><NoData /></div>
+	// 		<div className="absolute bottom-0"><SubjectCard /></div>
+	// 	</div>
+	// }
 	console.warn("ClassCard updated");
 	return (
 		<DataCard collection="classes" data={Object.entries(classes)[0][1]}>
@@ -127,49 +131,15 @@ function ClassCard() {
 }
 
 function SubjectCard() {
-	const dispatch = useDispatch();
-	const subjects = useSelector<AppState, Record<string, IClass>>(
-		(state) => state.entities.subjects as Record<string, IClass>
-	);
+	const subjects = useSelector(subjectsSelector);
 
 	if (Object.keys(subjects).length < 1) {
-		dispatch<SubjectAction>({ type: "getAllSubjects" });
 		return <NoData />;
 	}
 
 	console.warn("SubjectCard updated");
 	return (
 		<DataCard collection="subjects" data={Object.entries(subjects)[0][1]} />
-	);
-}
-
-function ResponseHeader() {
-	const { code, success, type, message } = useSelector<AppState, Response>(
-		(state) => state.latestResponse
-	);
-	return (
-		<div className="max-w-md mt-6 bg-gray-50 p-4 rounded-md border border-gray-200 shadow-sm text-sm text-gray-700">
-			<div className="flex justify-between mb-1">
-				<span className="font-medium">Code:</span>
-				<span>{code}</span>
-			</div>
-			<div className="flex justify-between mb-1">
-				<span className="font-medium">Success:</span>
-				<span className={success ? "text-green-600" : "text-red-600"}>
-					{success ? "True" : "False"}
-				</span>
-			</div>
-			<div className="flex justify-between">
-				<span className="font-medium">Type:</span>
-				<span>{type}</span>
-			</div>
-			{message && (
-				<div className="mt-2 text-blue-600 italic">
-					<span>Message: </span>
-					<span>{message}</span>
-				</div>
-			)}
-		</div>
 	);
 }
 
@@ -184,10 +154,17 @@ function DataCard({
 	children,
 }: {
 	data: (object & { id: number }) | null;
-	collection: string;
+	collection: keyof Entities;
 	children?: React.ReactNode;
 }) {
-	const dispatch = useDispatch();
+	const { deleteUser } = useActions("UserEntity");
+	const { deleteClass } = useActions("ClassEntity");
+	const { deleteSubject } = useActions("SubjectEntity");
+	const actions = {
+		users: deleteUser,
+		classes: deleteClass,
+		subjects: deleteSubject,
+	};
 	return data == null ? (
 		<Null />
 	) : (
@@ -200,10 +177,7 @@ function DataCard({
 			))}
 			<button
 				className={buttonStyle}
-				onClick={() => {
-					// dispatch(deleteEntities({ [collection]: { [data.id]: data } }));
-					dispatch({ type: actions[collection][2], payload: data });
-				}}
+				onClick={() => actions[collection](data)}
 			>
 				Delete
 			</button>

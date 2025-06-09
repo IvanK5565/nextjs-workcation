@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../context/container";
 import { put } from "redux-saga/effects";
-import { addEntities } from "../store/actions";
 
 export type ClassAction = EntityAction<ClassEntity>
 
@@ -26,7 +24,7 @@ export default class ClassEntity extends BaseEntity {
 	}
 
 	@action
-	public *getAllClasses(_payload: any) {
+	public *getAllClasses() {
 		yield this.xRead("/classes");
 	}
 
@@ -46,6 +44,11 @@ export default class ClassEntity extends BaseEntity {
 	public *deleteClass(payload: any) {
 		if (!payload.id) throw new Error("Id required");
 		const normalized = this.normalize(payload);
-		yield put({type:'DELETE', payload:{entities:normalized.entities}});
+		yield put({type:'DELETE', payload:normalized.entities});
+	}
+	@action
+	public *getError() {
+		console.log('in saga action')
+		yield this.xRead('/classes/error');
 	}
 }

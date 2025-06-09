@@ -104,8 +104,7 @@ class Guard {
 		role: ROLE | null = null
 	) {
 		resource = resource ?? this.resource ?? null;
-		secret = secret ?? this.secret ?? null;
-		const s = secret ? secret + ":" : "";
+		const s = secret || this.secret ? (secret ?? this.secret) + ":" : "";
 		role = role ?? this.role;
 		let isAllowed = false;
 

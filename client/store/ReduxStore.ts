@@ -2,29 +2,33 @@ import { createWrapper } from "next-redux-wrapper";
 import { all, fork } from "redux-saga/effects";
 import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
-import { latestResponseReducer } from "./latestResponse";
 import { combineReducers } from "redux";
 import BaseEntity from "../entities/BaseEntity";
 import { errorReducer } from ".";
 import { BaseContext } from "../context/BaseContext";
 import { IClientContainer } from "../context/container";
 import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
+	persistStore,
+	persistReducer,
+	FLUSH,
+	REHYDRATE,
+	PAUSE,
+	PERSIST,
+	PURGE,
+	REGISTER,
 } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
-import { Entities } from "./types";
+import { Entities, IClass, ISubject, IUser } from "./types";
 import baseReducer from "./baseReducer";
 import { IEntityContainer } from "../entities";
+import authReducer from "./authReducer";
 
 export type AppStore = ReturnType<ReturnType<ReduxStore["getMakeStore"]>>;
-export type AppState = ReturnType<AppStore["getState"]>;
+export type AppState = ReturnType<AppStore["getState"]> & {
+	users: Record<string,IUser>;
+	classes: Record<string,IClass>;
+	subjects: Record<string,ISubject>;
+};
 export type AppDispatch = AppStore["dispatch"];
 
 export class ReduxStore extends BaseContext {
@@ -55,13 +59,9 @@ export class ReduxStore extends BaseContext {
 		return entity.normalize.bind(entity);
 	}
 
-	private *rootSaga() {		
+	private *rootSaga() {
 		const sagas = BaseEntity.sagas(this.di).map(saga => fork(saga));
-		// entitiesKeys.map((name) => {
-		// 	const entity = this.di[name];
-		// 	return fork(entity.rootSaga.bind(entity))
-		// })
-		yield all(sagas);
+			yield all(sagas);
 	}
 	private reducers() {
 		const names: (keyof Entities)[] =
@@ -81,9 +81,10 @@ export class ReduxStore extends BaseContext {
 		const reducers = this.reducers();
 		const makeStore = () => {
 			const reducer = combineReducers({
-				latestResponse: latestResponseReducer,
-				entities: combineReducers(reducers),
+				// entities: combineReducers(reducers),
+				...reducers,
 				error: errorReducer,
+				auth: authReducer,
 			});
 			const persistedReducer = persistReducer(this.persistConfig, reducer);
 			const sagaMiddleware = createSagaMiddleware();

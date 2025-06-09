@@ -6,6 +6,7 @@ import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../context/container";
 import { put } from "redux-saga/effects";
 import { addEntities } from "../store/actions";
+import type { IUser } from "../store/types";
 
 export type UserAction = EntityAction<UserEntity>;
 
@@ -25,7 +26,7 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *getAllUsers(_payload: any) {
+	public *getAllUsers() {
 		yield this.xRead("/users");
 	}
 
@@ -52,6 +53,6 @@ export default class UserEntity extends BaseEntity {
 	public *deleteUser(payload:any) {
 		if (!payload.id) throw new Error("Id required");
 		const normalized = this.normalize(payload);
-		yield put({type:'DELETE', payload:{entities:normalized.entities}});
+		yield put({type:'DELETE', payload:normalized.entities});
 	}
 }

@@ -22,13 +22,14 @@ export {
   Journal,
 }
 
-export default {
+const models = {
   UserModel: asFunction(UserModel).singleton(),
   ClassesModel: asFunction(ClassesModel).singleton(),
   SubjectsModel: asFunction(SubjectsModel).singleton(),
   UserClassesModel: asFunction(UserClassesModel).singleton(),
   JournalModel: asFunction(JournalModel).singleton(),
 };
+export default models;
 
 export function associateModels(container: AwilixContainer<IContextContainer>) {
   // Associations

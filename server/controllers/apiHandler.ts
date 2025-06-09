@@ -10,19 +10,6 @@ import BaseController from "./BaseController";
 import { Handler } from "@/types";
 import { Logger } from "../logger";
 
-
-// const api:[string, string & keyof IControllerContainer][] = BaseController.getRoutes();
-// // {
-// //   '/api/users': 'UsersController',
-// //   '/api/users/[id]': 'UsersController',
-// //   '/api/classes': 'ClassesController',
-// //   '/api/classes/[id]': 'ClassesController',
-// //   '/api/subjects': 'SubjectsController',
-// //   '/api/subjects/[id]': 'SubjectsController',
-// // }
-
-// const routes:Routes = Routes.fromStrings(...api.map(route => route[0]));
-
 export default function apiHandler(
 ):Handler{
   return async (req, res) => {

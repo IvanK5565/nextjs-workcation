@@ -10,6 +10,7 @@ import { randomUUID } from "crypto";
 import { ApiError } from "../exceptions";
 import { StatusCodes } from "http-status-codes";
 import { AnswerType } from "@/types";
+import { Logger } from "../logger";
 
 export default function authOptionsContainer(ctx: IContextContainer) {
 	const log = ctx.Logger.log;
@@ -28,7 +29,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 				},
 				async authorize(credentials) {
 					if (!credentials) return null;
-					let user = await ctx.UserModel.findOne({
+					const user = await ctx.UserModel.findOne({
 						where: {
 							email: credentials.email,
 							status: UserStatus.ACTIVE,
@@ -45,21 +46,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			}),
 		],
 		callbacks: {
-			async signIn(params) {
-				log('signIn params', params)
-					// let exitingUser = await ctx.UserModel.findOne({
-					// 	where: {
-					// 		email: email,
-					// 		status: UserStatus.ACIVE,
-					// 	},
-					// });
-					// if(!exitingUser){
-					// 	return false;
-					// }
-				return true;
-			},
 			async jwt({ account, token, user }) {
-				// log("callback: jwt", user)
 				if(account?.provider === 'credentials'){
 					token.credentials = true;
 				}
@@ -68,14 +55,14 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			},
 			async session({session, user}) {
 				session.user = user as unknown as IIdentity;
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				session.acl = (user as any).acl
-				// log("callback: session", session)
+				// Logger.log('session:', session, user);
 				return session
 			},
 		},
 		jwt:{
 			encode: async (param)=>{
-				// log("jwt: encode")
 				if(param.token?.credentials){
 					const sessionToken = randomUUID();
 

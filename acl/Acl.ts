@@ -1,6 +1,6 @@
-// @ts-ignore-begin
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Requires set-value@^2.0.1 !!!
-const set = require("set-value");
+import set from "set-value";
 
 import AclInterface from "./AclInterface";
 import Registry from "./role/Registry";
@@ -318,7 +318,8 @@ export default class Acl implements AclInterface {
                 resourceParent = this.getResource(resourceParentId);
             } catch (e) {
                 throw new Error(
-                    `InvalidArgumentException: Parent Resource id ${resourceParentId} does not exist'`
+                    `InvalidArgumentException: Parent Resource id ${resourceParentId} does not exist'`,
+                    {cause:e}
                 );
             }
             set(
@@ -807,7 +808,7 @@ export default class Acl implements AclInterface {
         for (const key in children) {
             const child: ResourceInterface = children[key];
             const child_return = this.getChildResources(child);
-            // @ts-ignore
+            // @ts-expect-error Index of object, not array
             child_return[child.getResourceId()] = child;
             result = { ...result, ...child_return };
         }
@@ -1279,4 +1280,4 @@ export default class Acl implements AclInterface {
         return Object.keys(this.resources);
     }
 }
-// @ts-ignore-end
+

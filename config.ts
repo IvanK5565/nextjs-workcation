@@ -25,6 +25,7 @@ let localConfig = {};
 
 if (isDev) {
 	try {
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		localConfig = require("./config.local.ts");
 	} catch (ex) {
 		Logger.error(ex);

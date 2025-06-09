@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { About, SignIn, Register } from "@/components/signIn";
 import { useState } from "react"
 

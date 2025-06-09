@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt'
 
 const SALT_ROUNDS = 10;
 

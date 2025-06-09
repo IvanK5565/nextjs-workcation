@@ -9,6 +9,26 @@ import { IEntityContainer } from "@/client/entities";
 
 type ActionDecorator = (route: string, allow?: IAllowDeny) => MethodDecorator;
 
+function mergeGrants(a: IGrants = {}, b: IGrants = {}) {
+  const result: IGrants = {};
+
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+
+  for (const key of keys) {
+    const valuesA = a[key] ?? [];
+    const valuesB = b[key] ?? [];
+    // Merge and remove duplicates
+    result[key] = Array.from(new Set([...valuesA, ...valuesB]));
+	}
+  return result;
+}
+function mergeRules(a: IAllowDeny = {allow:{}}, b:IAllowDeny = {allow:{}}):IAllowDeny{
+	return {
+		allow: mergeGrants(a.allow, b.allow),
+		deny: a.deny || b.deny ? mergeGrants(a.deny, b.deny) : undefined
+	}
+}
+
 function addMethodToRouteRules(routeRules: IAllowDeny, method: GRANT) {
 	if (routeRules.allow) {
 		routeRules.allow = Object.entries(routeRules.allow).reduce(
@@ -42,7 +62,8 @@ const endpointDecorator: ActionDecoratorFactory =
 		if (pRules) {
 			const reg = /\[([a-zA-Z0-9_-]+)\]/g;
 			const routePattern = route.replace(reg, "*");
-			rules[routePattern] = addMethodToRouteRules(pRules, GRANT.GET);
+			pRules = addMethodToRouteRules(pRules, GRANT.GET);
+			rules[routePattern] = mergeRules(pRules, rules[routePattern]);
 		}
 		const routes: [string, string][] = BaseController.getRoutes();
 		if (!routes.find(rc => rc[0] === route && rc[1] === target.constructor.name))

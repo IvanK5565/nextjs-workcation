@@ -13,6 +13,7 @@ import getServerSidePropsContainer from "@/server/controllers/getServerSideProps
 import { DatabaseAdapter } from '@/server/lib/DatabaseAdapter';
 import { Logger } from "@/server/logger";
 import { Cleaner } from '@/acl/cleaner';
+import { Mutex } from '../utils/Mutex';
 
 const container = createContainer<IContextContainer>({
   injectionMode: InjectionMode.PROXY,
@@ -34,6 +35,7 @@ container.register({
   adapter: asFunction(DatabaseAdapter).singleton(),
   Logger: asClass(Logger).singleton(),
   cleaner: asClass(Cleaner).singleton(),
+  mutex: asClass(Mutex).singleton(),
 })
 
 associateModels(container);

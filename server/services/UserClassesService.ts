@@ -7,7 +7,7 @@ export default class UserClassesService extends BaseContext implements IService 
     const {id,...fields} = body;
     let model = Model.build();
     if(id){
-      let finded = await Model.findByPk(Number(id));
+      const finded = await Model.findByPk(Number(id));
       if(!finded){
         return Promise.reject(Error('Invalid id'))
       }

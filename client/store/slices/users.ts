@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createSlice } from "@reduxjs/toolkit";
 import { Entities, EntitiesAction } from "../types";
 import { HYDRATE } from "next-redux-wrapper";
 
 export const usersSlice = createSlice({
   name: 'users',
-  initialState:{},
+  initialState:{} as Entities['users'],
   reducers: baseR('users')
 })
 

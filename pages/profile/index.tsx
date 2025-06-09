@@ -1,8 +1,8 @@
 import ctx from "@/server/container/container";
 import { useState } from "react";
 import type { User as User } from "@/server/models/users";
-import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
+import Header from "@/components/layout/Header";
+import SearchBar from "@/components/layout/SearchBar";
 import NoSuccessResponse from "@/components/NoSuccessResponse";
 
 export default function Home({ data, code }: { data?: User; code: number }) {
@@ -32,7 +32,7 @@ export const getServerSideProps = ctx.resolve("getServerSideProps")(
 );
 
 function UserForm({data}:{data:User}){
-  const [isView, toggleEditView] = useState(true);
+  const [isView] = useState(true);
 
   return(
     <form className="flex flex-col w-min pl-10">

@@ -1,5 +1,5 @@
 import { Location } from "@/pages/api/data";
-import HouseCard from "@/components/HouseCard";
+import HouseCard from "@/components/workcation/HouseCard";
 import clsx from "clsx";
 
 export default function LocationCards({ data }: { data: Location }) {

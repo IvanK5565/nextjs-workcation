@@ -1,10 +1,10 @@
-import { AppState } from ".";
+import { AppState } from "@/client/store/ReduxStore";
 
-const entitySelector = <K extends keyof AppState['entities']>(name:K) => (state:AppState):AppState['entities'][K] => state.entities[name];
+const entitySelector = <K extends keyof AppState>(name:K) => (state:AppState):AppState[K] => state[name];
 
-const usersSelector = (state:AppState)=>state.entities.users;
-const classesSelector = (state:AppState)=>state.entities.classes;
-const subjectsSelector = (state:AppState)=>state.entities.subjects;
+const usersSelector = (state:AppState)=>state.users;
+const classesSelector = (state:AppState)=>state.classes;
+const subjectsSelector = (state:AppState)=>state.subjects;
 
 export {
   entitySelector,
