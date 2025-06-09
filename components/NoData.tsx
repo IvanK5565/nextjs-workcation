@@ -1,5 +1,8 @@
+import { useTranslation } from "next-i18next";
+
 export default function NoData() {
-  const message = "No Data Available"
+  const {t} = useTranslation('common')
+  const message = t('noData-title')
   const subMessage = "Please check back later."
 	return (
     <div className="flex flex-col items-center justify-center w-full h-full text-center p-6 bg-gray-50 rounded-md border border-dashed border-gray-300">

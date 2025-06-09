@@ -20,7 +20,7 @@ function NavButton({
 	);
 }
 export default function Navigation({ isHidden, onClose }: { isHidden: boolean, onClose:()=>void }) {
-	const {t} = useTranslation();
+	const {t} = useTranslation('common');
 	return (
 		<div
 			className={clsx(

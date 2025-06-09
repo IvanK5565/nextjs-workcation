@@ -19,6 +19,7 @@ export default function getServerSidePropsContainer(
 ): GSSPFactory {
 	return (controllersNames, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
+			// init
 			const {locale} = context;
 			const req: ExtendedRequest = Object.assign(context.req, {
 				query: context.query,
@@ -27,11 +28,12 @@ export default function getServerSidePropsContainer(
 				// session: await getServerSession()
 			});
 			let auth:object= {};
+			// collect promises from controllers
 			const promises = controllersNames.map((name) => {
 				return ctx[name]
 					.handler(route)(req, context.res as NextApiResponse)
 					.then((r) => {
-						auth = {...req.session?.acl, identity:req.session?.user};
+						auth = {...(req.session?.acl ?? null), identity:(req.session?.user??null)};
 						if (r) {
 							const entity = ctx[name].getEntityName();
 							if (entity) {
@@ -45,6 +47,7 @@ export default function getServerSidePropsContainer(
 						}
 					});
 			});
+			// run promises
 			try {
 				await Promise.all(promises);
 				store.dispatch({type:'setAuth', payload:{auth}})
@@ -66,6 +69,7 @@ export default function getServerSidePropsContainer(
 					redirect: { destination: "/404", permanent: false },
 				};
 			}
+			// end
 			return {
 				props: {
 					...( await serverSideTranslations(locale ?? 'en', ['common'])) 

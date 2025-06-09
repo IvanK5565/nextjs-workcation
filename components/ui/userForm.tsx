@@ -25,7 +25,7 @@ function getField<T>(
 }
 
 export function UserForm({onSubmit,className}:{onSubmit?:(values:IUser)=>void,className?:string}) {
-	const {t} = useTranslation()
+	const {t} = useTranslation('common')
 	const schema = Yup.object({
 		email: Yup.string().email("Invalid email address").required("Required"),
 		password: Yup.string()

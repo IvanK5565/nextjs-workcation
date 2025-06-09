@@ -53,6 +53,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 				return token
 			},
 			async session({session, user}) {
+				Logger.info('Seesion callback', session);
 				session.user = user as unknown as IIdentity;
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				session.acl = (user as any).acl

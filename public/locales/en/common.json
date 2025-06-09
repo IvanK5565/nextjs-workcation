@@ -18,5 +18,6 @@
   "admin":"Admin",
   "main":"Main",
   "submit":"Submit",
-  "reset":"Reset"
+  "reset":"Reset",
+  "noData":"No Data Available"
 }

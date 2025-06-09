@@ -9,8 +9,11 @@ import { deleteEntities } from "@/client/store/actions";
 import { useActions } from "@/client/hooks";
 import { Entities } from "@/client/store/types";
 import { useTranslation } from "next-i18next";
-import { t } from "i18next";
+import container from "@/server/container/container";
 
+export const getServerSideProps = container.resolve("getServerSideProps")(
+	[]
+);
 const Home = () => {
 	const session = useSession();
 	const [entity, setEntity] = useState<keyof Entities>("users");
@@ -65,7 +68,7 @@ function DataCard({
 	data: (object & { id: string }) | null;
 	onDelete: () => void;
 }) {
-	const { t } = useTranslation();
+	const { t } = useTranslation('common');
 	return data == null ? (
 		<Null />
 	) : (
@@ -124,6 +127,7 @@ function GetEntityBar({ entity }: { entity: keyof Entities }) {
 	const { getUserById, getAllUsers } = useActions("UserEntity");
 	const { getClassById, getAllClasses } = useActions("ClassEntity");
 	const { getAllSubjects, getSubjectById } = useActions("SubjectEntity");
+	const { t } = useTranslation('common');
 
 	const baseUrl = `/api/${entity}`;
 	const actions = {
@@ -230,6 +234,7 @@ function Filter({
 	onEntitySelect: (data: keyof Entities) => void;
 	onDirectionSelect: (dir: "straight" | "reverse") => void;
 }) {
+	const { t } = useTranslation('common');
 	return (
 		<div className={className}>
 			<div className="max-w-md mt-6 bg-gray-50 p-4 rounded-md border border-gray-200 shadow-sm text-sm text-gray-700">
@@ -259,7 +264,7 @@ function Filter({
 				<div className="flex flex-wrap -mx-2">
 					<label className="block w-full px-2 sm:mt-0 sm:w-1/2 lg:mt-4 lg:w-full">
 						<span className="text-sm font-semibold text-gray-500">
-							Direction
+							{t('direction')}
 						</span>
 						<select
 							className="mt-1 form-select rounded-lg block w-full text-white shadow"
@@ -272,8 +277,8 @@ function Filter({
 								}
 							}}
 						>
-							<option>{t('direction.straight')}</option>
-							<option>{t('direction.reverse')}</option>
+							<option>{t('direction-straight')}</option>
+							<option>{t('direction-reverse')}</option>
 						</select>
 					</label>
 				</div>
