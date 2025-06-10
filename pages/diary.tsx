@@ -1,9 +1,9 @@
-import { UserAction } from "@/client/entities/UserEntity";
+import { useActions } from "@/client/hooks";
 import { AppState } from "@/client/store/ReduxStore";
+import { usersSelector } from "@/client/store/selectors";
 import { IUser } from "@/client/store/types";
-import Header from "@/components/layout/Header";
-import SearchBar from "@/components/layout/SearchBar";
-import { useDispatch, useSelector } from "react-redux";
+import container from "@/server/container/container";
+import { useSelector } from "react-redux";
 
 type Lesson = {
 	name: string;
@@ -28,7 +28,7 @@ const lesson = {
 	homework:
 		"Open page 200 and do execise 1 and 2, next open page 202 and read text 1" as string,
 	mark: "4" as "1" | "2" | "3" | "4" | "5" | null,
-	teacherId: "2" as string,
+	teacherId: "11" as string,
 };
 const day: Day = {
 	name: "Monday" as string,
@@ -43,21 +43,26 @@ const diaryData: Diary = {
 	saturday: day,
 };
 
+export const getServerSideProps = container.resolve("getServerSideProps")([]);
 export default function Home() {
+	const users = useSelector(usersSelector);
+	const { getUserById } = useActions("UserEntity");
+
+	const ids = Object.values(diaryData).reduce((acc, day) => {
+		acc.push(...(day.lessons.map((l) => l.teacherId)));
+		acc = new Array(...(new Set(acc)));
+		return acc;
+	}, [] as string[]);
+	console.log('id lengh', ids.length)
+	ids.forEach((id) => {
+		if (!users[id]) {
+			console.log("teacher", users[id], 'id', id);
+			getUserById({ id: id });
+		}
+	});
+
 	return <Diary data={diaryData} />;
 }
-
-Home.getLayout = ({ children }: { children: React.ReactNode }) => {
-	return (
-		<div className="min-h-screen bg-gray-200 antialiased xl:flex xl:flex-col xl:h-screen">
-			<Header />
-			<div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
-				<SearchBar />
-				<main className="py-4 xl:flex-1 xl:overflow-x-hidden">{children}</main>
-			</div>
-		</div>
-	);
-};
 
 function Diary({ data }: { data: Diary }) {
 	return (
@@ -84,18 +89,11 @@ function initials(user: IUser) {
 }
 
 function Lesson({ data }: { data: Lesson }) {
-	const entities = useSelector<AppState, AppState["entities"]>(
-		(state) => state.entities
+	const users = useSelector<AppState, AppState["users"]>(
+		(state) => state.users
 	);
-	const teacher = entities.users[data.teacherId] as IUser;
-	const dispatch = useDispatch();
-	if (!teacher) {
-		console.log("teacher", !teacher);
-		dispatch<UserAction>({
-			type: "getUserById",
-			payload: { id: data.teacherId },
-		});
-	}
+	const teacher = users[data.teacherId] as IUser;
+
 	return (
 		<div className="flex w-full h-full mt-1">
 			<div className="w-40 px-1 bg-slate-400">{data.name}</div>
@@ -148,18 +146,9 @@ function Day({ data }: { data: Day }) {
 }
 
 function MiniLesson({ data }: { data: Lesson }) {
-	const entities = useSelector<AppState, AppState["entities"]>(
-		(state) => state.entities
-	);
-	const teacher = entities.users[data.teacherId] as IUser;
-	const dispatch = useDispatch();
-	if (!teacher) {
-		console.log("teacher", !teacher);
-		dispatch<UserAction>({
-			type: "getUserById",
-			payload: { id: data.teacherId },
-		});
-	}
+	const users = useSelector(usersSelector);
+	const teacher = users[data.teacherId] as IUser;
+
 	return (
 		<div className="flex w-full h-full mt-1">
 			<div className="w-40 px-1 bg-slate-400">{data.name}</div>

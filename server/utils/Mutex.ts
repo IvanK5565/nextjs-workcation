@@ -4,22 +4,41 @@ import { Logger } from "../logger";
 export class Mutex extends BaseContext {
   private mutexes = {} as Record<string, Promise<void>>;
 
-  public async runCritical<T>(name:string, callback: () => Promise<T> | T): Promise<T> {
-    if(!this.mutexes[name]){
+  public async runCritical<T>(
+    name: string,
+    callback: () => Promise<T> | T,
+    timeoutMs: number = 10000
+  ): Promise<T> {
+    if (!this.mutexes[name]) {
       this.mutexes[name] = Promise.resolve();
     }
-    
+
     const unlock = await this.lock(name);
     Logger.info('Start critical section');
+    let timeoutHandle: undefined | NodeJS.Timeout = undefined;
     try {
-      return await callback();
+      // return await callback();
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+          reject(new Error(`Mutex "${name}" timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+
+      // Race the callback against the timeout
+      const result = await Promise.race([
+        Promise.resolve(callback()),
+        timeoutPromise,
+      ]);
+      return result as T;
     } finally {
+      clearTimeout(timeoutHandle);
       unlock();
       Logger.info('End critical section');
     }
   }
 
-  private lock(name:string): Promise<() => void> {
+  private lock(name: string): Promise<() => void> {
     let begin: (unlock: () => void) => void = () => { };
     this.mutexes[name] = this.mutexes[name].then(() => new Promise(begin));
     return new Promise(resolve => {

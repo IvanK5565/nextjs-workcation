@@ -110,7 +110,7 @@ function UserCard() {
 		return <NoData />;
 	}
 
-	return <DataCard collection="users" data={Object.entries(users)[0][1]} />;
+	return <DataCard collection="users" data={Object.entries(users)?.[0]?.[1]} />;
 }
 
 function ClassCard() {
@@ -124,7 +124,7 @@ function ClassCard() {
 	// }
 	console.warn("ClassCard updated");
 	return (
-		<DataCard collection="classes" data={Object.entries(classes)[0][1]}>
+		<DataCard collection="classes" data={Object.entries(classes)?.[0]?.[1]}>
 			<SubjectCard />
 		</DataCard>
 	);

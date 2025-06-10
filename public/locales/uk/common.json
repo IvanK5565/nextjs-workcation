@@ -9,8 +9,8 @@
   "deleteAll":"Видалити все",
   "callError":"Викликати помилку",
   "direction":"Напрямок",
-  "direction.straight":"Прямий",
-  "direction.reverse":"Обернений",
+  "direction-straight":"Прямий",
+  "direction-reverse":"Обернений",
   "createClass":"Додати клас",
   "createUser":"Додати користувача",
   "classes":"Усі класи",
@@ -18,5 +18,11 @@
   "admin":"Адмін",
   "main":"Головна",
   "submit":"Підтвердити",
-  "reset":"Скинути"
+  "reset":"Скинути",
+  "noData-title":"Наразі тут пусто",
+  "noData-describe":"Будь-ласка, завітайте пізніше.",
+  "requestCompleted":"Запит успішний!",
+  "requestFailed":"Запит невдалий",
+  "accessDenied-title":"Доступ заборонено!",
+  "accessDenied-describe":"У вас немає дозволу бути тут."
 }

@@ -6,7 +6,7 @@ import { Routes } from "@/server/utils/routes";
 import type { NextApiRequest, NextApiResponse } from "next";
 import container from "../container/container";
 // import { IControllerContainer } from ".";
-import BaseController from "./BaseController";
+import BaseController from "../controllers/BaseController";
 import { Handler } from "@/types";
 import { Logger } from "../logger";
 

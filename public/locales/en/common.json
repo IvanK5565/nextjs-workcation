@@ -19,5 +19,10 @@
   "main":"Main",
   "submit":"Submit",
   "reset":"Reset",
-  "noData":"No Data Available"
+  "noData-title":"No Data Available",
+  "noData-describe":"Please check back later.",
+  "requestCompleted":"Request completed!",
+  "requestFailed":"Request Failed",
+  "accessDenied-title":"Access Denied",
+  "accessDenied-describe":"You do not have permission to be here."
 }

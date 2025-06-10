@@ -7,7 +7,7 @@ import { AnswerType } from "@/types";
 import type { ActionProps } from "@/types";
 import { GRANT, ROLE } from "@/acl/types";
 import { AccessDeniedError, ApiError } from "../exceptions";
-import { registerBodySchema } from "./schemas";
+import { registerBodySchema } from "../lib/schemas";
 
 @Entity('UserEntity')
 export default class UsersController extends BaseController {

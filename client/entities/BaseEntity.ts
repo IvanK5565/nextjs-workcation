@@ -99,7 +99,7 @@ export default abstract class BaseEntity extends BaseContext {
 		if (!res.success) {
 			if (res.type && res.type === AnswerType.Toast) {
 			}
-			throw new Error("Request unsuccess: " + res.message);
+			throw new Error(res.message);
 		} else {
 			return res;
 		}
@@ -116,9 +116,11 @@ export default abstract class BaseEntity extends BaseContext {
 				const normalData = this.normalize(res.data);
 				yield put(addEntities(normalData.entities));
 			}
-			toast.success(res.message ?? 'Request completed!')
+			const text = this.di.t('requestCompleted')
+			toast.success(res.message ?? text ?? 'Request Completed!')
 		} catch (e) {
-			toast.error((e as Error).message);
+			const text = this.di.t('requestFailed')
+			toast.error(text+': '+(e as Error).message);
 			console.error('in actionRequest', (e as Error).message ?? e);
 		}
 	}

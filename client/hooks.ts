@@ -60,23 +60,25 @@ interface IUseAclResult {
 
 export function useAcl() {
   const { replace, pathname, query } = useRouter();
-  let resource = pathname.replace(/./g,"_")
+  // let resource = pathname.replace(/./g,"_")
+  let resource = pathname
   const id = query?.id?.toString();
   if (id) {
     resource = resource.replace("[id]", id);
   }
   // TODO: get auth
   const auth = useSelector((state: AppState) => state.auth);
+  console.log(auth)
   if(!auth){
     console.log("error resource", resource);
-    replace("/error/403");
+    // replace("/403");
   }
 
   const { roles, rules, identity } = auth!;
-  const guard = new Guard(roles, rules, identity.role ?? ROLE.GUEST)
+  const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
   if(!guard.allow(GRANT.READ, resource)){
     console.log("error resource", resource);
-    replace("/error/403");
+    replace("/403");
   }
 
   const res:IUseAclResult = {

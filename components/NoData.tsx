@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 export default function NoData() {
   const {t} = useTranslation('common')
   const message = t('noData-title')
-  const subMessage = "Please check back later."
+  const subMessage = t('noData-describe')
 	return (
     <div className="flex flex-col items-center justify-center w-full h-full text-center p-6 bg-gray-50 rounded-md border border-dashed border-gray-300">
       <NoDataSVG width={800} height={800} className="w-12 h-12 text-gray-400 mb-3" />

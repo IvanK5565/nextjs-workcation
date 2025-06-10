@@ -19,9 +19,9 @@ const authReducer = (auth: AuthState = { roles: {}, rules: {}, identity: {} as I
   switch (action.type) {
     case HYDRATE:
     case 'setAuth': return {
-      roles:roles??null,
-      rules:rules??null,
-      identity:identity??null,
+      roles:roles,
+      rules:rules,
+      identity:identity,
     }
     default: return auth;
   }

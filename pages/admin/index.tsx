@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import NoData from "@/components/NoData";
 import clsx from "clsx";
 import { entitySelector } from "@/client/store/selectors";
-import { deleteEntities } from "@/client/store/actions";
 import { useActions } from "@/client/hooks";
 import { Entities } from "@/client/store/types";
 import { useTranslation } from "next-i18next";
@@ -53,8 +52,8 @@ const Home = () => {
 		</div>
 	);
 };
-export default Home;
 Home.getLayout = (page: React.ReactNode) => page;
+export default Home;
 
 const buttonStyle =
 	"block xl:w-32 sm:w-auto sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block";
@@ -95,9 +94,18 @@ function EntitiesExplorer({
 	collection: 'users'|'classes'|'subjects';
 	reverse?: boolean;
 }) {
-	const dispatch = useDispatch();
 	const entities = useSelector(entitySelector(collection));
 	const entries = Object.entries(entities);
+
+		const { deleteUser } = useActions("UserEntity");
+	const { deleteClass } = useActions("ClassEntity");
+	const { deleteSubject } = useActions("SubjectEntity");
+
+	const actions = {
+		['users']: deleteUser,
+		['classes']: deleteClass,
+		['subjects']: deleteSubject,
+	}
 
 	if (!entities || entries.length < 1)
 		return (
@@ -112,8 +120,7 @@ function EntitiesExplorer({
 				<DataCard
 					key={index}
 					data={item[1]}
-					onDelete={() =>
-						dispatch(deleteEntities({ [collection]: { [item[0]]: item[1] } }))
+					onDelete={() => actions[collection]({ [collection]: { [item[0]]: item[1] } })
 					}
 				/>
 			))}

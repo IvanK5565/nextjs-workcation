@@ -1,9 +1,14 @@
+import { useTranslation } from "next-i18next";
+
 export default function AccessDenied() {
+  const {t} = useTranslation('common')
+  const title = t('accessDenied-title');
+  const describe = t('accessDenied-describe');
 	return (
-    <div className="flex flex-col items-center justify-center w-full h-full text-center p-6 bg-gray-50 rounded-md border border-dashed border-gray-300">
+    <div className="flex flex-col items-center justify-center w-full h-full text-center p-6 bg-indigo-200 rounded-md border border-dashed border-gray-300">
       <AccessDeniedSVG />
-      <h3 className="text-lg font-medium text-gray-700">Access Denied!</h3>
-      <p className="text-gray-500 text-sm mt-1">Please check back later.</p>
+      <h3 className="text-lg font-medium text-gray-700">{title}</h3>
+      <p className="text-gray-500 text-sm mt-1">{describe}</p>
     </div>
   );
 }

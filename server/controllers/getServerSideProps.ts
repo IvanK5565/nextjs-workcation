@@ -2,12 +2,15 @@ import { GetServerSideProps, NextApiResponse } from "next";
 import IContextContainer from "@/server/container/IContextContainer";
 import { IControllerContainer } from ".";
 import { StatusCodes } from "http-status-codes";
-import { ApiError } from "../exceptions";
+import { AccessDeniedError, ApiError } from "../exceptions";
 import { redux } from "@/client/store";
 import { addEntities } from "@/client/store/actions";
 import { Logger } from "../logger";
 import { ExtendedRequest } from "./BaseController";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { getServerSession } from "next-auth";
+import { AuthOptions } from "next-auth";
+import { Session } from "next-auth";
 
 type GSSPFactory = (
 	controllersNames: (keyof IControllerContainer)[],
@@ -20,20 +23,28 @@ export default function getServerSidePropsContainer(
 	return (controllersNames, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
 			// init
-			const {locale} = context;
+			const { locale } = context;
+			const props = {
+				...(await serverSideTranslations(locale ?? 'en', ['common']))
+			}
 			const req: ExtendedRequest = Object.assign(context.req, {
 				query: context.query,
 				body: {},
 				env: {},
 				// session: await getServerSession()
 			});
-			let auth:object= {};
+			req.session = await getServerSession<AuthOptions, Session>(
+				req,
+				context.res,
+				ctx.authOptions
+			);
+			let auth: object = { ...(req.session?.acl ?? {roles:null, rules:null}), identity: (req.session?.user ?? null) };
 			// collect promises from controllers
 			const promises = controllersNames.map((name) => {
 				return ctx[name]
 					.handler(route)(req, context.res as NextApiResponse)
 					.then((r) => {
-						auth = {...(req.session?.acl ?? null), identity:(req.session?.user??null)};
+						auth = { ...(req.session?.acl ?? null), identity: (req.session?.user ?? null) };
 						if (r) {
 							const entity = ctx[name].getEntityName();
 							if (entity) {
@@ -47,21 +58,33 @@ export default function getServerSidePropsContainer(
 						}
 					});
 			});
+			Logger.log('gssp handlers count', promises.length)
 			// run promises
 			try {
+				store.dispatch({ type: 'setAuth', payload: { auth } })
 				await Promise.all(promises);
-				store.dispatch({type:'setAuth', payload:{auth}})
 			} catch (error) {
 				ctx.Logger.error("GSSP ERROR: ", (error as Error).message);
+
+				if (error instanceof AccessDeniedError) {
+					return {
+						redirect: { destination: "/403", permanent: true },
+					};
+				}
 
 				if (error instanceof ApiError) {
 					switch (error.code) {
 						case StatusCodes.UNAUTHORIZED:
-							return { redirect: { destination: "/signIn", permanent: true } };
+							return {
+								redirect: { destination: "/signIn", permanent: true },
+							};
 						case StatusCodes.NOT_FOUND:
-							return { notFound: true };
-						case StatusCodes.METHOD_NOT_ALLOWED:
-							return { props: {} };
+							return {
+								notFound: true,
+							};
+						// case StatusCodes.METHOD_NOT_ALLOWED:
+						// 	return { props };
+
 					}
 				}
 				return {
@@ -71,9 +94,7 @@ export default function getServerSidePropsContainer(
 			}
 			// end
 			return {
-				props: {
-					...( await serverSideTranslations(locale ?? 'en', ['common'])) 
-				},
+				props
 			};
 		});
 }

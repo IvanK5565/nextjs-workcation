@@ -15,7 +15,7 @@ import nextI18nConfig from '@/next-i18next.config'
 
 export type GetLayout = (page: React.ReactNode) => React.ReactNode;
 
-type AppPropsWithLayout = AppProps & {
+export type AppPropsWithLayout = AppProps & {
 	Component: AppProps["Component"] & {
 		getLayout?: GetLayout;
 	};
