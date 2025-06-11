@@ -59,7 +59,7 @@ interface IUseAclResult {
 }
 
 export function useAcl() {
-  const { replace, pathname, query } = useRouter();
+  const { pathname, query } = useRouter();
   // let resource = pathname.replace(/./g,"_")
   let resource = pathname
   const id = query?.id?.toString();

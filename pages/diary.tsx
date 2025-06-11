@@ -1,4 +1,3 @@
-import { useActions } from "@/client/hooks";
 import { AppState } from "@/client/store/ReduxStore";
 import { usersSelector } from "@/client/store/selectors";
 import { IUser } from "@/client/store/types";

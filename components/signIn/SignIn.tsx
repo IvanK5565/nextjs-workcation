@@ -38,7 +38,7 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting }) => {
-        signIn('credentials', values as any);
+        signIn('credentials', { ...values });
         setSubmitting(false);
       }}
     >
