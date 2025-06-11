@@ -24,5 +24,16 @@
   "requestCompleted":"Request completed!",
   "requestFailed":"Request Failed",
   "accessDenied-title":"Access Denied",
-  "accessDenied-describe":"You do not have permission to be here."
+  "accessDenied-describe":"You do not have permission to be here.",
+  "search-placeholder":"Search by keywords",
+  "signIn":"Sign In",
+  "signIn-title":"Sign in your account.",
+  "signOut":"Sign out",
+  "register-title":"Create your account.",
+  "support":"Support",
+  "accountSettings":"Account Settings",
+  "messages":"Messages",
+  "confirm":"Confirm",
+  "dontHaveAccount":"Don`t have an account?",
+  "haveAccount":"Already have an account?"
 }

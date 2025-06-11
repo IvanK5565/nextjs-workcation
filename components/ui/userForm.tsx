@@ -2,7 +2,7 @@ import { IUser } from "@/client/store/types";
 import { UserRole, UserStatus } from "@/constants";
 import { Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
-import { TextInput2 } from "./textInput";
+import { TextInput } from "./textInput";
 import Button from "./button";
 import * as Yup from "yup";
 import { useTranslation } from "next-i18next";
@@ -54,7 +54,7 @@ export function UserForm({onSubmit,className}:{onSubmit?:(values:IUser)=>void,cl
 			<Form>
 				<Field
 					name="firstName"
-					component={TextInput2}
+					component={TextInput}
 					label="First Name"
 					placeholder="John"
 				/>
@@ -62,21 +62,23 @@ export function UserForm({onSubmit,className}:{onSubmit?:(values:IUser)=>void,cl
 
 				<Field
 					name="lastName"
-					component={TextInput2}
+					component={TextInput}
 					label="last Name"
 					placeholder="Doe"
 				/>
 				<Field
 					name="email"
-					component={TextInput2}
+					component={TextInput}
 					label="Email"
 					placeholder="example@mail.com"
+					type='email'
 				/>
 				<Field
 					name="password"
-					component={TextInput2}
+					component={TextInput}
 					label="Password"
 					placeholder="********"
+					type='password'
 				/>
 
 				<Button className="m-1" type="submit">{t('submit')}</Button>

@@ -8,6 +8,7 @@ import {
 import * as Yup from "yup";
 import Button from "../ui/button";
 import { useActions } from "@/client/hooks";
+import { useTranslation } from "next-i18next";
 
 interface IRegisterFormValues {
   firstName: string;
@@ -46,6 +47,7 @@ export default function Register({
   className?: string;
   onLogin: () => void;
 }) {
+  const {t} = useTranslation();
   const { register } = useActions('UserEntity')
   // const dispatch = useAppDispatch()
   const handleSubmit = async (values: IRegisterFormValues, { resetForm }:FormikHelpers<IRegisterFormValues>) => {
@@ -69,7 +71,7 @@ export default function Register({
   return (
     <div className={className ?? ""}>
       <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-        Create your account.
+        {t('register-title')}
       </h1>
       <Formik
         initialValues={initialValues}
@@ -105,11 +107,11 @@ export default function Register({
               }}
               className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
             >
-              Already have an account?
+              {t('haveAccount')}
             </span>
           </div>
           <div className="flex flex-row-reverse justify-between">
-            <Button type="submit">Confirm</Button>
+            <Button type="submit">{t('confirm')}</Button>
           </div>
         </Form>
       </Formik>

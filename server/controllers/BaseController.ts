@@ -34,6 +34,7 @@ export type ExtendedRequest = NextApiRequest & {
 };
 
 export default abstract class BaseController extends BaseContext {
+
 	@POST("/api/echo")
 	public async echo({ body }: ActionProps) {
 		Logger.info(body);
@@ -42,6 +43,7 @@ export default abstract class BaseController extends BaseContext {
 
 	private createAction(handler: string, route: string): ActionAdapter {
 		return (req, res) => {
+			console.log('handler:', handler)
 			const fn: Action = (this as any)[handler].bind(this);
 			return this.getActionProps(req, res, route)
 				.then((props) => fn(props))
@@ -50,6 +52,7 @@ export default abstract class BaseController extends BaseContext {
 					this.di.Logger.error(`Error in action: ${handler}. ${error}`);
 					throw error;
 				});
+
 		};
 	}
 
@@ -58,7 +61,7 @@ export default abstract class BaseController extends BaseContext {
 		res: NextApiResponse,
 		route: string
 	): Promise<ActionProps> {
-		await this.di.mutex.runCritical('getActionProps',async () => {
+		await this.di.mutex.runCritical('getActionProps', async () => {
 			if (!req.session) {
 				Logger.log('get session in getActionProps for route:', route, 'in controller:', this.constructor.name);
 				req.session = await getServerSession<AuthOptions, Session>(
@@ -85,7 +88,7 @@ export default abstract class BaseController extends BaseContext {
 		return {
 			query: req.query,
 			body: req.body,
-			session: req.session??null,
+			session: req.session ?? null,
 			guard: req.guard,
 		};
 	}
@@ -106,6 +109,7 @@ export default abstract class BaseController extends BaseContext {
 		if (!meta?.invokeOutput) throw error;
 		return meta.invokeOutput as string;
 	}
+
 
 	private createRouter(route: string) {
 		const router = createRouter<NextApiRequest, NextApiResponse>();
@@ -134,7 +138,7 @@ export default abstract class BaseController extends BaseContext {
 
 	public handler(route?: string): Handler {
 		return async (req, res) => {
-			if(req.body && typeof req.body === 'string') req.body = JSON.parse(req.body);			
+			if (req.body && typeof req.body === 'string') req.body = JSON.parse(req.body);
 			route = route ?? BaseController.getInvokeOutput(req);
 			const ssr = !route.startsWith("/api/");
 			const router = this.createRouter(route);
@@ -161,7 +165,7 @@ export default abstract class BaseController extends BaseContext {
 
 	public getEntityName(): (keyof IEntityContainer) | null {
 		const entity = Reflect.getMetadata("entity", this);
-		if(!entity) return null;
+		if (!entity) return null;
 		return entity as keyof IEntityContainer;
 	}
 }

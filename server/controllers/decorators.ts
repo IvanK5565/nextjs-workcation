@@ -59,6 +59,12 @@ const endpointDecorator: ActionDecoratorFactory =
 		const endpoints: MethodHandler[] = Reflect.getMetadata(route, target) ?? [];
 		endpoints.push({ method, handler: propertyKey as string });
 		Reflect.defineMetadata(route, endpoints, target);
+
+		const endpoints2: Record<string, Record<string, string>> = Reflect.getMetadata('endpoints',target) ?? {};
+		if(!endpoints2[route]) endpoints2[route] = {};
+		endpoints2[route][method] = propertyKey as string;
+		Reflect.defineMetadata('endpoints',endpoints2,target);
+
 		if (pRules) {
 			const reg = /\[([a-zA-Z0-9_-]+)\]/g;
 			const routePattern = route.replace(reg, "*");

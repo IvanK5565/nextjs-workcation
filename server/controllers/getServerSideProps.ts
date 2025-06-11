@@ -1,6 +1,5 @@
-import { GetServerSideProps, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import IContextContainer from "@/server/container/IContextContainer";
-import { IControllerContainer } from ".";
 import { StatusCodes } from "http-status-codes";
 import { AccessDeniedError, ApiError } from "../exceptions";
 import { redux } from "@/client/store";
@@ -11,16 +10,14 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { getServerSession } from "next-auth";
 import { AuthOptions } from "next-auth";
 import { Session } from "next-auth";
+import { GSSPFactory } from "@/types";
 
-type GSSPFactory = (
-	controllersNames: (keyof IControllerContainer)[],
-	route?: string
-) => GetServerSideProps;
+
 
 export default function getServerSidePropsContainer(
 	ctx: IContextContainer
 ): GSSPFactory {
-	return (controllersNames, route?) =>
+	return (controllersNames, isPublic=false, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
 			// init
 			const { locale } = context;
@@ -38,6 +35,11 @@ export default function getServerSidePropsContainer(
 				context.res,
 				ctx.authOptions
 			);
+			if(!isPublic && !req.session){
+				return {
+						redirect: { destination: "/403", permanent: true },
+					};
+			}
 			let auth: object = { ...(req.session?.acl ?? {roles:null, rules:null}), identity: (req.session?.user ?? null) };
 			// collect promises from controllers
 			const promises = controllersNames.map((name) => {

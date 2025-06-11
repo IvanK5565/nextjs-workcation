@@ -4,6 +4,7 @@ import clsx from "clsx";
 import Dropdown from "./Dropdown";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useTranslation } from "next-i18next";
 
 export default function Header() {
 	const [isNavOpen, setNavOpen] = useState(false);
@@ -70,6 +71,7 @@ const navButtonStyle =
 
 function Navigation({ isOpen }: { isOpen: boolean }) {
 	const session = useSession();
+	const {t} = useTranslation();
 	return (
 		<nav
 			className={clsx(
@@ -95,13 +97,13 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 					type="text"
 					name="search"
 					id="search"
-					placeholder="Search by keywords"
+					placeholder={t('search-placeholder')}
 				/>
 			</div>
 			<div className="sm:flex sm:items-center">
 				<div className="px-2 pt-2 pb-5 border-b border-gray-800 sm:flex sm:items-center sm:border-b-0 sm:py-0 sm:px-0">
 					<Link href="/messages" className={"mt-1 sm:mt-0 " + navButtonStyle}>
-						Messages
+						{t('messages')}
 					</Link>
 					<Link href="/classes/1" className={"mt-1 sm:mt-0 " + navButtonStyle}>
 						Classes/1
@@ -126,20 +128,20 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 							href="/profile"
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-							Account settings
+						{t('accountSettings')}
 						</Link>
 						<Link
 							href="/"
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-							Support
+						{t('support')}
 						</Link>
 						<Link
 							href="/signIn"
 							onClick={() => signOut({ redirect: false })}
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-							Sign out
+							{t('signOut')}
 						</Link>
 					</div>
 					<Dropdown
@@ -162,20 +164,20 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 								href="/profile"
 								className="block hover:text-white text-gray-800 px-4 py-2 hover:bg-indigo-500"
 							>
-								Account Settings
+								{t('accountSettings')}
 							</Link>
 							<Link
 								href=""
 								className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500"
 							>
-								Support
+								{t('support')}
 							</Link>
 							<Link
 								href="/signIn"
 								onClick={() => signOut({ redirect: false })}
 								className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500"
 							>
-								Sign Out
+								{t('signOut')}
 							</Link>
 						</div>
 					</Dropdown>

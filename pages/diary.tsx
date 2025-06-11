@@ -43,24 +43,8 @@ const diaryData: Diary = {
 	saturday: day,
 };
 
-export const getServerSideProps = container.resolve("getServerSideProps")([]);
+export const getServerSideProps = container.resolve("getServerSideProps")(['UsersController']);
 export default function Home() {
-	const users = useSelector(usersSelector);
-	const { getUserById } = useActions("UserEntity");
-
-	const ids = Object.values(diaryData).reduce((acc, day) => {
-		acc.push(...(day.lessons.map((l) => l.teacherId)));
-		acc = new Array(...(new Set(acc)));
-		return acc;
-	}, [] as string[]);
-	console.log('id lengh', ids.length)
-	ids.forEach((id) => {
-		if (!users[id]) {
-			console.log("teacher", users[id], 'id', id);
-			getUserById({ id: id });
-		}
-	});
-
 	return <Diary data={diaryData} />;
 }
 

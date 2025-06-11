@@ -3,20 +3,27 @@
 import { signIn } from "next-auth/react";
 import Button from "../ui/button";
 import clsx from "clsx";
-import { Form, Formik } from 'formik'
-import MyTextInput from "../ui/textInput";
+import { Field, Form, Formik } from 'formik'
+import { TextInput } from "../ui/textInput";
 import * as Yup from 'yup'
+import { useTranslation } from "next-i18next";
+
+interface ILogin{
+  email:string;
+  password:string;
+}
 
 export default function SignIn({ className, onRegister }: { className?: string, onRegister: ()=>void }) {
+  const {t} = useTranslation('common')
   // const credentialsAction = (formData: FormData) => {
   //   signIn('credentials', { email, password });
   // }
 
   return <div className={clsx(className)}>
     <h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-      Sign in your account.
+      {t("signIn-title")}
     </h1>
-    <Formik
+    <Formik<ILogin>
       initialValues={{
         email: '',
         password: '',
@@ -31,12 +38,26 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting }) => {
-        signIn('credentials', values);
+        signIn('credentials', values as any);
         setSubmitting(false);
       }}
     >
       <Form className="flex flex-col mt-2">
-        <MyTextInput
+        <Field
+          component={TextInput}
+          name='email'
+          placeholder='example@email.com'
+          label='Email'
+          type='email'
+        />
+        <Field
+          component={TextInput}
+          name="password"
+          placeholder="********"
+          label='Password'
+          type='password'
+        />
+        {/* <MyTextInput
           type="email"
           name="email"
           placeholder='example@email.com'
@@ -47,12 +68,12 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           name="password"
           placeholder="********"
           label='Password'
-        />
+        /> */}
         <div className='text-right'>
-          <span onClick={() => { onRegister() }} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min text-right">Don`t have an account?</span>
+          <span onClick={() => { onRegister() }} className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min text-right">{t('dontHaveAccount')}</span>
         </div>
         <div className="mt-1 flex justify-between">
-          <Button type="submit" disabled={false} >Confirm</Button>
+          <Button type="submit" disabled={false} >{t('confirm')}</Button>
           <div className="flex">
             <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor" display="inline-block" overflow="visible"
               className="ml-2 h-full cursor-pointer"

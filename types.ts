@@ -61,7 +61,8 @@ export type ActionProps = {
 	session: Session | null;
 	guard:Guard;
 };
-export type GSSPFactory = <K extends keyof IControllerContainer>(
-	controllersNames: K[],
+export type GSSPFactory = (
+	controllersNames: (keyof IControllerContainer)[],
+	isPublic?:boolean,
 	route?: string
 ) => GetServerSideProps;

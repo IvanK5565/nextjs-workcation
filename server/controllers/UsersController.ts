@@ -20,6 +20,11 @@ export default class UsersController extends BaseController {
 			[ROLE.ADMIN]: [GRANT.WRITE],
 		},
 	})
+	@GET('/diary', {
+		allow: {
+			[ROLE.TEACHER]:[GRANT.READ]
+		}
+	})
 	public getTeachersSSR({ guard }: ActionProps) {
 		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
 		return this.di.UsersService.findByFilter(undefined, undefined, {

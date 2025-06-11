@@ -74,11 +74,11 @@ export function useAcl() {
     // replace("/403");
   }
 
-  const { roles, rules, identity } = auth!;
+  const { roles, rules, identity } = auth;
   const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
   if(!guard.allow(GRANT.READ, resource)){
     console.log("error resource", resource);
-    replace("/403");
+    // replace("/403");
   }
 
   const res:IUseAclResult = {

@@ -1,5 +1,4 @@
 import {
-	ErrorMessage,
 	Field,
 	Form,
 	Formik,
@@ -8,6 +7,10 @@ import {
 import * as Yup from "yup";
 import Button from "../ui/button";
 import { useActions } from "@/client/hooks";
+import { TextInput } from "../ui/textInput";
+import { toast } from "react-toastify";
+import { SelectInput } from "../ui/selectInput";
+import { useTranslation } from "next-i18next";
 
 interface IRegisterFormValues {
 	firstName: string;
@@ -15,7 +18,7 @@ interface IRegisterFormValues {
 	email: string;
 	password: string;
 	status: "active";
-	role: "admin" | "teacher" | "student"|'';
+	role: "admin" | "teacher" | "student" | "";
 }
 
 const validationSchema = Yup.object({
@@ -46,50 +49,67 @@ export default function Register({
 	className?: string;
 	onLogin: () => void;
 }) {
-	const { register } = useActions('UserEntity')
+	const {t} = useTranslation();
+	const { register } = useActions("UserEntity");
 	// const dispatch = useAppDispatch()
-	const handleSubmit = async (values: IRegisterFormValues, { resetForm }:FormikHelpers<IRegisterFormValues>) => {
-		console.log('submit')
-		// dispatch<UserAction>({type:'register', payload:values})
+	const handleSubmit = async (
+		values: IRegisterFormValues,
+		{ resetForm }: FormikHelpers<IRegisterFormValues>
+	) => {
+		console.log("submit");
+		toast(JSON.stringify(values))
 		register(values);
 		resetForm();
-		// const res = await fetch("/api/register", {
-		// 	method: "POST",
-		// 	headers: { "Content-Type": "application/json" },
-		// 	body: JSON.stringify(values),
-		// });
-		// const data = (await res.json()) as Response;
-		// if (data && data.success) {
-		// 	alert("Registered! " + JSON.stringify(data.data, null, 2));
-			// resetForm();
-		// } else if (data) {
-		// 	alert("Error! " + JSON.stringify(data, null, 2));
-		// }
 	};
 	return (
 		<div className={className ?? ""}>
 			<h1 className="mt-8 lg:mt-12 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-				Create your account.
+				{t('register-title')}
 			</h1>
-			<Formik
+			<Formik<IRegisterFormValues>
 				initialValues={initialValues}
 				onSubmit={handleSubmit}
 				validationSchema={validationSchema}
 			>
 				<Form className="flex flex-col">
-					<TextInput name="firstName" placeholder="John">
-						First Name
-					</TextInput>
-					<TextInput name="lastName" placeholder="Doe">
-						Last Name
-					</TextInput>
-					<EmailInput name="email" placeholder="example@email.com">
-						Email
-					</EmailInput>
-					<PasswordInput name="password" placeholder="Password">
-						Password
-					</PasswordInput>
-					<SelectInput name="role" />
+					<Field
+						component={TextInput}
+						name="firstName"
+						placeholder="John"
+						label="First Name"
+						type="text"
+					/>
+					<Field
+						component={TextInput}
+						name="lastName"
+						placeholder="Doe"
+						label="Last Name"
+						type="text"
+					/>
+					<Field
+						component={TextInput}
+						name="email"
+						placeholder="example@email.com"
+						label="Email"
+						type="email"
+					/>
+					<Field
+						component={TextInput}
+						name="password"
+						placeholder="********"
+						label="Password"
+						type="password"
+					/>
+					<Field
+						component={SelectInput}
+						name="role"
+						options={[
+							{ value: "", label: "Select Role" },
+							{ value: "admin", label: "Admin" },
+							{ value: "teacher", label: "Teacher" },
+							{ value: "student", label: "Student" },
+						]}
+					/>
 					<input
 						className="rounded-lg"
 						type="text"
@@ -105,70 +125,14 @@ export default function Register({
 							}}
 							className="mt-2 text-indigo-500 underline text-sm cursor-pointer h-min"
 						>
-							Already have an account?
+							{t('haveAccount')}
 						</span>
 					</div>
 					<div className="flex flex-row-reverse justify-between">
-						<Button type="submit">Confirm</Button>
+						<Button type="submit">{t('confirm')}</Button>
 					</div>
 				</Form>
 			</Formik>
 		</div>
-	);
-}
-
-const EmailInput = (props: ITypedTextInputProps) =>
-	TextInput({ ...props, type: "email" });
-const PasswordInput = (props: ITypedTextInputProps) =>
-	TextInput({ ...props, type: "password" });
-
-interface ITextInputProps {
-	children: string;
-	type?: "text" | "password" | "email";
-	name: string;
-	placeholder: string;
-}
-type ITypedTextInputProps = Omit<ITextInputProps, "type">
-
-function TextInput({
-	children,
-	type = "text",
-	name,
-	placeholder,
-}: ITextInputProps) {
-	return (
-		<>
-			<label
-				htmlFor={name}
-				className="mt-4 text-2xl text-indigo-500 font-bold leading-tight"
-			>
-				{children}
-			</label>
-			<Field
-				className="rounded-lg"
-				type={type}
-				name={name}
-				id={name}
-				placeholder={placeholder}
-				required={true}
-			/>
-			<ErrorMessage name={name} className="text-red-600" component="small" />
-		</>
-	);
-}
-function SelectInput({ name }: { name: string }) {
-	return (
-		<>
-			<label className="mt-4 text-2xl text-indigo-500 font-bold leading-tight">
-				Role
-			</label>
-			<Field as="select" className="rounded-lg" name={name} required={true}>
-				<option value="">Select Role</option>
-				<option value="admin">Admin</option>
-				<option value="teacher">Teacher</option>
-				<option value="student">Student</option>
-			</Field>
-			<ErrorMessage name={name} className="text-red-600" component="small" />
-		</>
 	);
 }

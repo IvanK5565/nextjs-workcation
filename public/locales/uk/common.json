@@ -24,5 +24,16 @@
   "requestCompleted":"Запит успішний!",
   "requestFailed":"Запит невдалий",
   "accessDenied-title":"Доступ заборонено!",
-  "accessDenied-describe":"У вас немає дозволу бути тут."
+  "accessDenied-describe":"У вас немає дозволу бути тут.",
+  "search-placeholder":"Пошук за ключем",
+  "signIn":"Вхід",
+  "signIn-title":"Увійдіть до вашого аккаунту.",
+  "signOut":"Вихід",
+  "register-title":"Створіть новий аккаунт.",
+  "support":"Підтримка",
+  "accountSettings":"Налаштування акаунту",
+  "messages":"Повідомлення",
+  "confirm":"Підтвердити",
+  "dontHaveAccount":"Намає аккаунту?",
+  "haveAccount":"Вже є аккаунт?"
 }

@@ -1,7 +1,7 @@
 import AccessDenied from "@/components/AccessDenied";
 import container from "@/server/container/container";
 
-export const getServerSideProps = container.resolve('getServerSideProps')([])
+export const getServerSideProps = container.resolve('getServerSideProps')([],true)
 
 const Page = () => {
 	return (

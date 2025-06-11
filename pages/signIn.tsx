@@ -49,5 +49,5 @@ export default Home;
 Home.getLayout = (page: React.ReactNode) => page;
 
 export const getServerSideProps = container.resolve("getServerSideProps")(
-	[]
+	[], true
 );
