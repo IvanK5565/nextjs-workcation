@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import BaseEntity, { EntitiesName } from "./BaseEntity";
 import { Entities } from "../store/types";
-import { IClientContainer } from "../context/container";
+import { IClientContainer } from "../di/container";
 
 /**
  * ActionInfo type represents the metadata for an action method.

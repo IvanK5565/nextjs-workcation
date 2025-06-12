@@ -10,8 +10,8 @@ import {
 } from "redux-saga/effects";
 import { addEntities } from "../store/actions";
 import { IEntityContainer } from ".";
-import { BaseContext } from "../context/BaseContext";
-import { IClientContainer } from "../context/container";
+import { BaseContext } from "../di/BaseContext";
+import { IClientContainer } from "../di/container";
 import { toast } from "react-toastify";
 
 export type EntityAction<E extends BaseEntity> = {

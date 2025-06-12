@@ -2,7 +2,7 @@
 import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
-import type { IClientContainer } from "../context/container";
+import type { IClientContainer } from "../di/container";
 import { put } from "redux-saga/effects";
 import Router from "next/router";
 import { toast } from "react-toastify";

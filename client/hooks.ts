@@ -3,7 +3,7 @@ import { IEntityContainer } from "./entities";
 import BaseEntity from "./entities/BaseEntity";
 import { useDispatch, useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
-import ContainerContext from "./ContainerContext";
+import DIContext from "./DIContext";
 import { useSession } from "next-auth/react";
 import Guard from "@/acl/Guard";
 import { GRANT, IIdentity, ROLE } from "@/acl/types";
@@ -14,7 +14,7 @@ import { AppState } from "./store/ReduxStore";
 export function useEntity<T extends keyof IEntityContainer>(
   entityName: T
 ): IEntityContainer[T] {
-  const di = useContext(ContainerContext);
+  const di = useContext(DIContext);
   return di.resolve(entityName);
 }
 type FirstParam<Type> = Type extends (...args: infer P) => unknown

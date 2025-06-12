@@ -5,8 +5,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import BaseEntity from "../entities/BaseEntity";
 import { errorReducer } from "./errorReducer";
-import { BaseContext } from "../context/BaseContext";
-import { IClientContainer } from "../context/container";
+import { BaseContext } from "../di/BaseContext";
+import { IClientContainer } from "../di/container";
 import {
 	persistStore,
 	persistReducer,
