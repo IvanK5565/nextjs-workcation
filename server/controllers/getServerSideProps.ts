@@ -69,6 +69,7 @@ export default function getServerSidePropsContainer(
 				ctx.Logger.error("GSSP ERROR: ", (error as Error).message);
 
 				if (error instanceof AccessDeniedError) {
+					Logger.info('\n\nACCESS DENIED!!!!')
 					return {
 						redirect: { destination: "/403", permanent: true },
 					};

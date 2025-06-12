@@ -32,6 +32,16 @@ export default class UsersController extends BaseController {
 		});
 	}
 
+	@GET('/classes/new', {
+		allow:{
+			[ROLE.TEACHER]: [GRANT.READ]
+		}
+	})
+	public getAuth({ guard }: ActionProps){
+		if (!guard.allow(GRANT.READ)) throw new AccessDeniedError();
+		return {};
+	}
+
 	@Body(registerBodySchema)
 	@POST("/api/register", { allow: { [ROLE.GUEST]: [GRANT.WRITE] } })
 	public async signUp({ body }: ActionProps) {

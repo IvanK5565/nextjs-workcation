@@ -2,7 +2,7 @@
 import { IEntityContainer } from "./entities";
 import BaseEntity from "./entities/BaseEntity";
 import { useDispatch, useSelector } from "react-redux";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import ContainerContext from "./ContainerContext";
 import { useSession } from "next-auth/react";
 import Guard from "@/acl/Guard";
@@ -58,28 +58,81 @@ interface IUseAclResult {
     query: ParsedUrlQuery;
 }
 
+// export function useAcl() {
+//   const { replace, pathname, query } = useRouter();
+//   const dispatch = useDispatch();
+//   // let resource = pathname.replace(/./g,"_")
+//   let resource = pathname
+//   const id = query?.id?.toString();
+//   if (id) {
+//     resource = resource.replace("[id]", id);
+//   }
+//   // TODO: get auth
+//   const auth = useSelector((state: AppState) => state.auth);
+//   console.log(auth)
+//   if(!auth){
+//     console.log("error resource", resource);
+//     replace("/403");
+//     // dispatch({type:'redirect', payload:'/403' })
+//   }
+
+//   const { roles, rules, identity } = auth;
+//   const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
+//   if(!guard.allow(GRANT.READ, resource) && pathname !== '/403'){
+//     console.log("error resource", resource);
+//     replace("/403");
+//     // dispatch({type:'redirect', payload:'/403' })
+//   }
+
+//   const res:IUseAclResult = {
+//     allow: (grant: GRANT, res?: string, role?: ROLE) => {
+//       const r = res ? res : resource;
+//       return guard.allow(grant, r, null, role);
+//     },
+//     isItMe: (userId: string) => {
+//       return identity.id === userId;
+//     },
+//     identity,
+//     pathname,
+//     query,
+//   };
+//   return res;
+// };
+
 export function useAcl() {
-  const { pathname, query } = useRouter();
-  // let resource = pathname.replace(/./g,"_")
-  let resource = pathname
+  const { replace, pathname, query } = useRouter();
+  let resource = pathname;
   const id = query?.id?.toString();
   if (id) {
     resource = resource.replace("[id]", id);
   }
-  // TODO: get auth
   const auth = useSelector((state: AppState) => state.auth);
-  console.log(auth)
-  if(!auth){
-    console.log("error resource", resource);
-    // replace("/403");
+
+  const hasAccess = (() => {
+    if (!auth) return false;
+    const { roles, rules, identity } = auth;
+    const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
+    return guard.allow(GRANT.READ, resource);
+  })();
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !hasAccess && pathname !== "/403") {
+      replace("/403");
+    }
+  }, [hasAccess, pathname, replace]);
+
+  if (!auth) {
+    return {
+      allow: () => false,
+      isItMe: () => false,
+      identity: {},
+      pathname,
+      query,
+    };
   }
 
   const { roles, rules, identity } = auth;
   const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
-  if(!guard.allow(GRANT.READ, resource)){
-    console.log("error resource", resource);
-    // replace("/403");
-  }
 
   const res:IUseAclResult = {
     allow: (grant: GRANT, res?: string, role?: ROLE) => {
@@ -95,4 +148,3 @@ export function useAcl() {
   };
   return res;
 };
-

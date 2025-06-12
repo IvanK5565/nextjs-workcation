@@ -4,6 +4,8 @@ import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../context/container";
 import { put } from "redux-saga/effects";
+import Router from "next/router";
+import { toast } from "react-toastify";
 
 export type ClassAction = EntityAction<ClassEntity>
 
@@ -21,6 +23,12 @@ export default class ClassEntity extends BaseEntity {
 		},
 			{ idAttribute: 'id' });
 		this.name = "ClassEntity";
+	}
+
+	@action
+	public *redirect(payload:string){
+		toast('redirect: '+ payload)
+		yield Router.replace(payload);
 	}
 
 	@action
