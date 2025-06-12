@@ -6,5 +6,5 @@ export function t(key: string | TemplateStringsArray | (string | TemplateStrings
 }
 
 export function tContainer(){
-  return t;
+  return i18n?.t;
 }

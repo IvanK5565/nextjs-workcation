@@ -19,6 +19,6 @@ container.register({
   ...entities,
   // sagas: asFunction(sagas),
   store: asClass(ReduxStore).singleton(),
-  t: asFunction(tContainer),
+  t: asFunction(tContainer).singleton(),
 })
 export default container;
