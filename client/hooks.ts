@@ -69,18 +69,20 @@ interface IUseAclResult {
 //   }
 //   // TODO: get auth
 //   const auth = useSelector((state: AppState) => state.auth);
+//   let redirected = false;
 //   console.log(auth)
 //   if(!auth){
 //     console.log("error resource", resource);
-//     replace("/403");
+//     use(replace("/403"));
+//     redirected = true;
 //     // dispatch({type:'redirect', payload:'/403' })
 //   }
 
 //   const { roles, rules, identity } = auth;
 //   const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
-//   if(!guard.allow(GRANT.READ, resource) && pathname !== '/403'){
+//   if(!redirected && !guard.allow(GRANT.READ, resource) && pathname !== '/403'){
 //     console.log("error resource", resource);
-//     replace("/403");
+//     use(replace("/403"));
 //     // dispatch({type:'redirect', payload:'/403' })
 //   }
 

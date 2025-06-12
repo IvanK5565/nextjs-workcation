@@ -15,14 +15,9 @@ const authReducer = (auth: AuthState = { roles: {}, rules: {}, identity: {} as I
   if(!action.payload || !action.payload.auth){
     return auth;
   }
-  const { roles, rules, identity } = action.payload.auth;
   switch (action.type) {
     case HYDRATE:
-    case 'setAuth': return {
-      roles:roles,
-      rules:rules,
-      identity:identity,
-    }
+    case 'setAuth': return action.payload.auth;
     default: return auth;
   }
 }

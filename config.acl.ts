@@ -86,6 +86,12 @@ export const rules: IRules = {
         },
     },
 
+    '/users/new':{
+        allow:{
+            [ROLE.ADMIN]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
+        }
+    },
+
    
 
     // '/login': {
