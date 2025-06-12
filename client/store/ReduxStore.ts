@@ -4,7 +4,7 @@ import createSagaMiddleware from "redux-saga";
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import BaseEntity from "../entities/BaseEntity";
-import { errorReducer } from ".";
+import { errorReducer } from "./errorReducer";
 import { BaseContext } from "../context/BaseContext";
 import { IClientContainer } from "../context/container";
 import {
