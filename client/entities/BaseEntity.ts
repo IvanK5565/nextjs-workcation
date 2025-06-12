@@ -3,10 +3,8 @@ import { AnswerType, Response } from "@/types";
 import { normalize, Schema } from "normalizr";
 import {
 	actionChannel,
-	all,
 	call,
 	Effect,
-	fork,
 	put,
 	take,
 } from "redux-saga/effects";
@@ -38,37 +36,9 @@ export default abstract class BaseEntity extends BaseContext {
 		return Object.fromEntries(actions.map(action => [action, (data?: any) => ({ type: action, payload: data })]))
 	}
 
-	protected watcher(name: string) {
-		if (!(name in this)) throw new Error("Action not found : " + name);
-		const worker = (this as any)[name].bind(this);
-		return function* (): Generator<Effect> {
-			const chan = yield actionChannel(name);
-			while (true) {
-				const { payload } = yield take(chan);
-				try {
-				yield call(worker, payload);
-				} catch (e) {
-					console.error('Error in saga Watcher', (e as Error).message);
-					throw e;
-				}
-			}
-		};
-	}
-
-	public *rootSaga(): Generator<Effect> {
-		const actions: string[] = Reflect.getMetadata("actions", this) ?? [];
-		const sagas = actions
-			.filter((action) => action in this)
-			.map((action) => fork(this.watcher(action)));
-		yield all(sagas);
-	}
 	public static sagas(di: IClientContainer) {
 		const actions: (keyof IClientContainer)[] =
 			Reflect.getMetadata("actions", BaseEntity) ?? [];
-		// return actions
-		// 	.map(name => di[name])
-		// 	.filter(entity => entity instanceof BaseEntity)
-		// .map(entity => entity.rootSaga.bind(entity));
 		const res: (() => Generator<Effect>)[] = []
 		return res.concat(
 			...(actions
@@ -82,7 +52,21 @@ export default abstract class BaseEntity extends BaseContext {
 		const actions: string[] = Reflect.getMetadata("actions", this) ?? [];
 		const sagas = actions
 			.filter((action) => action in this)
-			.map((action) => this.watcher(action));
+			.map((action) => {
+				const worker = (this as any)[action].bind(this);
+				return function* (): Generator<Effect> {
+					const chan = yield actionChannel(action);
+					while (true) {
+						const { payload } = yield take(chan);
+						try {
+							yield call(worker, payload);
+						} catch (e) {
+							console.error('Error in saga', (e as Error).message);
+							throw e;
+						}
+					}
+				};
+			});
 		return sagas;
 	}
 
@@ -120,7 +104,7 @@ export default abstract class BaseEntity extends BaseContext {
 			toast.success(res.message ?? text ?? 'Request Completed!')
 		} catch (e) {
 			const text = this.di.t('requestFailed')
-			toast.error(text+': '+(e as Error).message);
+			toast.error(text + ': ' + (e as Error).message);
 			console.error('in actionRequest', (e as Error).message ?? e);
 		}
 	}

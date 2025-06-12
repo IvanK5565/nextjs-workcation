@@ -1,12 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../context/container";
 import { put } from "redux-saga/effects";
-import { addEntities } from "../store/actions";
-import type { IUser } from "../store/types";
 
 export type UserAction = EntityAction<UserEntity>;
 
