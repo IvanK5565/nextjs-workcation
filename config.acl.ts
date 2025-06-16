@@ -53,10 +53,18 @@ export const rules: IRules = {
     ************************************* MENU and navigation ********************************
     ******************************************************************************************/
 
-    "NavigationMenu/*/*/*": {
+    // "NavigationMenu/*/*/*": {
+    //     allow: {
+    //         [ROLE.ADMIN]: [GRANT.READ]
+    //     }
+    // },
+
+    "NavigationMenu/*":{
         allow: {
-            [ROLE.ADMIN]: [GRANT.READ]
-        }
+            [ROLE.GUEST]: [GRANT.READ],
+            [ROLE.TEACHER]: [GRANT.WRITE],
+            [ROLE.ADMIN]: [GRANT.EXECUTE],
+        },
     },
 
     "NavigationMenu/MyProfile": {
@@ -91,6 +99,7 @@ export const rules: IRules = {
             [ROLE.ADMIN]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
         }
     },
+
 
    
 

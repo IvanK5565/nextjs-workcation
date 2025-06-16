@@ -10,6 +10,11 @@ import { GRANT, IIdentity, ROLE } from "@/acl/types";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { AppState } from "./store/ReduxStore";
+import { IMenu } from "./types";
+import get from "lodash/get";
+import has from "lodash/has";
+import { IPaginationInfo } from "./paginatorExamples/types";
+import { Entities } from "./store/types";
 
 export function useEntity<T extends keyof IEntityContainer>(
   entityName: T
@@ -25,37 +30,37 @@ export function useActions<T extends keyof IEntityContainer>(entityName: T) {
   const dispatch = useDispatch();
   const entity = useEntity(entityName);
   const actions = entity.actions as Omit<
-        IEntityContainer[T],
-        keyof BaseEntity
-    >;
+    IEntityContainer[T],
+    keyof BaseEntity
+  >;
 
-    const dispatches: {
-        [key in keyof typeof actions]: (
-            data?: FirstParam<IEntityContainer[T][key]>,
-        ) => any;
-    } = {} as any;
+  const dispatches: {
+    [key in keyof typeof actions]: (
+      data?: FirstParam<IEntityContainer[T][key]>,
+    ) => any;
+  } = {} as any;
 
-    Object.keys(actions).forEach((action) => {
-        dispatches[action as keyof typeof actions] = (data) => dispatch((actions as any)[action](data));
-    });
+  Object.keys(actions).forEach((action) => {
+    dispatches[action as keyof typeof actions] = (data) => dispatch((actions as any)[action](data));
+  });
 
-    return dispatches;
+  return dispatches;
 }
 
-export function useGuard(){
-  const {data:session} = useSession();
-  if(session && session.acl){
-    const guard = new Guard(session.acl.roles,session.acl.rules, session.user.role);
+export function useGuard() {
+  const { data: session } = useSession();
+  if (session && session.acl) {
+    const guard = new Guard(session.acl.roles, session.acl.rules, session.user.role);
     return guard;
   }
   return null;
 }
 interface IUseAclResult {
-    allow: (grant: GRANT, res?: string, role?: ROLE) => boolean;
-    isItMe: (userId: string, slug?: string) => boolean;
-    identity: IIdentity;
-    pathname: string;
-    query: ParsedUrlQuery;
+  allow: (grant: GRANT, res?: string, role?: ROLE) => boolean;
+  isItMe: (userId: string, slug?: string) => boolean;
+  identity: IIdentity;
+  pathname: string;
+  query: ParsedUrlQuery;
 }
 
 // export function useAcl() {
@@ -113,8 +118,13 @@ export function useAcl() {
   const hasAccess = (() => {
     if (!auth) return false;
     const { roles, rules, identity } = auth;
-    const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
-    return guard.allow(GRANT.READ, resource);
+    try {
+
+      const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
+      return guard.allow(GRANT.READ, resource);
+    } catch (e) {
+      return false;
+    }
   })();
 
   useEffect(() => {
@@ -134,19 +144,71 @@ export function useAcl() {
   }
 
   const { roles, rules, identity } = auth;
-  const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
+  try {
+    const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
 
-  const res:IUseAclResult = {
-    allow: (grant: GRANT, res?: string, role?: ROLE) => {
-      const r = res ? res : resource;
-      return guard.allow(grant, r, null, role);
-    },
-    isItMe: (userId: string) => {
-      return identity.id === userId;
-    },
-    identity,
-    pathname,
-    query,
-  };
-  return res;
+    const res: IUseAclResult = {
+      allow: (grant: GRANT, res?: string, role?: ROLE) => {
+        const r = res ? res : resource;
+        return guard.allow(grant, r, null, role);
+      },
+      isItMe: (userId: string) => {
+        return identity.id === userId;
+      },
+      identity,
+      pathname,
+      query,
+    };
+    return res;
+  } catch (e) {
+    return {
+      allow: () => false,
+      isItMe: () => false,
+      identity: {},
+      pathname,
+      query,
+    };
+  }
 };
+
+
+export function useMenu(menu: IMenu, strict?: boolean): IMenu {
+  const { allow } = useAcl();
+  return Object.fromEntries(Object.entries(menu).filter(([key, value]) => (value.grant ? allow(value.grant, key) : !strict)))
+}
+
+export function usePageItems(pagerName: string, needConcatPages = false):any[] {
+  const pager = useSelector<{ pagination: IPaginationInfo }>(state => state.pagination);
+  const entityName:any = get(pager, [pagerName, "entityName"]);
+  const items = useSelector<any, any>(state => state[entityName]);
+  if (!items) return [];
+
+  const pageNumber = get(pager, [pagerName, "currentPage"]);
+  if (!needConcatPages) {
+    if (has(pager, [pagerName, "pages", pageNumber])) {
+      const ids: any[] = get(pager, [pagerName, "pages", pageNumber]);
+      return ids
+        .map(id => items[String(id)])
+        .filter(item => item !== undefined && item !== null);
+    }
+    return [];
+  } else {
+    let allItems: any[] = [];
+    const pages = get(pager, [pagerName, "pages"]);
+
+    if (pages) {
+      for (const i of Object.keys(pages)) {
+        const pageIds: any[] = pages[i];
+        if (pageIds) {
+          allItems = [
+            ...allItems,
+            ...pageIds.map(id => items[String(id)])
+          ];
+        }
+      }
+    }
+
+    return allItems.filter(item => item !== undefined && item !== null
+    );
+  }
+}

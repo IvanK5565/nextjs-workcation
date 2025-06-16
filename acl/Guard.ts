@@ -108,8 +108,6 @@ class Guard {
 		role = role ?? this.role;
 		let isAllowed = false;
 
-		Logger.log("allow: ", this.role, resource, grant);
-
 		if(!resource) throw new Error('No Resource in Guard')
 		try {
 			if (this.rules.hasOwnProperty(resource)) {
@@ -117,6 +115,7 @@ class Guard {
 			} else {
 				const match = this.isRouteMatch(resource);
 				if (match) {
+					Logger.log('match', match)
 					if (this.rules.hasOwnProperty(match)) {
 						isAllowed = this.acl.isAllowed(s + role, s + match, grant);
 					}
@@ -126,6 +125,8 @@ class Guard {
 			Logger.error('allow error', (e as Error).message)
 			isAllowed = false;
 		}
+		Logger.log("allow: ", this.role, resource, grant, ':',isAllowed);
+
 		return isAllowed;
 	}
 }
