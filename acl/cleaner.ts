@@ -4,7 +4,6 @@ if (typeof document !== "undefined") {
     );
 }
 
-// Requires set-value@^2.0.1 !!!
 import set from "set-value";
 
 import { IRoles, ROLE, IRules } from "./types";
@@ -50,9 +49,15 @@ export class Cleaner extends BaseContext{
                     for (const r in grant.allow) {
                         if (grant.allow.hasOwnProperty(r)) {
                             if (role === r || acl.inheritsRole(role, r)) {
+                            // set-value change
+                                // set(
+                                //     result,
+                                //     `${resource}.allow.${r}`,
+                                //     grant.allow[r]
+                                // );
                                 set(
                                     result,
-                                    `${resource}.allow.${r}`,
+                                    [resource,`allow`,r],
                                     grant.allow[r]
                                 );
                             }
@@ -63,7 +68,8 @@ export class Cleaner extends BaseContext{
                     for (const r in grant.deny) {
                         if (grant.deny.hasOwnProperty(r)) {
                             if (role === r || acl.inheritsRole(role, r)) {
-                                set(result, `${resource}.deny.${r}`, grant.deny[r]);
+                            // set-value change
+                                set(result, [resource,'deny',r], grant.deny[r]);
                             }
                         }
                     }

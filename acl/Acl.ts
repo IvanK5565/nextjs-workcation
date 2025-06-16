@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Requires set-value@^2.0.1 !!!
 import set from "set-value";
 
 import AclInterface from "./AclInterface";
@@ -322,9 +321,15 @@ export default class Acl implements AclInterface {
                     {cause:e}
                 );
             }
+            // set-value change
+            // set(
+            //     this.resources,
+            //     `${resourceParentId}.children.${resourceId}`,
+            //     resource
+            // );
             set(
                 this.resources,
-                `${resourceParentId}.children.${resourceId}`,
+                [resourceParentId,`children`,resourceId],
                 resource
             );
         }
@@ -716,16 +721,24 @@ export default class Acl implements AclInterface {
                         const role = roles[roleKey];
                         const rules = this.getRules(resource, role, true);
                         if (privileges.length === 0) {
-                            set(rules, "allPrivileges.type", type);
+                            // set-value change
+                            // set(rules, "allPrivileges.type", type);
+                            set(rules, ["allPrivileges","type"], type);
                             if (!rules.hasOwnProperty("byPrivilegeId")) {
                                 rules["byPrivilegeId"] = {};
                             }
                         } else {
                             for (const privKey in privileges) {
                                 const privilege = privileges[privKey];
+                            // set-value change
+                                // set(
+                                //     rules,
+                                //     `byPrivilegeId.${privilege}.type`,
+                                //     type
+                                // );
                                 set(
                                     rules,
-                                    `byPrivilegeId.${privilege}.type`,
+                                    [`byPrivilegeId`,privilege,`type`],
                                     type
                                 );
                             }
@@ -746,8 +759,11 @@ export default class Acl implements AclInterface {
                         if (privileges.length === 0) {
                             if (resource === null && role === null) {
                                 if (type === rules["allPrivileges"]["type"]) {
-                                    set(rules, "allPrivileges.type", TYPE.DENY);
-                                    set(rules, "byPrivilegeId", []);
+                            // set-value change
+                                    // set(rules, "allPrivileges.type", TYPE.DENY);
+                                    // set(rules, "byPrivilegeId", []);
+                                    set(rules, ["allPrivileges","type"], TYPE.DENY);
+                                    set(rules, ["byPrivilegeId"], []);
                                     // rules = {
                                     //     'allPrivileges': {
                                     //         'type'   : TYPE.DENY,
@@ -1235,7 +1251,8 @@ export default class Acl implements AclInterface {
                 if (!create) {
                     return null;
                 }
-                set(this.rules, `byResourceId.${resourceId}.byRoleId`, {});
+                            // set-value change
+                set(this.rules, [`byResourceId`,resourceId,`byRoleId`], {});
             }
 
             visitor = this.rules["byResourceId"][resourceId];
@@ -1246,7 +1263,8 @@ export default class Acl implements AclInterface {
                 if (!create) {
                     return null;
                 }
-                set(visitor, "allRoles.byPrivilegeId", {});
+                            // set-value change
+                set(visitor, ["allRoles","byPrivilegeId"], {});
             }
             return visitor["allRoles"];
         }
@@ -1261,7 +1279,8 @@ export default class Acl implements AclInterface {
             if (!create) {
                 return null;
             }
-            set(visitor, `byRoleId.${roleId}.byPrivilegeId`, {});
+                            // set-value change
+            set(visitor, [`byRoleId`,roleId,`byPrivilegeId`], {});
         }
         return visitor["byRoleId"][roleId];
     }
