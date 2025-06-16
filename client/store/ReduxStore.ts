@@ -34,7 +34,11 @@ export type AppDispatch = AppStore["dispatch"];
 export class ReduxStore extends BaseContext {
 	private _wrapper: ReturnType<typeof createWrapper>;
 	private persistConfig;
-
+	private _state?:AppState;
+	public get state(){
+		return this._state;
+	}
+	
 	public get wrapper() {
 		return this._wrapper;
 	}
@@ -108,11 +112,13 @@ export class ReduxStore extends BaseContext {
 			});
 			const saga = sagaMiddleware.run(rootSaga);
 			const persistor = persistStore(store);
-			return {
+			const state = {
 				...store,
 				__persistor: persistor,
 				sagaTask: saga,
 			};
+			this._state = state as any;
+			return state;
 		};
 		return makeStore;
 	}
