@@ -6,7 +6,7 @@ export interface TPaginationInfo {
     currentPage?: number,
     count?: number,
     pages?: {
-      [key: string]: string;
+      [key: string]: string[];
     },
     filter?: {
       [key: string]: any;
@@ -58,7 +58,8 @@ interface ISortParams {
   sort: Sort;
 };
 
-enum Sort{
+export enum Sort{
+  none='NONE',
   ASC = 'ASC',
   DESC = 'DESC',
 }

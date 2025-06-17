@@ -9,6 +9,7 @@ import { IControllerContainer } from "./server/controllers";
 import { StatusCodes } from "http-status-codes";
 import Guard from "./acl/Guard";
 import { Classes, Subjects, User, UserClasses } from "./server/models";
+import { IPagerParams } from "./client/paginatorExamples/types";
 
 export type RouterRun = (
 	req: NextApiRequest,
@@ -17,7 +18,10 @@ export type RouterRun = (
 
 export type Entity = User | Classes | Subjects | UserClasses;
 
-export type ActionResult = Entity | Entity[];
+export type ActionResult = Entity | Entity[] | {
+	items:Entity | Entity[],
+	count:number,
+};
 
 export type Middleware = (
 	req: NextApiRequest,
@@ -49,6 +53,7 @@ export type Response = {
 	data?: ActionResult;
 	type?: AnswerType;
 	message?: string;
+	pager?:IPagerParams;
 };
 export type Handler = (
 	req: NextApiRequest,
@@ -60,6 +65,7 @@ export type ActionProps = {
 	body?: any;
 	session: Session | null;
 	guard:Guard;
+	pager:IPagerParams;
 };
 export type GSSPFactory = (
 	controllersNames: (keyof IControllerContainer)[],

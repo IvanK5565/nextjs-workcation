@@ -22,15 +22,19 @@ import type { ActionProps } from "@/types";
 import { AuthOptions, getServerSession, Session } from "next-auth";
 import { onSuccessResponse, onErrorResponse } from "@/server/utils";
 import { ROLE } from "@/acl/types";
-import { POST } from "./decorators";
+import { pager, POST } from "./decorators";
 import { Logger } from "../logger";
 import Guard from "@/acl/Guard";
 import { IControllerContainer } from ".";
 import { IEntityContainer } from "@/client/entities";
+import { DEFAULT_PER_PAGE } from "@/constants";
+import { IPagerParams } from "@/client/paginatorExamples/types";
+import set from "set-value";
 
 export type ExtendedRequest = NextApiRequest & {
 	guard?: Guard;
 	session?: Session | null;
+	pager?: IPagerParams;
 };
 
 export default abstract class BaseController extends BaseContext {
@@ -90,6 +94,12 @@ export default abstract class BaseController extends BaseContext {
 			body: req.body,
 			session: req.session ?? null,
 			guard: req.guard,
+			pager: req.pager ?? {
+				page: 1,
+				pageName: '',
+				perPage: DEFAULT_PER_PAGE,
+				entityName: '',
+			},
 		};
 	}
 
@@ -142,13 +152,23 @@ export default abstract class BaseController extends BaseContext {
 			route = route ?? BaseController.getInvokeOutput(req);
 			const ssr = !route.startsWith("/api/");
 			const router = this.createRouter(route);
-			const data = router.run(req, res).then((d) => d as ActionResult);
+			const pagerParams: IPagerParams = {
+				page: parseInt(req.body?.page ?? '1'),
+				pageName: req.body?.pageName,
+				perPage: req.body?.perPage ? parseInt(req.body?.perPage) : DEFAULT_PER_PAGE,
+				filter: req.body.filter,
+				sort: req.body.sort,
+				entityName: req.body.entityName,
+			};
+			set(req, ['pager'], pagerParams);
 
+			const data = router.run(req, res).then((d) => d as ActionResult);
 			if (ssr) return data;
 
+			
 			let response: Response;
 			try {
-				response = onSuccessResponse(await data);
+				response = onSuccessResponse(await data, pagerParams);
 			} catch (e) {
 				this.di.Logger.error("API:", e);
 				response = onErrorResponse(e as Error);

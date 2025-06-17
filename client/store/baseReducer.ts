@@ -17,7 +17,6 @@ function baseReducer<K extends keyof Entities>(collectionName: K) {
 
 		switch (action.type) {
 			case HYDRATE:
-				return { ...newEntities };
 			case "ADD":
 				return { ...collection, ...newEntities };
 			case "DELETE":

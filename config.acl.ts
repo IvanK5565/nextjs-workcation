@@ -100,6 +100,12 @@ export const rules: IRules = {
         }
     },
 
+    '/pager':{
+        allow:{
+            [ROLE.GUEST]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
+        }
+    }
+
 
    
 

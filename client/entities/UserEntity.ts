@@ -3,17 +3,18 @@ import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../di/container";
-import { put } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
+import type { IPagerParams } from "../paginatorExamples/types";
 
 export type UserAction = EntityAction<UserEntity>;
 
 @reducer('users')
 export default class UserEntity extends BaseEntity {
 	protected schema;
-		protected name:EntitiesName;
+	protected name: EntitiesName;
 
-	constructor(di:IClientContainer) {
-    super(di);
+	constructor(di: IClientContainer) {
+		super(di);
 		const _class = new schema.Entity("classes");
 		this.schema = new schema.Entity("users", {
 			classes: [_class],
@@ -30,7 +31,7 @@ export default class UserEntity extends BaseEntity {
 	@action
 	public *saveUser(payload: any) {
 		const id = payload.id;
-		yield this.xSave(id ? `/users/${id}` : "/users", payload);
+		yield this.xSave(`/users${id ? '/'+id : ''}`, payload);
 	}
 
 	@action
@@ -41,15 +42,20 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *register(payload: any){
-		console.log('register',payload)
+	public *register(payload: any) {
+		console.log('register', payload)
 		yield this.xSave(`/register`, payload)
 	}
-	
+
 	@action
-	public *deleteUser(payload:any) {
+	public *deleteUser(payload: any) {
 		if (!payload.id) throw new Error("Id required");
 		const normalized = this.normalize(payload);
-		yield put({type:'DELETE', payload:normalized.entities});
+		yield put({ type: 'DELETE', payload: normalized.entities });
+	}
+
+	@action
+	public *fetchProjectPage(data: IPagerParams) {
+		yield this.pageEntity('/users/page', data);
 	}
 }

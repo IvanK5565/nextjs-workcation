@@ -1,6 +1,7 @@
 
 // import bcrypt from "bcrypt"
 import { IRules, ROLE } from "@/acl/types";
+import { IPagerParams } from "@/client/paginatorExamples/types";
 import { ApiError } from "@/server/exceptions";
 import { AnswerType, type Response } from "@/types";
 import { StatusCodes } from "http-status-codes";
@@ -11,11 +12,23 @@ import { StatusCodes } from "http-status-codes";
 //   return hash
 // }
 
-export function onSuccessResponse(data: Response['data']): Response {
+export function onSuccessResponse(data: Response['data'], pagerParams?: IPagerParams): Response {
+	let pager:any = undefined;
+	if (pagerParams && data && 'count' in data) {
+		pager = {
+			count: data.count,
+			page: pagerParams.page,
+			pageName: pagerParams.pageName,
+			perPage: pagerParams.perPage,
+			entityName: pagerParams.entityName,
+		};
+		data = data.items;
+	}
 	return {
 		code: StatusCodes.OK,
 		success: true,
 		data: data,
+		pager,
 		type: AnswerType.Data,
 	};
 }

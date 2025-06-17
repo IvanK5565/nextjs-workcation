@@ -22,6 +22,7 @@ import { Entities, IClass, ISubject, IUser } from "./types";
 import baseReducer from "./baseReducer";
 import { IEntityContainer } from "../entities";
 import authReducer from "./authReducer";
+import paginationReducer from "./paginationReducer";
 
 export type AppStore = ReturnType<ReturnType<ReduxStore["getMakeStore"]>>;
 export type AppState = ReturnType<AppStore["getState"]> & {
@@ -89,6 +90,7 @@ export class ReduxStore extends BaseContext {
 				...reducers,
 				error: errorReducer,
 				auth: authReducer,
+				pagination: paginationReducer,
 			});
 			const persistedReducer = persistReducer(this.persistConfig, reducer);
 			const sagaMiddleware = createSagaMiddleware();

@@ -11,13 +11,16 @@ import { getServerSession } from "next-auth";
 import { AuthOptions } from "next-auth";
 import { Session } from "next-auth";
 import { GSSPFactory } from "@/types";
+import { has } from "lodash";
+import { IPagerParams } from "@/client/paginatorExamples/types";
+import { DEFAULT_PER_PAGE } from "@/constants";
 
 
 
 export default function getServerSidePropsContainer(
 	ctx: IContextContainer
 ): GSSPFactory {
-	return (controllersNames, isPublic=false, route?) =>
+	return (controllersNames, isPublic = false, route?) =>
 		redux.getServerSideProps((store) => async (context) => {
 			// init
 			const { locale } = context;
@@ -35,12 +38,12 @@ export default function getServerSidePropsContainer(
 				context.res,
 				ctx.authOptions
 			);
-			if(!isPublic && !req.session){
+			if (!isPublic && !req.session) {
 				return {
-						redirect: { destination: "/403", permanent: true },
-					};
+					redirect: { destination: "/403", permanent: true },
+				};
 			}
-			let auth: object = { ...(req.session?.acl ?? {roles:null, rules:null}), identity: (req.session?.user ?? null) };
+			let auth: object = { ...(req.session?.acl ?? { roles: null, rules: null }), identity: (req.session?.user ?? null) };
 			// collect promises from controllers
 			const promises = controllersNames.map((name) => {
 				return ctx[name]
@@ -48,12 +51,29 @@ export default function getServerSidePropsContainer(
 					.then((r) => {
 						auth = { ...(req.session?.acl ?? null), identity: (req.session?.user ?? null) };
 						if (r) {
+							let pager: any = undefined;
+							if (r && 'count' in r) {
+								pager = {
+									count: r.count,
+									page: parseInt(req.body?.page ?? '1'),
+									pageName: req.body?.pageName,
+									perPage: req.body?.perPage ? parseInt(req.body?.perPage) : DEFAULT_PER_PAGE,
+									entityName: req.body.entityName,
+								};
+								r = r.items;
+							}
+
 							const entity = ctx[name].getEntityName();
 							if (entity) {
 								const normalize = redux.normalizer(entity);
 								const normal = normalize(r);
 								normal.result = normal.result ?? null;
 								store.dispatch(addEntities(normal.entities));
+								store.dispatch({
+									type: 'PAGER',
+									data: normal,
+									pager,
+								})
 							} else {
 								Logger.warn(`Controller ${name} does not have an entity associated with it.`);
 							}

@@ -10,18 +10,27 @@ export const PAGE_CLEAR = 'PAGE_CLEAR'
 export const PAGE_CLEAR_ALL = 'PAGE_CLEAR_ALL'
 export const PAGE_SET_PARAMS = 'PAGE_SET_PARAMS'
 
-const initialPagerState:TPaginationInfo = {}
+const initialPagerState:TPaginationInfo = {
+  users:{
+    count:0,
+    currentPage:0,
+    pages:{},
+  }
+}
 
-export default function pagination(state = initialPagerState, action: any) {
+export default function paginationReducer(state = initialPagerState, action: any) {
+		switch (action.type) {
+			case 'DELETE_ALL': return Object.fromEntries(Object.entries(state).map(([key,p]) => [key,{...p, pages:undefined}]));
+		}
   // get result for the paginator, disable fetching
   if (action?.payload?.data && action.payload.pager) {
     const pager = action.payload.pager;
     const result = action.payload.data?.result ?? [];
     if (pager.pageName) {
-      const pageName = pager.pageName;
+      const paginatorName = pager.pageName;
  
-      const pagination = state[pageName] ? state[pageName] : {};
-      const pages = pagination["pages"] ? pagination["pages"] : {};
+      const pagination = state[paginatorName] ?? {};
+      const pages = pagination["pages"] ?? {};
       let item: any | null = null;
  
       if (result?.length === 0) {
@@ -32,11 +41,11 @@ export default function pagination(state = initialPagerState, action: any) {
  
       return {
         ...state,
-        [pageName]: {
-          ...state[pageName],
+        [paginatorName]: {
+          ...state[paginatorName],
           ...pagination,
           entityName: pager.entityName,
-          pageName: pageName,
+          pageName: paginatorName,
           currentPage: pager.page,
           count: pager.count,
           perPage: pager.perPage,

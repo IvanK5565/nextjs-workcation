@@ -35,5 +35,6 @@
   "messages":"Повідомлення",
   "confirm":"Підтвердити",
   "dontHaveAccount":"Намає аккаунту?",
-  "haveAccount":"Вже є аккаунт?"
+  "haveAccount":"Вже є аккаунт?",
+  "somethingWentWrong":"Щось пішло не так"
 }

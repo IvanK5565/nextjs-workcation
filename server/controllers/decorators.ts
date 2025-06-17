@@ -10,19 +10,19 @@ import { IEntityContainer } from "@/client/entities";
 type ActionDecorator = (route: string, allow?: IAllowDeny) => MethodDecorator;
 
 function mergeGrants(a: IGrants = {}, b: IGrants = {}) {
-  const result: IGrants = {};
+	const result: IGrants = {};
 
-  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+	const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
 
-  for (const key of keys) {
-    const valuesA = a[key] ?? [];
-    const valuesB = b[key] ?? [];
-    // Merge and remove duplicates
-    result[key] = Array.from(new Set([...valuesA, ...valuesB]));
+	for (const key of keys) {
+		const valuesA = a[key] ?? [];
+		const valuesB = b[key] ?? [];
+		// Merge and remove duplicates
+		result[key] = Array.from(new Set([...valuesA, ...valuesB]));
 	}
-  return result;
+	return result;
 }
-function mergeRules(a: IAllowDeny = {allow:{}}, b:IAllowDeny = {allow:{}}):IAllowDeny{
+function mergeRules(a: IAllowDeny = { allow: {} }, b: IAllowDeny = { allow: {} }): IAllowDeny {
 	return {
 		allow: mergeGrants(a.allow, b.allow),
 		deny: a.deny || b.deny ? mergeGrants(a.deny, b.deny) : undefined
@@ -60,10 +60,10 @@ const endpointDecorator: ActionDecoratorFactory =
 		endpoints.push({ method, handler: propertyKey as string });
 		Reflect.defineMetadata(route, endpoints, target);
 
-		const endpoints2: Record<string, Record<string, string>> = Reflect.getMetadata('endpoints',target) ?? {};
-		if(!endpoints2[route]) endpoints2[route] = {};
+		const endpoints2: Record<string, Record<string, string>> = Reflect.getMetadata('endpoints', target) ?? {};
+		if (!endpoints2[route]) endpoints2[route] = {};
 		endpoints2[route][method] = propertyKey as string;
-		Reflect.defineMetadata('endpoints',endpoints2,target);
+		Reflect.defineMetadata('endpoints', endpoints2, target);
 
 		if (pRules) {
 			const reg = /\[([a-zA-Z0-9_-]+)\]/g;
@@ -114,4 +114,11 @@ export const Entity: (entity: keyof IEntityContainer) => ClassDecorator = (e) =>
 	return (target) => {
 		Reflect.defineMetadata("entity", e, target.prototype);
 	}
+}
+
+export const pager: MethodDecorator = (target, methodName): void => {
+	methodName = String(methodName);
+	const pagers: { methodName: string }[] = Reflect.getMetadata('pagers', target) || []
+	pagers.push({ methodName })
+	Reflect.defineMetadata('pagers', pagers, target)
 }

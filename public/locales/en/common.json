@@ -35,5 +35,6 @@
   "messages":"Messages",
   "confirm":"Confirm",
   "dontHaveAccount":"Don`t have an account?",
-  "haveAccount":"Already have an account?"
+  "haveAccount":"Already have an account?",
+  "somethingWentWrong":"Something went wrong"
 }

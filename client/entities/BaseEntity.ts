@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnswerType, Response } from "@/types";
+import { Response } from "@/types";
 import { normalize, Schema } from "normalizr";
 import {
 	actionChannel,
@@ -16,9 +16,10 @@ import container, { IClientContainer } from "../di/container";
 import { toast } from "react-toastify";
 import { IPagerParams, TPaginationInfo } from "../paginatorExamples/types";
 import { AppState } from "../store/ReduxStore";
-import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../Pagination/reducer";
-import get from "lodash/get";
+import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../store/paginationReducer";
+import { XFetchError } from "../exceptions";
 import has from "lodash/has";
+import get from "lodash/get";
 
 export type EntityAction<E extends BaseEntity> = {
 	type: keyof Omit<E, keyof BaseEntity>;
@@ -30,7 +31,6 @@ export type EntitiesName = keyof IEntityContainer;
 export default abstract class BaseEntity extends BaseContext {
 	protected abstract schema: Schema;
 	protected abstract name: EntitiesName;
-	public foo = "bar";
 
 	public getName = () => this.name;
 	public getSchema = () => this.schema;
@@ -79,7 +79,8 @@ export default abstract class BaseEntity extends BaseContext {
 	private static async xFetch<TBody = unknown>(
 		url?: string,
 		method?: "GET" | "POST",
-		body?: TBody
+		body?: TBody,
+		force?: boolean
 	) {
 		if (!url || !method) throw new Error("xFetch: no url");
 		const res: Response = await fetch("/api/" + url, {
@@ -87,9 +88,7 @@ export default abstract class BaseEntity extends BaseContext {
 			body: body ? JSON.stringify(body) : undefined,
 		}).then((data) => data.json());
 		if (!res.success) {
-			if (res.type && res.type === AnswerType.Toast) {
-			}
-			throw new Error(res.message);
+			throw new XFetchError(res.message);
 		} else {
 			return res;
 		}
@@ -98,26 +97,39 @@ export default abstract class BaseEntity extends BaseContext {
 	private *actionRequest(
 		method: "GET" | "POST",
 		url?: string,
-		body?: any
-	): Generator {
+		body?: any,
+		force?: boolean
+	): Generator<Effect> {
 		try {
-			const res = yield call(BaseEntity.xFetch, url, method, body);
+			const res = yield call(BaseEntity.xFetch, url, method, body, force);
 			if (res) {
 				const normalData = this.normalize(res.data);
 				yield put(addEntities(normalData.entities));
+				yield put({
+					type:'PAGER',
+					payload:{
+						data:normalData,
+						pager: res.pager,
+					}
+				})
 			}
 			const text = this.di.t('requestCompleted')
 			toast.success(res.message ?? text ?? 'Request Completed!')
 		} catch (e) {
-			const text = this.di.t('requestFailed')
-			toast.error(text + ': ' + (e as Error).message);
-			console.error('in actionRequest', (e as Error).message ?? e);
+			if (e instanceof XFetchError) {
+				const text = this.di.t('requestFailed')
+				toast.error(text + ': ' + e.message);
+			} else if (e instanceof Error) {
+				const text = this.di.t('somethingWentWrong')
+				toast.error(text + ': ' + e.message);
+			} else {
+				console.error('In actionRequest', e);
+			}
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public xRead(url?: string, method: "GET" | "POST" = "GET", pagerData?: object, force?: boolean) {
-		return this.actionRequest(method, url);
+	public xRead(url?: string, method: "GET" | "POST" = "GET", body?: object, force?: boolean) {
+		return this.actionRequest(method, url, body, force);
 	}
 	public xSave(url: string, body: any = {}) {
 		return this.actionRequest("POST", url, body);
@@ -130,7 +142,7 @@ export default abstract class BaseEntity extends BaseContext {
 
 	public *pageEntity(uri: string, params: IPagerParams): Generator<Effect> {
 		const actionTypes = {
-			pageSetFilter: (pageName: string, filter: any, sort:any) => {
+			pageSetFilter: (pageName: string, filter: any, sort: any) => {
 				return {
 					type: PAGE_SET_FILTER,
 					pageName,
@@ -163,8 +175,8 @@ export default abstract class BaseEntity extends BaseContext {
 		}
 
 		// set filter to paginator, in case fetch from getInitProps()
-		const pFilter = params.filter ? params.filter : {};
-		const pSort = params.sort ? params.sort : {};
+		const pFilter = params.filter ?? {};
+		const pSort = params.sort ?? {};
 		yield put(actionTypes.pageSetFilter(pageName, pFilter, pSort));
 
 		const pagerData = {
@@ -179,7 +191,7 @@ export default abstract class BaseEntity extends BaseContext {
 			!pagination?.[pageName]?.['pages']?.[params?.page ?? 0];
 		if (isPageNotExist || params?.force) {
 			const res = yield call(
-				this.xRead,
+				this.xRead.bind(this),
 				uri,
 				'POST',
 				pagerData,
@@ -243,45 +255,5 @@ export default abstract class BaseEntity extends BaseContext {
 		}
 		return [];
 	}
-	// public static getPagerItemsIds(
-	// 	pagerName: string,
-	// 	needConcatPages = false
-	// ): any[] {
-	// 	const state:any = container.resolve("store").state ?? {};
-	// 	const pager = state["pagination"];
-	// 	if (has(pager, pagerName)) {
-	// 		const entityName = get(pager, [pagerName, "entityName"]);
-	// 		if (has(state, ["entities", entityName])) {
-	// 			const pageNumber = get(pager, [pagerName, "currentPage"]);
-	// 			const items = state["entities"][entityName];
-	// 			if (!needConcatPages) {
-	// 				if (get(pager, [pagerName, "pages", pageNumber])) {
-	// 					const ids: any[] = get(pager, [pagerName, "pages", pageNumber]);
-	// 					return ids
-	// 						.map(id => items[String(id)])
-	// 						.filter(item => item !== undefined && item !== null);
-	// 				}
-	// 			} else {
-	// 				let allItems: any[] = [];
-	// 				const pages = get(pager, [pagerName, "pages"]);
 
-	// 				if (pages) {
-	// 					for (const i of Object.keys(pages)) {
-	// 						const pageIds: any[] = pages[i];
-	// 						if (pageIds) {
-	// 							allItems = [
-	// 								...allItems,
-	// 								...pageIds.map(id => items[String(id)])
-	// 							];
-	// 						}
-	// 					}
-	// 				}
-
-	// 				return allItems.filter(item => item !== undefined && item !== null
-	// 				);
-	// 			}
-	// 		}
-	// 	}
-	// 	return [];
-	// }
 }

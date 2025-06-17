@@ -127,4 +127,29 @@ export default class UsersController extends BaseController {
 		return this.di.UsersService.findByStatus(UserStatus.ACTIVE);
 	}
 
+	// export interface IPagerParams {
+	// 	pageName?: string; // paginator name
+	// 	// sort?: object;      // object with sorting key/values
+	// 	sort?: ISortParams;
+	// 	filter?: object; //object;    // object with filtering key/values
+	// 	page?: number; // page number
+	// 	perPage: number; // count items on one page
+	// 	force?: boolean; // reload data in the redux and pager
+	// 	count?: number; // count by filter, if 0 need to recalculate, if > 0 count doesn't need to calculate
+	// 	entityName?: string;
+	// }
+	@Body({
+		type:'object',
+		properties:{
+			sort: {type:'string'},
+			pageName: { type:'string' },
+			perPage: { type:'string' },
+			page: { type:'integer' },
+		},
+		required:['perPage']
+	})
+	@POST('/api/users/page', {allow:{[ROLE.GUEST]:[GRANT.EXECUTE]}})
+	public pageUsers({pager}:ActionProps){
+		return this.di.UsersService.pageUsers(pager);
+	}
 }

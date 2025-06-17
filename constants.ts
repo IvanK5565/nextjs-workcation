@@ -41,3 +41,5 @@ export enum TimesInMS{
   YEAR=DAY*365,
   LAEPYEAR=YEAR+1,
 }
+
+export const DEFAULT_PER_PAGE = 10;
