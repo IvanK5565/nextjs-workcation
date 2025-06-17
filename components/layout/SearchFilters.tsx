@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { useTranslation } from "next-i18next";
 import { RenderMenu } from "@/client/menus/Menu";
 import { SideBarnavigationMenu } from "@/client/menus/SideBarNavigationMenu";
 
@@ -22,7 +21,6 @@ export function NavButton({
 	);
 }
 export default function Navigation({ isHidden, onClose }: { isHidden: boolean, onClose:()=>void }) {
-	const {t} = useTranslation('common');
 	return (
 		<div
 			className={clsx(

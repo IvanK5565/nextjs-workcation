@@ -9,6 +9,7 @@ import { useActions } from "@/client/hooks";
 import { Entities } from "@/client/store/types";
 import { useTranslation } from "next-i18next";
 import container from "@/server/container/container";
+import { EntitiesExplorer } from "@/components/admin/entitiesExplorer";
 
 export const getServerSideProps = container.resolve("getServerSideProps")(
 	[]
@@ -55,78 +56,9 @@ const Home = () => {
 Home.getLayout = (page: React.ReactNode) => page;
 export default Home;
 
-const buttonStyle =
-	"block xl:w-32 sm:w-auto sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block";
 
-const Null = () => <span className="text-gray-400 italic">null</span>;
 
-function DataCard({
-	data,
-	onDelete,
-}: {
-	data: (object & { id: string }) | null;
-	onDelete: () => void;
-}) {
-	const { t } = useTranslation('common');
-	return data == null ? (
-		<Null />
-	) : (
-		<div className="bg-white shadow rounded-md p-4 border border-gray-200">
-			{Object.entries(data).map(([key, value]) => (
-				<div key={key} className="flex gap-x-2 space-y-1 text-gray-700">
-					<div className="w-32 font-semibold">{key}:</div>
-					<div className="truncate">
-						{value === null ? <Null /> : String(value)}
-					</div>
-				</div>
-			))}
-			<button className={buttonStyle} onClick={onDelete}>
-				{t('delete')}
-			</button>
-		</div>
-	);
-}
 
-function EntitiesExplorer({
-	collection,
-	reverse,
-}: {
-	collection: 'users'|'classes'|'subjects';
-	reverse?: boolean;
-}) {
-	const entities = useSelector(entitySelector(collection));
-	const entries = Object.entries(entities);
-
-		const { deleteUser } = useActions("UserEntity");
-	const { deleteClass } = useActions("ClassEntity");
-	const { deleteSubject } = useActions("SubjectEntity");
-
-	const actions = {
-		['users']: deleteUser,
-		['classes']: deleteClass,
-		['subjects']: deleteSubject,
-	}
-
-	if (!entities || entries.length < 1)
-		return (
-			<div className="mt-4">
-				<NoData />
-			</div>
-		);
-
-	return (
-		<section className="space-y-4 mt-4">
-			{(reverse ? entries.reverse() : entries).map((item, index) => (
-				<DataCard
-					key={index}
-					data={item[1]}
-					onDelete={() => actions[collection]({ [collection]: { [item[0]]: item[1] } })
-					}
-				/>
-			))}
-		</section>
-	);
-}
 
 function GetEntityBar({ entity }: { entity: keyof Entities }) {
 	const [input, setInput] = useState("1");
