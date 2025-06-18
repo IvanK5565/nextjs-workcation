@@ -2,17 +2,7 @@
 import { Entities } from "../store/types";
 
 export interface TPaginationInfo {
-  [key: string]: {
-    currentPage?: number,
-    count?: number,
-    pages?: {
-      [key: string]: string[];
-    },
-    filter?: {
-      [key: string]: any;
-    };
-    touched?: string[];
-  }
+  [key: string]: IPaginationInfo
 }
 
 // In-redux entity
@@ -29,9 +19,10 @@ export interface IPaginationInfo {
     field: string;
     dir: SortDirection;
   };
-  pages: {
+  pages?: {
     [key: number]: [number];
   };
+  touched?: number[];
   fetching?: boolean;
 }
 

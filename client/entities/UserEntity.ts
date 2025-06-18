@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
+import BaseEntity, { EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../di/container";
-import { call, put } from "redux-saga/effects";
+import { put } from "redux-saga/effects";
 import type { IPagerParams } from "../paginatorExamples/types";
+import { Entities } from "../store/types";
 
 export type UserAction = EntityAction<UserEntity>;
 
 @reducer('users')
 export default class UserEntity extends BaseEntity {
 	protected schema;
-	protected name: EntitiesName;
+	protected name: keyof Entities;
 
 	constructor(di: IClientContainer) {
 		super(di);
@@ -20,7 +21,7 @@ export default class UserEntity extends BaseEntity {
 			classes: [_class],
 			userClasses: [_class],
 		});
-		this.name = 'UserEntity';
+		this.name = 'users';
 	}
 
 	@action

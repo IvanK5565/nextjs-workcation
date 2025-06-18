@@ -9,7 +9,7 @@ function DataCard({
 	data,
 	onDelete,
 }: {
-	data: (object & { id: string|number }) | null;
+	data: object | null;
 	onDelete?: () => void;
 }) {
 	const { t } = useTranslation("common");

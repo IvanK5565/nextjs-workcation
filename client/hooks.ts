@@ -14,7 +14,6 @@ import { IMenu } from "./types";
 import get from "lodash/get";
 import has from "lodash/has";
 import { IPaginationInfo } from "./paginatorExamples/types";
-import { Entities } from "./store/types";
 
 export function useEntity<T extends keyof IEntityContainer>(
   entityName: T
@@ -122,6 +121,7 @@ export function useAcl() {
 
       const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
       return guard.allow(GRANT.READ, resource);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return false;
     }
@@ -160,6 +160,7 @@ export function useAcl() {
       query,
     };
     return res;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return {
       allow: () => false,

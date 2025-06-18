@@ -119,6 +119,7 @@ export class ReduxStore extends BaseContext {
 				__persistor: persistor,
 				sagaTask: saga,
 			};
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			this._state = state as any;
 			return state;
 		};

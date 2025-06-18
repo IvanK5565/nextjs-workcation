@@ -20,6 +20,7 @@ import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../store/paginationReducer";
 import { XFetchError } from "../exceptions";
 import has from "lodash/has";
 import get from "lodash/get";
+import { Entities } from "../store/types";
 
 export type EntityAction<E extends BaseEntity> = {
 	type: keyof Omit<E, keyof BaseEntity>;
@@ -30,9 +31,8 @@ export type EntitiesName = keyof IEntityContainer;
 
 export default abstract class BaseEntity extends BaseContext {
 	protected abstract schema: Schema;
-	protected abstract name: EntitiesName;
+	protected abstract name: keyof Entities;
 
-	public getName = () => this.name;
 	public getSchema = () => this.schema;
 	public normalize = (data: object) =>
 		normalize(data, Array.isArray(data) ? [this.schema] : this.schema);
@@ -80,6 +80,7 @@ export default abstract class BaseEntity extends BaseContext {
 		url?: string,
 		method?: "GET" | "POST",
 		body?: TBody,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		force?: boolean
 	) {
 		if (!url || !method) throw new Error("xFetch: no url");

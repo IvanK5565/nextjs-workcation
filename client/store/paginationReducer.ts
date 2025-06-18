@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // --------------------------------- reducer.ts ---------------------
 
-import { TPaginationInfo } from "../paginatorExamples/types";
+import { IPaginationInfo, TPaginationInfo } from "../paginatorExamples/types";
+import { Entities } from "./types";
 
 export const PAGE_FETCHING = 'PAGE_FETCHING'
 export const PAGE_SET_FILTER = 'PAGE_SET_FILTER'
@@ -10,15 +11,30 @@ export const PAGE_CLEAR = 'PAGE_CLEAR'
 export const PAGE_CLEAR_ALL = 'PAGE_CLEAR_ALL'
 export const PAGE_SET_PARAMS = 'PAGE_SET_PARAMS'
 
-const initialPagerState:TPaginationInfo = {
-  users:{
-    count:0,
-    currentPage:0,
-    pages:{},
+export function pageSetParam(pageName:string, params:Partial<IPaginationInfo>){
+  return {
+    type:PAGE_SET_PARAMS,
+    pageName,
+    params,
   }
 }
 
-export default function paginationReducer(state = initialPagerState, action: any) {
+function emptyPaginator(name:string, entityName:keyof Entities, perPage:number = 10):IPaginationInfo{
+  return {
+    count:0,
+    currentPage:0,
+    pages:{},
+    entityName,
+    pageName: name,
+    perPage,
+  }
+}
+
+const initialPagerState:TPaginationInfo = {
+  users:emptyPaginator('users','users')
+}
+
+export default function paginationReducer(state = initialPagerState, action: any):TPaginationInfo {
 		switch (action.type) {
 			case 'DELETE_ALL': return Object.fromEntries(Object.entries(state).map(([key,p]) => [key,{...p, pages:undefined}]));
 		}
@@ -34,7 +50,8 @@ export default function paginationReducer(state = initialPagerState, action: any
       let item: any | null = null;
  
       if (result?.length === 0) {
-        pager.page = pages?.size ?? 1;
+        // pager.page = pages?.size ?? 1;
+        pager.page = 1;
       } else {
         item = result;
       }
@@ -106,7 +123,10 @@ export default function paginationReducer(state = initialPagerState, action: any
     case PAGE_SELECT_ITEM:
       {
         const { pageName, selectedItems } = action;
-        const pagination = state[pageName] ? { ...state[pageName] } : {};
+        if(!state[pageName]){
+          return state;
+        }
+        const pagination:IPaginationInfo = state[pageName];
         pagination["touched"] = selectedItems;
         const newState = {
           ...state,

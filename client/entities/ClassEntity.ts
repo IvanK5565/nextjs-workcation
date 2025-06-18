@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import BaseEntity, { EntitiesName, EntityAction } from "./BaseEntity";
+import BaseEntity, {  EntityAction } from "./BaseEntity";
 import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../di/container";
 import { put } from "redux-saga/effects";
 import Router from "next/router";
 import { toast } from "react-toastify";
+import { Entities } from "../store/types";
 
 export type ClassAction = EntityAction<ClassEntity>
 
 @reducer('classes')
 export default class ClassEntity extends BaseEntity {
 	protected schema;
-	protected name: EntitiesName;
+	protected name: keyof Entities;
 
 	constructor(di: IClientContainer) {
 		super(di);
@@ -22,7 +23,7 @@ export default class ClassEntity extends BaseEntity {
 			studentsInClass: [user],
 		},
 			{ idAttribute: 'id' });
-		this.name = "ClassEntity";
+		this.name = "classes";
 	}
 
 	@action

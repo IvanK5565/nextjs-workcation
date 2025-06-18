@@ -6,18 +6,19 @@ import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../di/container";
 import { addEntities } from "../store/actions";
 import { put } from "redux-saga/effects";
+import { Entities } from "../store/types";
 
 export type SubjectAction = EntityAction<SubjectEntity>;
 
 @reducer('subjects')
 export default class SubjectEntity extends BaseEntity {
 	protected schema;
-	protected name: EntitiesName;
+	protected name: keyof Entities;
 
 	constructor(di: IClientContainer) {
 		super(di);
 		this.schema = new schema.Entity("subjects");
-		this.name = 'SubjectEntity';
+		this.name = 'subjects';
 	}
 
 	@action
