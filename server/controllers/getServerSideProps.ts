@@ -11,8 +11,6 @@ import { getServerSession } from "next-auth";
 import { AuthOptions } from "next-auth";
 import { Session } from "next-auth";
 import { GSSPFactory } from "@/types";
-import { has } from "lodash";
-import { IPagerParams } from "@/client/paginatorExamples/types";
 import { DEFAULT_PER_PAGE } from "@/constants";
 
 
@@ -53,7 +51,7 @@ export default function getServerSidePropsContainer(
 						if (r) {
 							let pager: any = undefined;
 							if (r && 'count' in r) {
-								pager = {
+								pager = req.pager ?? { 
 									count: r.count,
 									page: parseInt(req.body?.page ?? '1'),
 									pageName: req.body?.pageName,
@@ -68,12 +66,17 @@ export default function getServerSidePropsContainer(
 								const normalize = redux.normalizer(entity);
 								const normal = normalize(r);
 								normal.result = normal.result ?? null;
-								store.dispatch(addEntities(normal.entities));
 								store.dispatch({
-									type: 'PAGER',
-									data: normal,
-									pager,
-								})
+									...addEntities(normal.entities),
+									pager: pager,
+									result: normal.result,
+								});
+								// store.dispatch(addEntities(normal.entities));
+								// store.dispatch({
+								// 	type: 'PAGER',
+								// 	data: normal,
+								// 	pager,
+								// })
 							} else {
 								Logger.warn(`Controller ${name} does not have an entity associated with it.`);
 							}

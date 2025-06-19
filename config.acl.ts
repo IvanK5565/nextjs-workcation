@@ -104,7 +104,13 @@ export const rules: IRules = {
         allow:{
             [ROLE.GUEST]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
         }
-    }
+    },
+
+    '/table':{
+        allow:{
+            [ROLE.GUEST]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
+        }
+    },
 
 
    

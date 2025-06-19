@@ -141,10 +141,13 @@ export default class UsersController extends BaseController {
 	@Body({
 		type:'object',
 		properties:{
-			sort: {type:'string'},
+			sort: {type:'object'},
 			pageName: { type:'string' },
 			perPage: { type:'string' },
 			page: { type:'integer' },
+			count: { type:'integer' },
+			entityName: { type:'string' },
+			filter: { type:'object' },
 		},
 		required:['perPage']
 	})

@@ -1,5 +1,6 @@
 import { HYDRATE } from "next-redux-wrapper";
 import { Entities, EntitiesAction } from "./types";
+import { ADD_ENTITIES, DELETE_ENTITIES } from "./actions";
 
 function baseReducer<K extends keyof Entities>(collectionName: K) {
 
@@ -17,9 +18,9 @@ function baseReducer<K extends keyof Entities>(collectionName: K) {
 
 		switch (action.type) {
 			case HYDRATE:
-			case "ADD":
+			case ADD_ENTITIES:
 				return { ...collection, ...newEntities };
-			case "DELETE":
+			case DELETE_ENTITIES:
 				console.warn('DELETE action: ' + newEntities)
 				return Object.fromEntries(
 					Object.entries(collection).filter((entry) => !Object.hasOwn(newEntities, entry[0]))

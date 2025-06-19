@@ -9,7 +9,7 @@ import { IControllerContainer } from "./server/controllers";
 import { StatusCodes } from "http-status-codes";
 import Guard from "./acl/Guard";
 import { Classes, Subjects, User, UserClasses } from "./server/models";
-import { IPagerParams } from "./client/paginatorExamples/types";
+import { IPagerParams } from "./client/pagination/types";
 
 export type RouterRun = (
 	req: NextApiRequest,

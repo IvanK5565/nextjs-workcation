@@ -35,8 +35,14 @@ export const SideBarnavigationMenu:IMenu = {
   },
   "NavigationMenu/Pager":{
     grant: GRANT.READ,
-    label:'pager',
+    label:'Pager',
     url: '/pager',
-    component: <NavButtonWrapper href='/pager' label="pager"/>
+    component: <NavButtonWrapper href='/pager' label="Pager"/>
+  },
+  "NavigationMenu/Table":{
+    grant: GRANT.READ,
+    label:'Table',
+    url: '/table',
+    component: <NavButtonWrapper href='/table' label="Table"/>
   },
 }

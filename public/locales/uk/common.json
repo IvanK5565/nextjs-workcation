@@ -36,5 +36,11 @@
   "confirm":"Підтвердити",
   "dontHaveAccount":"Намає аккаунту?",
   "haveAccount":"Вже є аккаунт?",
-  "somethingWentWrong":"Щось пішло не так"
+  "somethingWentWrong":"Щось пішло не так",
+  "page-showing":"Показано",
+  "page-to": "-",
+  "page-of": "з",
+  "page-results": "результатів",
+  "page-previous": "Попередня",
+  "page-next": "Наступна"
 }

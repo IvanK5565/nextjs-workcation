@@ -1,7 +1,7 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import Button from "../ui/button";
-import { useActions } from "@/client/hooks";
+import { useActions } from "@/client/hooks/useActions";
 import { useTranslation } from "next-i18next";
 import { TextInput } from "./textInput";
 import { SelectInput } from "./selectInput";

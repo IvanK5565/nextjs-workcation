@@ -1,4 +1,4 @@
-import { IPagerParams, Sort } from "@/client/paginatorExamples/types";
+import { IPagerParams, Sort } from "@/client/pagination/types";
 import { IService } from ".";
 import BaseContext from "../container/BaseContext";
 import { ValidateError } from "../exceptions";

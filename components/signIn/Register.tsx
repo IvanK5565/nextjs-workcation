@@ -6,7 +6,7 @@ import {
 } from "formik";
 import * as Yup from "yup";
 import Button from "../ui/button";
-import { useActions } from "@/client/hooks";
+import { useActions } from "@/client/hooks/useActions";
 import { TextInput } from "../ui/textInput";
 import { toast } from "react-toastify";
 import { SelectInput } from "../ui/selectInput";

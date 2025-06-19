@@ -20,15 +20,14 @@ import {
 } from "@/types";
 import type { ActionProps } from "@/types";
 import { AuthOptions, getServerSession, Session } from "next-auth";
-import { onSuccessResponse, onErrorResponse } from "@/server/utils";
 import { ROLE } from "@/acl/types";
-import { pager, POST } from "./decorators";
+import { POST } from "./decorators";
 import { Logger } from "../logger";
 import Guard from "@/acl/Guard";
 import { IControllerContainer } from ".";
 import { IEntityContainer } from "@/client/entities";
 import { DEFAULT_PER_PAGE } from "@/constants";
-import { IPagerParams } from "@/client/paginatorExamples/types";
+import { IPagerParams } from "@/client/pagination/types";
 import set from "set-value";
 
 export type ExtendedRequest = NextApiRequest & {
@@ -188,4 +187,37 @@ export default abstract class BaseController extends BaseContext {
 		if (!entity) return null;
 		return entity as keyof IEntityContainer;
 	}
+}
+
+export function onSuccessResponse(data: Response['data'], pagerParams?: IPagerParams): Response {
+	let pager:any = undefined;
+	if (pagerParams && data && 'count' in data) {
+		pager = {
+			count: data.count,
+			page: pagerParams.page,
+			pageName: pagerParams.pageName,
+			perPage: pagerParams.perPage,
+			entityName: pagerParams.entityName,
+		};
+		data = data.items;
+	}
+
+	return {
+		code: StatusCodes.OK,
+		success: true,
+		data: data,
+		pager,
+		type: AnswerType.Data,
+	};
+}
+export function onErrorResponse(error: Error): Response {
+	return {
+		code:
+			error instanceof ApiError
+				? error.code
+				: StatusCodes.INTERNAL_SERVER_ERROR,
+		success: false,
+		type: AnswerType.Toast,
+		message: error.message,
+	};
 }

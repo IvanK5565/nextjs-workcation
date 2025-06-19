@@ -7,7 +7,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { AppStore } from "@/client/store/ReduxStore";
 import Layout from "../components/layout";
 import { ToastContainer } from "react-toastify";
-import DIContext from "@/client/DIContext";
+import ContainerContext from "@/client/ContainerContext";
 import container from "@/client/di/container";
 import { appWithTranslation } from "next-i18next";
 import nextI18nConfig from '@/next-i18next.config'
@@ -30,7 +30,7 @@ function App({
 	const { store, props } = redux.useWrappedStore(rest);
 	// const { store, props } = wrapper.useWrappedStore(rest);
 	return (
-		<DIContext.Provider value={container}>
+		<ContainerContext.Provider value={container}>
 			<Provider store={store}>
 				<PersistGate persistor={(store as AppStore).__persistor}>
 					<SessionProvider session={props.session}>
@@ -40,7 +40,7 @@ function App({
 				</PersistGate>
 			</Provider>
 			<ToastContainer />
-		</DIContext.Provider>
+		</ContainerContext.Provider>
 	);
 }
 // export default App;

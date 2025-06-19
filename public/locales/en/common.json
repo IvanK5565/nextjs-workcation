@@ -36,5 +36,12 @@
   "confirm":"Confirm",
   "dontHaveAccount":"Don`t have an account?",
   "haveAccount":"Already have an account?",
-  "somethingWentWrong":"Something went wrong"
+  "somethingWentWrong":"Something went wrong",
+  "page-showing":"Showing from",
+  "page-to": "to",
+  "page-of": "of",
+  "page-results": "results",
+  "page-previous": "Previous",
+  "page-next": "Next"
+
 }

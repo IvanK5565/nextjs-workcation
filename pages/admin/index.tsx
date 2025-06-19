@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import NoData from "@/components/NoData";
 import clsx from "clsx";
 import { entitySelector } from "@/client/store/selectors";
-import { useActions } from "@/client/hooks";
+import { useActions } from "@/client/hooks/useActions";
 import { Entities } from "@/client/store/types";
 import { useTranslation } from "next-i18next";
 import container from "@/server/container/container";

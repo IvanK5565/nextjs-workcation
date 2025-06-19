@@ -1,4 +1,4 @@
-import { useActions } from "@/client/hooks";
+import { useActions } from "@/client/hooks/useActions";
 import NoData from "../NoData";
 import { useSelector } from "react-redux";
 import { entitySelector } from "@/client/store/selectors";

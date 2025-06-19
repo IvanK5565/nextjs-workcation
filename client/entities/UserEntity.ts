@@ -4,7 +4,7 @@ import { schema } from "normalizr";
 import { action, reducer } from "./decorators";
 import type { IClientContainer } from "../di/container";
 import { put } from "redux-saga/effects";
-import type { IPagerParams } from "../paginatorExamples/types";
+import type { IPagerParams } from "../pagination/types";
 import { Entities } from "../store/types";
 
 export type UserAction = EntityAction<UserEntity>;

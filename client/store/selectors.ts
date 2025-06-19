@@ -1,14 +1,11 @@
 import { AppState } from "@/client/store/ReduxStore";
+import { Entities } from "./types";
 
-const entitySelector = <K extends keyof AppState>(name:K) => (state:AppState):AppState[K] => state[name];
+function entitySelector(name:keyof Entities) {
+  return (state:AppState) => state.entities[name] as Entities[typeof name];
+}
 
-const usersSelector = (state:AppState)=>state.users;
-const classesSelector = (state:AppState)=>state.classes;
-const subjectsSelector = (state:AppState)=>state.subjects;
 
 export {
   entitySelector,
-  usersSelector,
-  classesSelector,
-  subjectsSelector,
 }

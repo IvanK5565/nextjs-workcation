@@ -14,13 +14,14 @@ import { IEntityContainer } from ".";
 import { BaseContext } from "../di/BaseContext";
 import container, { IClientContainer } from "../di/container";
 import { toast } from "react-toastify";
-import { IPagerParams, TPaginationInfo } from "../paginatorExamples/types";
+import { IPagerParams, TPaginationInfo } from "../pagination/types";
 import { AppState } from "../store/ReduxStore";
-import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../store/paginationReducer";
+import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../store/actions";
 import { XFetchError } from "../exceptions";
-import has from "lodash/has";
-import get from "lodash/get";
 import { Entities } from "../store/types";
+import get from 'get-value';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const has = require('has-value')
 
 export type EntityAction<E extends BaseEntity> = {
 	type: keyof Omit<E, keyof BaseEntity>;
@@ -105,14 +106,18 @@ export default abstract class BaseEntity extends BaseContext {
 			const res = yield call(BaseEntity.xFetch, url, method, body, force);
 			if (res) {
 				const normalData = this.normalize(res.data);
-				yield put(addEntities(normalData.entities));
 				yield put({
-					type:'PAGER',
-					payload:{
-						data:normalData,
-						pager: res.pager,
-					}
-				})
+					...addEntities(normalData.entities),
+					pager: res.pager,
+					result: normalData.result,
+				});
+				// yield put({
+				// 	type:'PAGER',
+				// 	payload:{
+				// 		data:normalData,
+				// 		pager: res.pager,
+				// 	}
+				// })
 			}
 			const text = this.di.t('requestCompleted')
 			toast.success(res.message ?? text ?? 'Request Completed!')

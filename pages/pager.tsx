@@ -1,5 +1,6 @@
-import { useActions, usePageItems } from "@/client/hooks";
-import { pageSetParam } from "@/client/store/paginationReducer";
+import { useActions } from "@/client/hooks/useActions";
+import { usePageItems } from "@/client/hooks/usePageItems";
+import { setPagerParams } from "@/client/store/actions";
 import { DataCard } from "@/components/admin/entitiesExplorer";
 import Button from "@/components/ui/button";
 import { useState } from "react";
@@ -18,7 +19,7 @@ function Pager() {
 					id="page"
 					onChange={({ target: { value } }) => {
 						setPage(parseInt(value))
-						dispatch(pageSetParam('users', {currentPage:parseInt(value)}))
+						dispatch(setPagerParams('users', {currentPage:parseInt(value)}))
 					}}
 				>
 					<option value="1">1</option>

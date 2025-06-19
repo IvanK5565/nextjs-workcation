@@ -1,5 +1,4 @@
-import { AppState } from "@/client/store/ReduxStore";
-import { usersSelector } from "@/client/store/selectors";
+import { entitySelector } from "@/client/store/selectors";
 import { IUser } from "@/client/store/types";
 import container from "@/server/container/container";
 import { useSelector } from "react-redux";
@@ -72,9 +71,7 @@ function initials(user: IUser) {
 }
 
 function Lesson({ data }: { data: Lesson }) {
-	const users = useSelector<AppState, AppState["users"]>(
-		(state) => state.users
-	);
+	const users = useSelector(entitySelector('users'));
 	const teacher = users[data.teacherId] as IUser;
 
 	return (
@@ -129,7 +126,7 @@ function Day({ data }: { data: Day }) {
 }
 
 function MiniLesson({ data }: { data: Lesson }) {
-	const users = useSelector(usersSelector);
+	const users = useSelector(entitySelector('users'));
 	const teacher = users[data.teacherId] as IUser;
 
 	return (

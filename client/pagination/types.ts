@@ -27,27 +27,13 @@ export interface IPaginationInfo {
 }
 
 // In-controller parameter
-export interface IPagerParams {
-  pageName?: string; // paginator name
-  // sort?: object;      // object with sorting key/values
-  sort?: ISortParams;
-  filter?: object; //object;    // object with filtering key/values
-  page?: number; // page number
-  perPage: number; // count items on one page
-  force?: boolean; // reload data in the redux and pager
-  count?: number; // count by filter, if 0 need to recalculate, if > 0 count doesn't need to calculate
-  entityName?: string;
-}
+export type {IPagerParams} from './IPagerParams'
 
 enum SortDirection {
   ASC = 'ASC',
   DESC = 'DESC',
 }
 
-interface ISortParams {
-  field: string;
-  sort: Sort;
-};
 
 export enum Sort{
   none='NONE',

@@ -86,8 +86,8 @@ export class ReduxStore extends BaseContext {
 		const reducers = this.reducers();
 		const makeStore = () => {
 			const reducer = combineReducers({
-				// entities: combineReducers(reducers),
-				...reducers,
+				entities: combineReducers(reducers),
+				// ...reducers,
 				error: errorReducer,
 				auth: authReducer,
 				pagination: paginationReducer,

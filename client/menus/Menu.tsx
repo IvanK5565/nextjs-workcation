@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAcl } from "../hooks";
+import { useAcl } from "../hooks/useAcl";
 import { IMenu, IMenuData } from "../types";
 
 export function FilterMenu(menu:IMenu):IMenu{

@@ -1,4 +1,4 @@
-import { useAcl } from "@/client/hooks"
+import { useAcl } from "@/client/hooks/useAcl"
 import { UserForm } from "@/components/ui/userForm";
 
 export default function Page(){

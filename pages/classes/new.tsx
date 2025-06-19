@@ -1,4 +1,4 @@
-import { useAcl } from "@/client/hooks"
+import { useAcl } from "@/client/hooks/useAcl"
 import ClassForm from "@/components/ui/classForm";
 import container from "@/server/container/container";
 import { useEffect } from "react";

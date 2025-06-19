@@ -1,23 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // --------------------------------- reducer.ts ---------------------
 
-import { IPaginationInfo, TPaginationInfo } from "../paginatorExamples/types";
+import { IPaginationInfo, TPaginationInfo } from "../pagination/types";
+import { PAGE_CLEAR, PAGE_CLEAR_ALL, PAGE_FETCHING, PAGE_SELECT_ITEM, PAGE_SET_FILTER, PAGE_SET_PARAMS } from "./actions";
 import { Entities } from "./types";
 
-export const PAGE_FETCHING = 'PAGE_FETCHING'
-export const PAGE_SET_FILTER = 'PAGE_SET_FILTER'
-export const PAGE_SELECT_ITEM = 'PAGE_SELECT_ITEM'
-export const PAGE_CLEAR = 'PAGE_CLEAR'
-export const PAGE_CLEAR_ALL = 'PAGE_CLEAR_ALL'
-export const PAGE_SET_PARAMS = 'PAGE_SET_PARAMS'
 
-export function pageSetParam(pageName:string, params:Partial<IPaginationInfo>){
-  return {
-    type:PAGE_SET_PARAMS,
-    pageName,
-    params,
-  }
-}
+
+
 
 function emptyPaginator(name:string, entityName:keyof Entities, perPage:number = 10):IPaginationInfo{
   return {
@@ -39,9 +29,10 @@ export default function paginationReducer(state = initialPagerState, action: any
 			case 'DELETE_ALL': return Object.fromEntries(Object.entries(state).map(([key,p]) => [key,{...p, pages:undefined}]));
 		}
   // get result for the paginator, disable fetching
-  if (action?.payload?.data && action.payload.pager) {
-    const pager = action.payload.pager;
-    const result = action.payload.data?.result ?? [];
+  // if (action?.payload?.data && action.payload.pager) {
+  if (action?.result && action.pager) {
+    const pager = action.pager;
+    const result = action.result ?? [];
     if (pager.pageName) {
       const paginatorName = pager.pageName;
  

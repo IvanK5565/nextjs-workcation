@@ -2,7 +2,7 @@
 import { ClassAction } from "@/client/entities/ClassEntity";
 import { SubjectAction } from "@/client/entities/SubjectEntity";
 import { UserAction } from "@/client/entities/UserEntity";
-import { useActions } from "@/client/hooks";
+import { useActions } from "@/client/hooks/useActions";
 import { deleteEntities } from "@/client/store/actions";
 import { AppState } from "@/client/store/ReduxStore";
 import {
