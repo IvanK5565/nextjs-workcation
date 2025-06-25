@@ -4,7 +4,7 @@ import Button from "@/components/ui/button";
 import NoData from "@/components/NoData";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
-import { classesSelector, usersSelector } from "@/client/store/selectors";
+import { entitySelector } from "@/client/store/selectors";
 import { UserRole } from "@/constants";
 import { IClass, IUser } from "@/client/store/types";
 
@@ -72,9 +72,10 @@ function ClassEditForm({
 
 export default function Home() {
 	const param = useParams();
-	const id = param?.id as string;
-	const users = useSelector(usersSelector) as Record<string, IUser>;
-	const state = useSelector(classesSelector);
+	// const id = param?.id as string;
+	const id = typeof param?.id === 'string' ? parseInt(param?.id) : -1;
+	const users = useSelector(entitySelector('users'));
+	const state = useSelector(entitySelector('classes'));
 	const _class = state[id] ?? null;
 	if(!_class) console.error('no class', state)
 	if(!users) console.error('no users')

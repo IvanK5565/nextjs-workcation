@@ -112,6 +112,12 @@ export const rules: IRules = {
         }
     },
 
+    '/test':{
+        allow:{
+            [ROLE.GUEST]:[GRANT.READ, GRANT.WRITE, GRANT.EXECUTE]
+        }
+    },
+
 
    
 

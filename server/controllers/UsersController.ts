@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import BaseController from "./BaseController";
 import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole, UserStatus } from "@/constants";
 import { IService } from "../services";
-import { Auth, Body, DELETE, Entity, GET, POST } from "./decorators";
+import { Auth, Body, DELETE, Entity, GET, Pager, POST } from "./decorators";
 import { AnswerType } from "@/types";
 import type { ActionProps } from "@/types";
 import { GRANT, ROLE } from "@/acl/types";
@@ -78,7 +78,7 @@ export default class UsersController extends BaseController {
 				AnswerType.Log
 			);
 		}
-		return this.di.UsersService.findByEmail(session.user.email);
+		return this.di.UsersService.findByEmail(session.identity.email);
 	}
 
 	@GET("/api/users", {
@@ -152,6 +152,7 @@ export default class UsersController extends BaseController {
 		required:['perPage']
 	})
 	@POST('/api/users/page', {allow:{[ROLE.GUEST]:[GRANT.EXECUTE]}})
+	@Pager
 	public pageUsers({pager}:ActionProps){
 		return this.di.UsersService.pageUsers(pager);
 	}

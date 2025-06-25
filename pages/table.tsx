@@ -2,13 +2,18 @@ import { useActions } from "@/client/hooks/useActions";
 import { Actions, FilterType, IFieldList, PaginationType } from "@/client/pagination/IPagerParams";
 import AdaptiveTable from "@/components/AdaptiveTable/Table";
 import { Null } from "@/components/null";
-import { DEFAULT_PER_PAGE } from "@/constants";
+import { DEFAULT_PER_PAGE, UserStatus } from "@/constants";
+import container from "@/server/container/container";
+import { upperFirst } from "lodash";
+import { toast } from "react-toastify";
+
+const statusOptions = Object.values(UserStatus).map(v => ({value:v, label:upperFirst(v)}))
 
 const fields: IFieldList = {
 	id:{
-		label: 'ID',
+		label: 'id-label',
 		sorted: true,
-		placeholder: 'ID',
+		placeholder: 'Id',
 		type: FilterType.Text,
 		column:{
 			headClassName:
@@ -18,32 +23,43 @@ const fields: IFieldList = {
 		}
 	},
 	firstName:{
-		label: 'First Name',
-		sorted: false,
+		label: 'firstName-label',
+		sorted: true,
 		placeholder: 'First Name',
 		type: FilterType.Text,
 		column:{
+			editable: true,
 			headClassName:
 				"bg-gray-50 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
 			itemClassName:
 				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6",
+			inputClassName: "bg-gray-100",
 		}
 	},
 	lastName:{
-		label: 'Last Name',
-		sorted: false,
+		label: 'lastName-label',
+		sorted: true,
 		placeholder: 'Last Name',
 		type: FilterType.Text,
 		column:{
+			editable: true,
 			headClassName:
 				"bg-gray-50 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
 			itemClassName:
 				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6",
+			inputClassName: "bg-gray-100",
+		},
+		filter:{
+			showLabel:true,
+			group:'gl',
+			className: "text-gray-900",
+			inputClassName:
+				"block w-full rounded-md border-0 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
 		}
 	},
 	email:{
-		label: 'Email',
-		sorted: false,
+		label: 'email-label',
+		sorted: true,
 		placeholder: 'Email',
 		type: FilterType.Text,
 		column:{
@@ -51,9 +67,83 @@ const fields: IFieldList = {
 				"bg-gray-50 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
 			itemClassName:
 				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6",
+		},
+		filter:{
+			showLabel:true,
+			group:'gl',
+			className: "text-gray-900 ",
+			inputClassName:
+				"block w-full rounded-md border-0 py-1.5 text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
+		}
+	},
+	status:{
+		label: 'status-label',
+		sorted: true,
+		placeholder: 'Status',
+		type: FilterType.Select,
+		column:{
+			options: statusOptions,
+			editable: true,
+			headClassName:
+				"bg-gray-50 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
+			itemClassName:
+				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6",
+		},
+		filter:{
+			options: statusOptions,
+			showLabel:true,
+			group:'gl',
+			className: "text-gray-900 ",
+			inputClassName:
+				"block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6",
 		}
 	}
 }
+
+
+
+export default function Page() {
+	const {fetchProjectPage} = useActions('UserEntity')
+	const { getUserById } = useActions('UserEntity');
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	function onActionClick(action: Actions, data: any/*, pagerParams: IPagerParams*/){
+	switch(action){
+		case Actions.Edit:{
+			toast('Edit action for:' + JSON.stringify(data));
+			return;
+		}
+		case Actions.Delete:{
+			toast('Delete action for:' + JSON.stringify(data));
+			getUserById({id:data.id})
+			return;
+		}
+	}
+}
+	
+	return (
+		<AdaptiveTable
+			fields={fields}
+			actionClassName="text-gray-500 bg-opacity-50 py-1.5 ring-inset ring-gray-300"
+			bodyClassName="divide-y divide-gray-200 bg-white"
+			className="overflow-hidden bg-gray-100 shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg"
+			actions={[Actions.Edit, Actions.Delete]}
+			pagerName={"users"}
+			perPage={DEFAULT_PER_PAGE}
+			onLoadMore={fetchProjectPage}
+			onActionClick={onActionClick}
+			loaderEntities={"machines-models"}
+			onItemChange={(key,value,field)=>toast('item changed: '+JSON.stringify({id: key,value,field}))}
+			typeOfPagination={PaginationType.LIGHT}
+		/>
+	);
+}
+
+export const getServerSideProps = container.resolve('getServerSideProps')([])
+
+
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fields2: IFieldList = {
 	mediaResources: {
 		label: "Image",
@@ -135,7 +225,7 @@ const fields2: IFieldList = {
 			itemClassName:
 				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 max-w-[200px] whitespace-pre-wrap overflow-auto",
 			draw: (data) => {
-				data.zones.map((item, indx) => {});
+				data.zones.map(() => {});
 				return (
 					<p className="first-letter:capitalize">{data.zones.join(", ")}</p>
 				);
@@ -143,21 +233,3 @@ const fields2: IFieldList = {
 		},
 	},
 };
-
-export default function Page() {
-	const {fetchProjectPage} = useActions('UserEntity')
-	return (
-		<AdaptiveTable
-			fields={fields}
-			actionClassName="text-gray-500 bg-opacity-50 py-1.5 ring-inset ring-gray-300"
-			bodyClassName="divide-y divide-gray-200 bg-white"
-			className="overflow-hidden bg-gray-100 shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg"
-			actions={[Actions.Edit, Actions.Delete]}
-			pagerName={"users"}
-			perPage={DEFAULT_PER_PAGE}
-			onLoadMore={fetchProjectPage}
-			// onActionClick={onActionClick}
-			loaderEntities={"machines-models"}
-		/>
-	);
-}

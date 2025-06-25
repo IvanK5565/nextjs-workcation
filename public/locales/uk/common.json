@@ -42,5 +42,9 @@
   "page-of": "з",
   "page-results": "результатів",
   "page-previous": "Попередня",
-  "page-next": "Наступна"
+  "page-next": "Наступна",
+  "id-label":"Ідентифікатор",
+  "firstName-label":"Ім'я",
+  "lastName-label":"Прізвище",
+  "email-label":"Електронна Пошта"
 }

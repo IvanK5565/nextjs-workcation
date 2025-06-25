@@ -14,7 +14,7 @@ export default function Home({ data, session }: { data: Location[], session:Sess
       <div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
         <SearchBar />
         <main className="py-6 xl:flex-1 xl:overflow-x-hidden">
-          <p>{session?.user?.firstName}</p>
+          <p>{session?.identity?.firstName}</p>
           {data.map((d, i) => <LocationCards data={d} key={i} />)}
         </main>
       </div>

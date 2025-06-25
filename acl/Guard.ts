@@ -4,35 +4,30 @@ import { ROLE, IRoles, IRules, GRANT } from "./types";
 
 class Guard {
 	private mAcl: Acl;
-	private mRoles: IRoles;
-	private mRules: IRules;
-	private mRole: ROLE;
+	private mRules?: IRules;
+	private mRole?: ROLE;
 	private secret?: string;
 	public resource?: string;
 
 	constructor(
-		roles: IRoles,
-		rules: IRules,
-		role: ROLE,
+		roles?: IRoles,
+		rules?: IRules,
+		role?: ROLE,
 		secret?: string,
 	) {
-		this.mRoles = roles;
 		this.mRules = rules;
 		this.mRole = role;
 		this.secret = secret && secret.length > 0 ? secret : undefined;
 		this.mAcl = new Acl(roles, rules, this.secret);
 	}
 
-	public get role(): ROLE {
+	public get role() {
 		return this.mRole;
 	}
-	public get acl(): Acl {
+	public get acl() {
 		return this.mAcl;
 	}
-	public get roles(): IRoles {
-		return this.mRoles;
-	}
-	public get rules(): IRules {
+	public get rules() {
 		return this.mRules;
 	}
 
@@ -44,6 +39,7 @@ class Guard {
  * @returns The matched rule string if found, or null if no match is found.
  */
 	private isRouteMatch(path: string): string | null {
+		if(!this.rules) return null;
 		// allow to use '/' in end of path
 		if (path.length > 1 && path.substring(path.length - 1) === "/") {
 			path = path.substring(0, path.length - 1);
@@ -78,6 +74,7 @@ class Guard {
  * @returns true if the resource matches a route, false otherwise.
  */
 	public inRouter(resource: string) {
+		if(!this.rules) return false;
 		let isRouter = false;
 		try {
 			if (this.rules.hasOwnProperty(resource)) {
@@ -105,10 +102,11 @@ class Guard {
 	) {
 		resource = resource ?? this.resource ?? null;
 		const s = secret || this.secret ? (secret ?? this.secret) + ":" : "";
-		role = role ?? this.role;
+		role = role ?? this.role ?? null;
 		let isAllowed = false;
 
-		if(!resource) throw new Error('No Resource in Guard')
+		// if(!resource) throw new Error('No Resource in Guard')
+		if(!resource || !role || !this.rules) return false;
 		try {
 			if (this.rules.hasOwnProperty(resource)) {
 				isAllowed = this.acl.isAllowed(s + role, s + resource, grant);

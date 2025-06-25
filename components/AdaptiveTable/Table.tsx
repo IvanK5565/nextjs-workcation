@@ -7,17 +7,16 @@ import union from "lodash/union";
 import { JSX, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { IMenu } from "@/acl/types";
-import { useEntitySelector } from "@/client/hooks/useEntitySelector";
 import { PagerName, usePageSelector } from "@/client/hooks/usePageSelector";
 import { useSearchParams } from "next/navigation";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 import { useDispatch } from "react-redux";
-import BaseEntity from "@/client/entities/BaseEntity";
 import {
   Actions,
   FilterType,
   IFieldList,
   IPagerParams,
+  ISortParams,
   PaginationType,
   Sort,
 } from "@/client/pagination/IPagerParams";
@@ -36,7 +35,7 @@ import Row from "./Row";
 import { ISortOptions } from "./SortBy";
 import TableActions from "./TableActions";
 import { withRequestResult } from "./withRequest";
-import { usePageItems } from "@/client/hooks/usePageItems";
+import { usePagerIds } from "@/client/hooks/usePagerIds";
 
 const FILTER_TIMEOUT = 500;
 
@@ -130,7 +129,6 @@ function AdaptiveTable(props: IAdaptiveTable) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const pager = usePageSelector(pagerName);
-  const entities = useEntitySelector(pager?.entityName);
   const dispatch = useDispatch();
   const paginationType = typeOfPagination || PaginationType.SHORT;
   const currPage = pager ? get(pager, "currentPage") : null;
@@ -141,16 +139,16 @@ function AdaptiveTable(props: IAdaptiveTable) {
   const isInfinityContainer = typeOfPagination === PaginationType.NONE;
   const isLoadMoreContainer = typeOfPagination === PaginationType.LOAD_MORE;
   
-  const bufItems = usePageItems(pagerName,isInfinityContainer || isLoadMoreContainer);
-  const bufItems2: any = useMemo(() => {
-    if (pager) {
-      return BaseEntity.getPagerItems(
-        pagerName,
-        isInfinityContainer || isLoadMoreContainer
-      );
-    }
-    return [];
-  }, [pager, pagerName, entities, typeOfPagination]);
+  const bufItems = usePagerIds(pagerName,isInfinityContainer || isLoadMoreContainer);
+  // const bufItems2: any = useMemo(() => {
+  //   if (pager) {
+  //     return BaseEntity.getPagerItems(
+  //       pagerName,
+  //       isInfinityContainer || isLoadMoreContainer
+  //     );
+  //   }
+  //   return [];
+  // }, [pager, pagerName, entities, typeOfPagination]);
 
   const fields = useMemo(() => {
     let fields = props.fields;
@@ -185,11 +183,13 @@ function AdaptiveTable(props: IAdaptiveTable) {
           //@ts-ignore
           pFilter[field] = fieldValue.initialValue;
         } else if (isFilter && isExistInSearch) {
+          //@ts-ignore
           pFilter[field] = searchParams.get(field);
         }
       });
       // dispatch(pageSetFilter(pagerName, pFilter, pSort));
       if (onLoadMore && typeof onLoadMore === "function") {
+        console.log('IN TABLE:', pSort)
         onLoadMore?.({
           page: currPage ?? 1,
           pageName: pagerName,
@@ -228,7 +228,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
         timerID.current = null;
       }
       timerID.current = setTimeout(() => {
-        onFilterChanged(name, value);
+        if(onFilterChanged) onFilterChanged(name, value);
       }, FILTER_TIMEOUT);
     },
     [onFilterChanged]
@@ -276,9 +276,9 @@ function AdaptiveTable(props: IAdaptiveTable) {
   );
 
   const handleSortEvent = useCallback(
-    (field: string, sort: Sort) => {
+    (field: string, dir: Sort) => {
       const pFilter = has(pager, "filter") ? get(pager, "filter") : {};
-      const pSort = { field, sort };
+      const pSort = { field, dir };
       // dispatch(pageSetFilter(props.pagerName, pFilter, pSort));
       if (timerID.current !== null) {
         clearTimeout(timerID.current);
@@ -303,11 +303,12 @@ function AdaptiveTable(props: IAdaptiveTable) {
     ? "overflow-auto md:overflow-visible"
     : "overflow-auto";
 
-  const [touched, setTouched] = useState<string[]>([]);
+  // const [touched, setTouched] = useState<string[]>([]);
+  const [touched, setTouched] = useState<number[]>([]);
 
   useEffect(() => {
     if (pager) {
-      setTouched(get(pager, "touched"));
+      setTouched(get(pager, "touched")??[]);
     }
   }, [pager]);
 
@@ -316,13 +317,14 @@ function AdaptiveTable(props: IAdaptiveTable) {
     if (isInfinityContainer) {
       pageIDS = bufItems;
     } else {
-      pageIDS = get(pager, ["pages", get(pager, "currentPage")]);
+      pageIDS = get(pager, ["pages", get(pager, "currentPage")]) ?? [];
     }
     if(!pageIDS || pageIDS.length === 0) return false;
     return pageIDS?.every((id) =>
-      typeof id === "string"
+      // typeof id === "string"
+      typeof id === "number"
         ? touched?.includes?.(id)
-        : touched?.includes?.(id?.id)
+        : touched?.includes?.((id as any)?.id)
     );
   }, [pager, bufItems]);
 
@@ -336,7 +338,8 @@ function AdaptiveTable(props: IAdaptiveTable) {
   );
 
   const onSelectRowHandler = useCallback(
-    (selectedIds: string[] | string | { id: string }[], needAdd: boolean) => {
+    // (selectedIds: string[] | string | { id: string }[], needAdd: boolean) => {
+    (selectedIds: number[] | number | { id: number }[], needAdd: boolean) => {
       let selected = [];
       if (Array.isArray(selectedIds)) {
         const selectedIdsUpdated = selectedIds.map((item) =>
@@ -365,8 +368,8 @@ function AdaptiveTable(props: IAdaptiveTable) {
 
   const onSelectOneRow = useMemo(() => {
     return isMultiSelect
-      ? (id: string) => onSelectRowHandler(id, isTouchedAll)
-      : null;
+      ? (id: any) => onSelectRowHandler(id, isTouchedAll)
+      : undefined;
   }, [isTouchedAll, onSelectRowHandler, isMultiSelect]);
 
   const onSelectAllRows = useCallback(() => {
@@ -384,13 +387,13 @@ function AdaptiveTable(props: IAdaptiveTable) {
   useEffect(() => {
     if (!lastItemRef.current || !pager || !isInfinityContainer) return;
 
-    const hasNextPage = currPage < Math.ceil(count / perPage);
+    const hasNextPage = (currPage) < Math.ceil((count) / perPage);
     if (!hasNextPage) return;
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          handleLoadMore(currPage + 1);
+          handleLoadMore((currPage) + 1);
           observerRef.current?.disconnect();
         }
       },
@@ -447,7 +450,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
     if (pagerSort) {
       return {
         field: get(pagerSort, "field"),
-        sort: get(pagerSort, "sort"),
+        sort: get(pagerSort, "dir"),
       };
     } else {
       return { field: "", sort: Sort.none };
@@ -465,6 +468,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
               ref={i === bufItems?.length - flooredValue ? lastItemRef : null}
               key={`AdaptiveTable_Row_${i}`}
               data={item}
+              id={item}
               pager={pager}
               columns={fields}
               actions={actions}
@@ -554,7 +558,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
                       // @ts-ignore
                       <HeadItem
                         key={`AdaptiveTable_Item_Head_${i}`}
-                        headClassName={fields[f].column.headClassName}
+                        headClassName={fields[f].column?.headClassName}
                         label={fields[f].label}
                         field={f}
                         fieldType={fields[f].type}
@@ -566,7 +570,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
                       />
                     );
                   })}
-              {actions?.length > 0 && (
+              {actions?.length && actions?.length > 0 && (
                 // @ts-ignore
                 <HeadItem
                   key="AdaptiveTable_Item_Head_Action"
@@ -623,13 +627,13 @@ function AdaptiveTable(props: IAdaptiveTable) {
       </div>
       <WrappedBlock />
 
-      {pager && count > 1 && <div className="">{pagination}</div>}
+      {pager && count && count > 1 && <div className="">{pagination}</div>}
     </div>
   );
 }
 
-const getFieldSort = (sort, f) => {
-  return sort.field === f ? sort.sort : Sort.none;
+const getFieldSort = (sort:ISortParams, f:string) => {
+  return sort.field === f ? sort.dir : Sort.none;
 };
 
 export default AdaptiveTable;

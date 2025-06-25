@@ -21,6 +21,7 @@ export type Entity = User | Classes | Subjects | UserClasses;
 export type ActionResult = Entity | Entity[] | {
 	items:Entity | Entity[],
 	count:number,
+	isPager:true,
 };
 
 export type Middleware = (

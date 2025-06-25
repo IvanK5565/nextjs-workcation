@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import { About, SignIn } from "@/components/signIn";
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Register from "@/components/signIn/Register";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import container from "@/server/container/container";
 
 enum Landing {
   About,
@@ -16,11 +15,14 @@ const Home = () => {
   const [landing, setLanding] = useState(Landing.Login);
   const {status} = useSession();
   const router = useRouter();
+  // useEffect(() => {
+  //   if (status === "authenticated") {
+  //     console.log('redirect to the /')
+  //     router.push('/')
+  //   }
+  // }, [status, router]);
   if(status === 'loading'){
     return <p>Loading...</p>
-  }
-  if(status === 'authenticated') {
-    router.push('/')
   }
   return <div className="bg-gray-100">
     <div className="px-8 py-8 max-w-xl mx-auto lg:max-w-full lg:px-0 lg:py-20 lg:relative lg:min-h-screen">
@@ -48,6 +50,6 @@ const Home = () => {
 export default Home;
 Home.getLayout = (page: React.ReactNode) => page;
 
-export const getServerSideProps = container.resolve("getServerSideProps")(
-	[], true
-);
+// export const getServerSideProps = container.resolve("getServerSideProps")(
+// 	[], true
+// );

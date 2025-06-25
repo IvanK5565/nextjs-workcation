@@ -9,14 +9,13 @@ import {
 	select,
 	take,
 } from "redux-saga/effects";
-import { addEntities } from "../store/actions";
+import { addEntities, pageSetFilter, pageSetParams } from "../store/actions";
 import { IEntityContainer } from ".";
 import { BaseContext } from "../di/BaseContext";
 import container, { IClientContainer } from "../di/container";
 import { toast } from "react-toastify";
 import { IPagerParams, TPaginationInfo } from "../pagination/types";
 import { AppState } from "../store/ReduxStore";
-import { PAGE_SET_FILTER, PAGE_SET_PARAMS } from "../store/actions";
 import { XFetchError } from "../exceptions";
 import { Entities } from "../store/types";
 import get from 'get-value';
@@ -147,28 +146,12 @@ export default abstract class BaseEntity extends BaseContext {
 	// Pagination
 
 	public *pageEntity(uri: string, params: IPagerParams): Generator<Effect> {
-		const actionTypes = {
-			pageSetFilter: (pageName: string, filter: any, sort: any) => {
-				return {
-					type: PAGE_SET_FILTER,
-					pageName,
-					filter,
-					sort
-				}
-			},
-			setPagerParams: (pageName: string, params: any) => {
-				return {
-					type: PAGE_SET_PARAMS,
-					pageName,
-					params
-				}
-			}
-		}
+
 		const pageName = params.pageName ?? '';
 		const pagination: TPaginationInfo = yield select(
-			(state: AppState & { pagination: TPaginationInfo }) => state.pagination ?? {},
+			(state: AppState) => state.pagination ?? {},
 		);
-		if (!('page' in params)) {
+		if (!params.page) {
 			params['page'] = pagination[pageName]['currentPage'];
 		}
 		let count = 0;
@@ -183,7 +166,7 @@ export default abstract class BaseEntity extends BaseContext {
 		// set filter to paginator, in case fetch from getInitProps()
 		const pFilter = params.filter ?? {};
 		const pSort = params.sort ?? {};
-		yield put(actionTypes.pageSetFilter(pageName, pFilter, pSort));
+		yield put(pageSetFilter(pageName, pFilter, pSort));
 
 		const pagerData = {
 			...params,
@@ -193,9 +176,10 @@ export default abstract class BaseEntity extends BaseContext {
 		};
 
 		const isPageNotExist =
-			!pagination?.[pageName] ||
-			!pagination?.[pageName]?.['pages']?.[params?.page ?? 0];
+			!pagination[pageName] ||
+			!pagination[pageName]?.['pages']?.[params?.page ?? 0];
 		if (isPageNotExist || params?.force) {
+			console.log('PAGER:', pagerData.sort)
 			const res = yield call(
 				this.xRead.bind(this),
 				uri,
@@ -212,7 +196,7 @@ export default abstract class BaseEntity extends BaseContext {
 			pagination?.[pageName]?.currentPage !== params?.page
 		) {
 			yield put(
-				actionTypes.setPagerParams(pageName, {
+				pageSetParams(pageName, {
 					...params,
 					currentPage: params.page,
 				}),
@@ -224,7 +208,7 @@ export default abstract class BaseEntity extends BaseContext {
 		pagerName: string,
 		needConcatPages = false
 	): any[] {
-		const state:any = container.resolve("store").state ?? {};
+		const state: any = container.resolve("store").state ?? {};
 		const pager = state["pagination"];
 		if (has(pager, pagerName)) {
 			const entityName = get(pager, [pagerName, "entityName"]);

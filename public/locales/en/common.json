@@ -42,6 +42,9 @@
   "page-of": "of",
   "page-results": "results",
   "page-previous": "Previous",
-  "page-next": "Next"
-
+  "page-next": "Next",
+  "id-label":"Id",
+  "firstName-label":"First Name",
+  "lastName-label":"Last Name",
+  "email-label":"Email"
 }

@@ -3,11 +3,9 @@ import { IIdentity, IRoles, IRules } from "@/acl/types";
 
 declare module "next-auth" {
 	interface Session {
-		acl?: {roles:IRoles, rules:IRules};
+		acl: {roles:IRoles, rules:IRules};
 		accessToken:any;
-		user:IIdentity;
-		roles?:IRoles;
-		rules?:IRules;
+		identity:IIdentity;
 	}
 }
 declare module "next-auth/jwt" {

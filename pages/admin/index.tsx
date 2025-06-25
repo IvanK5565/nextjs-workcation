@@ -29,7 +29,7 @@ const Home = () => {
 			<div className="xl:flex-1 xl:flex xl:overflow-y-hidden">
 				<GetEntityBar entity={entity} />
 				<main className="py-6 px-2 xl:flex-1 xl:overflow-x-hidden">
-					<p>{session.data?.user?.email}</p>
+					<p>{session.data?.identity?.email}</p>
 					<p>{entity}</p>
 					<div className="">
 						<Filter

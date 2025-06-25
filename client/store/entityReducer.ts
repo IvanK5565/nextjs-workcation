@@ -1,13 +1,22 @@
 import { HYDRATE } from "next-redux-wrapper";
 import { Entities, EntitiesAction } from "./types";
-import { ADD_ENTITIES, DELETE_ENTITIES } from "./actions";
+import { ADD_ENTITIES, DELETE_ENTITIES } from "./actionTypes";
 
-function baseReducer<K extends keyof Entities>(collectionName: K) {
+function entityReducer<K extends keyof Entities>(collectionName: K) {
 
 	return (collection: Entities[K] = {}, action: EntitiesAction): Entities[K] => {
 
 		switch (action.type) {
 			case 'DELETE_ALL': return {};
+			// case 'UPDATE_ENTITY':{
+			// 	if(action.payload && action.payload[collectionName]){
+			// 		const newValues = action.payload[collectionName] as Entities[K];
+			// 		Object.entries(newValues).forEach(([key,value]) => {
+			// 			collection[parseInt(key)] = value;
+			// 		})
+			// 	}
+			// 	return collection;
+			// }
 		}
 
 
@@ -30,4 +39,4 @@ function baseReducer<K extends keyof Entities>(collectionName: K) {
 		return collection;
 	};
 }
-export default baseReducer;
+export default entityReducer;

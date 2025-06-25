@@ -158,7 +158,7 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 					>
 						<div className="mt-3 bg-white xl:border rounded-lg w-48 py-2 shadow-xl">
 							<label className="block text-gray-800 px-4 pb-2 border-b">
-								{session.data?.user.email}
+								{session.data?.identity.email}
 							</label>
 							<Link
 								href="/profile"

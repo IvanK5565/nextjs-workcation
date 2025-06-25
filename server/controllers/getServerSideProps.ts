@@ -3,7 +3,7 @@ import IContextContainer from "@/server/container/IContextContainer";
 import { StatusCodes } from "http-status-codes";
 import { AccessDeniedError, ApiError } from "../exceptions";
 import { redux } from "@/client/store";
-import { addEntities } from "@/client/store/actions";
+import { addEntities, setAuth } from "@/client/store/actions";
 import { Logger } from "../logger";
 import { ExtendedRequest } from "./BaseController";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
@@ -12,8 +12,9 @@ import { AuthOptions } from "next-auth";
 import { Session } from "next-auth";
 import { GSSPFactory } from "@/types";
 import { DEFAULT_PER_PAGE } from "@/constants";
-
-
+import { IPagerParams } from "@/client/pagination/IPagerParams";
+import { AuthState } from "@/client/auth/authReducer";
+import { guestRulesNRoles } from "../utils";
 
 export default function getServerSidePropsContainer(
 	ctx: IContextContainer
@@ -31,6 +32,7 @@ export default function getServerSidePropsContainer(
 				env: {},
 				// session: await getServerSession()
 			});
+			Logger.info('GSSP getSession')
 			req.session = await getServerSession<AuthOptions, Session>(
 				req,
 				context.res,
@@ -41,17 +43,19 @@ export default function getServerSidePropsContainer(
 					redirect: { destination: "/403", permanent: true },
 				};
 			}
-			let auth: object = { ...(req.session?.acl ?? { roles: null, rules: null }), identity: (req.session?.user ?? null) };
+			const acl = req.session?.acl ?? guestRulesNRoles(ctx.rules, ctx.roles);
+			const auth: AuthState = req.session ? { ...(acl), identity: req.session.identity } : null;
+			store.dispatch(setAuth(auth))
 			// collect promises from controllers
 			const promises = controllersNames.map((name) => {
 				return ctx[name]
 					.handler(route)(req, context.res as NextApiResponse)
 					.then((r) => {
-						auth = { ...(req.session?.acl ?? null), identity: (req.session?.user ?? null) };
+						// auth = { ...(req.session?.acl ?? null), identity: (req.session?.user ?? null) };
 						if (r) {
-							let pager: any = undefined;
-							if (r && 'count' in r) {
-								pager = req.pager ?? { 
+							let pager: IPagerParams | undefined = undefined;
+							if (r && 'isPager' in r) {
+								pager = req.pager ?? {
 									count: r.count,
 									page: parseInt(req.body?.page ?? '1'),
 									pageName: req.body?.pageName,
@@ -71,12 +75,6 @@ export default function getServerSidePropsContainer(
 									pager: pager,
 									result: normal.result,
 								});
-								// store.dispatch(addEntities(normal.entities));
-								// store.dispatch({
-								// 	type: 'PAGER',
-								// 	data: normal,
-								// 	pager,
-								// })
 							} else {
 								Logger.warn(`Controller ${name} does not have an entity associated with it.`);
 							}
@@ -86,13 +84,12 @@ export default function getServerSidePropsContainer(
 			Logger.log('gssp handlers count', promises.length)
 			// run promises
 			try {
-				store.dispatch({ type: 'setAuth', payload: { auth } })
 				await Promise.all(promises);
 			} catch (error) {
 				ctx.Logger.error("GSSP ERROR: ", (error as Error).message);
 
 				if (error instanceof AccessDeniedError) {
-					Logger.info('\n\nACCESS DENIED!!!!')
+					Logger.info('\n\nRedirect because access denied')
 					return {
 						redirect: { destination: "/403", permanent: true },
 					};

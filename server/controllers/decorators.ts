@@ -116,9 +116,9 @@ export const Entity: (entity: keyof IEntityContainer) => ClassDecorator = (e) =>
 	}
 }
 
-export const pager: MethodDecorator = (target, methodName): void => {
+export const Pager: MethodDecorator = (target, methodName): void => {
 	methodName = String(methodName);
-	const pagers: { methodName: string }[] = Reflect.getMetadata('pagers', target) || []
-	pagers.push({ methodName })
+	const pagers: string[] = Reflect.getMetadata('pagers', target) || []
+	pagers.push(methodName)
 	Reflect.defineMetadata('pagers', pagers, target)
 }

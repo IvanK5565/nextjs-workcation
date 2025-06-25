@@ -8,7 +8,7 @@ const Page = () => {
   const {data} = useSession();
   if(!data) return <div>Unauth</div>
   return (<div>
-    <h2>Hello {data.user.firstName}</h2>
+    <h2>Hello {data.identity.firstName}</h2>
     <h3>Your Journalles:</h3>
     <div className="flex">
       <JournalPreview/>

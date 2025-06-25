@@ -51,6 +51,12 @@ export default abstract class BaseController extends BaseContext {
 			return this.getActionProps(req, res, route)
 				.then((props) => fn(props))
 				.then((results) => JSON.parse(JSON.stringify(results)))
+				.then(r => {
+					if((Reflect.getMetadata('pagers',this) as string[] ?? []).includes(handler)){
+						r.isPager = true;
+					}
+					return r;
+				})
 				.catch((error) => {
 					this.di.Logger.error(`Error in action: ${handler}. ${error}`);
 					throw error;
@@ -80,7 +86,7 @@ export default abstract class BaseController extends BaseContext {
 				req.guard = new Guard(
 					this.di.roles,
 					this.di.rules,
-					req.session?.user.role || ROLE.GUEST
+					req.session?.identity.role || ROLE.GUEST
 				);
 			} else {
 				Logger.log('Guard already exists in getActionProps for route:', route, 'in controller:', this.constructor.name);
@@ -98,6 +104,8 @@ export default abstract class BaseController extends BaseContext {
 				pageName: '',
 				perPage: DEFAULT_PER_PAGE,
 				entityName: '',
+				force: false,
+				count:0,
 			},
 		};
 	}
@@ -151,6 +159,7 @@ export default abstract class BaseController extends BaseContext {
 			route = route ?? BaseController.getInvokeOutput(req);
 			const ssr = !route.startsWith("/api/");
 			const router = this.createRouter(route);
+
 			const pagerParams: IPagerParams = {
 				page: parseInt(req.body?.page ?? '1'),
 				pageName: req.body?.pageName,
@@ -158,6 +167,8 @@ export default abstract class BaseController extends BaseContext {
 				filter: req.body.filter,
 				sort: req.body.sort,
 				entityName: req.body.entityName,
+				force: req.body.force,
+				count: req.body.count,
 			};
 			set(req, ['pager'], pagerParams);
 
@@ -191,7 +202,7 @@ export default abstract class BaseController extends BaseContext {
 
 export function onSuccessResponse(data: Response['data'], pagerParams?: IPagerParams): Response {
 	let pager:any = undefined;
-	if (pagerParams && data && 'count' in data) {
+	if (pagerParams && data && 'isPager' in data) {
 		pager = {
 			count: data.count,
 			page: pagerParams.page,

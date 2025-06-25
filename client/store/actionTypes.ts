@@ -1,0 +1,14 @@
+
+export const PAGE_FETCHING = 'PAGE_FETCHING'
+export const PAGE_SET_FILTER = 'PAGE_SET_FILTER'
+export const PAGE_SELECT_ITEM = 'PAGE_SELECT_ITEM'
+export const PAGE_CLEAR = 'PAGE_CLEAR'
+export const PAGE_CLEAR_ALL = 'PAGE_CLEAR_ALL'
+export const PAGE_CLEAR_BY_ENTITY = 'PAGE_CLEAR_BY_ENTITY'
+export const PAGE_SET_PARAMS = 'PAGE_SET_PARAMS'
+
+export const SET_AUTH = 'SET_AUTH'
+export const AUTH_SIGN_OUT = 'AUTH_SIGN_OUT'
+
+export const ADD_ENTITIES = 'ADD_ENTITIES'
+export const DELETE_ENTITIES = 'DELETE_ENTITIES'

@@ -39,7 +39,7 @@ function App({
 					</SessionProvider>
 				</PersistGate>
 			</Provider>
-			<ToastContainer />
+			<ToastContainer autoClose={1000}/>
 		</ContainerContext.Provider>
 	);
 }

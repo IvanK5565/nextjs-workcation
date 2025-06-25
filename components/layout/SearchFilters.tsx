@@ -7,13 +7,15 @@ export function NavButton({
 	href,
   onClick,
 	children,
+	className,
 }: {
 	href: string;
   onClick?: () => void;
 	children: React.ReactNode;
+	className?: string;
 }) {
 	return (
-		<div className="bg-gray-900 px-4 py-4 sm:rounded-sm xl:w-full">
+		<div className={className ?? "bg-gray-900 px-4 py-4 sm:rounded-sm xl:w-full"}>
 			<Link onClick={onClick} href={href} className={"block w-full text-center sm:w-50 sm:inline-block bg-indigo-500 hover:bg-indigo-400 font-semibold text-white px-4 py-2 rounded-lg xl:block xl:w-full"}>
 				{children}
 			</Link>

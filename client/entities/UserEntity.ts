@@ -36,7 +36,7 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *getUserById(payload: any) {
+	public *getUserById(payload: {id:number|string}) {
 		const id = payload.id;
 		if (!id) throw new Error("Id required");
 		yield this.xRead(`/users/${id}`);

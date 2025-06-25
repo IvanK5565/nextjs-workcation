@@ -22,9 +22,9 @@ export interface IClass{
 }
 /** Normalizeed */
 export type Entities = {
-	users: Record<string, IUser>;
-	classes: Record<string, IClass>;
-	subjects: Record<string, ISubject>;
+	users: Record<number, IUser>;
+	classes: Record<number, IClass>;
+	subjects: Record<number, ISubject>;
 };
 
 export type EntitiesAction = {
@@ -34,3 +34,16 @@ export type EntitiesAction = {
 };
 
 /******** */
+
+/******* Experiment ********/
+
+type TEntity<T> = {
+	count?:number;
+	[id:number]:T;
+}
+
+export type _Entities = {
+	users: TEntity<IUser>;
+	classes: TEntity<IClass>;
+	subjects: TEntity<ISubject>;
+};

@@ -18,19 +18,22 @@ import ActionItem from "./ActionItem";
 import ActionMenu from "./ActionMenu";
 import RowItem from "./RowItem";
 import { IPaginationInfo } from "@/client/constants";
+import { useSelector } from "react-redux";
+import { AppState } from "@/client/store/ReduxStore";
 
 const MAX_COLUMNS_COUNT = 500;
 const MAX_ROWS_COUNT = 10;
 
 interface IRowProps {
   data: object;
+  id: number;
   actionClassName?: string;
   actionContainerClassName?: string;
   rowClassName?: string;
   columns: IFieldList;
   actions?: Actions[];
   actionMenu?: IMenu;
-  pager?: IPaginationInfo;
+  pager: IPaginationInfo;
   subRowBackground?: string | boolean;
 
   drawSubRow?: (data: any) => JSX.Element;
@@ -43,6 +46,7 @@ interface IRowProps {
 
   onRowClick?: (data: any) => void;
   onTdClick?: (field: string, data: any) => void;
+  // onSelectOneRow?: (id: string) => void;
   onSelectOneRow?: (id: string) => void;
   onItemChange?: (id: string, value: any, field: string) => void;
 
@@ -50,7 +54,7 @@ interface IRowProps {
 }
 const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
   const {
-    data,
+    id,
     columns,
     actions,
     pager,
@@ -67,6 +71,7 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
     onSelectOneRow,
     actionIsDisabled: isActionActivePredicate,
   } = props;
+  const data = useSelector<AppState, object>(state => state.entities[pager.entityName][id]) as object
 
   const handleActionClick = useCallback(
     (action: Actions, data: any) => {
@@ -86,7 +91,7 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
             : MAX_ROWS_COUNT,
         };
 
-        onActionClick(action, data, pagerParams);
+        if(onActionClick) onActionClick(action, data, pagerParams);
       }
     },
     [onActionClick, pager]
@@ -102,7 +107,7 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
     [actionClassName]
   );
 
-  const isSubRowEnabled = isFunction(drawSubRow);
+  const isSubRowEnabled = drawSubRow && isFunction(drawSubRow);
   const subRowContent = isSubRowEnabled && drawSubRow(data);
 
   const columnsElement = useMemo(() => {
@@ -120,7 +125,7 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
             onTdClick={onTdClick}
             pager={pager}
             onSelectOneRow={onSelectOneRow}
-            onItemChange={onItemChange}
+            onItemChange={onItemChange ?? (()=>{})}
           />
         ))
     );
@@ -195,9 +200,9 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
   ]);
 
   const handleRowClick = useCallback(
-    (e) => {
+    (e:any) => {
       e?.stopPropagation?.();
-      if (isFunction(onRowClick)) {
+      if (onRowClick && isFunction(onRowClick)) {
         onRowClick(data);
       }
     },

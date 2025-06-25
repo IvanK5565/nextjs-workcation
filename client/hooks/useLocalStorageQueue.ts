@@ -1,51 +1,39 @@
-import { useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { IOptions } from "../pagination/IPagerParams";
 
+export function useLocalStorageQueue(key: string, maxItems: number) {
+  const [items, setItems] = useState<IOptions[]>([]);
 
-// TODO!!!!!!!!!!
-export interface IQueueItem {
-  label: string;
-  value: string;
-  [key: string]: any;
-}
-
-export function useLocalStorageQueue(key: string, maxLength: number = 5): [
-  IQueueItem[],
-  (item: IQueueItem) => void,
-  (item: IQueueItem) => void
-] {
-  const getQueue = (): IQueueItem[] => {
-    try {
+  useEffect(() => {
+    if (typeof window !== "undefined") {
       const stored = localStorage.getItem(key);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
+      if (stored) {
+        try {
+          setItems(JSON.parse(stored));
+        } catch (e) {
+          console.warn("Failed to parse localStorage item", e);
+        }
+      }
+    }
+  }, [key]);
+
+  const save = (newItems: IOptions[]) => {
+    setItems(newItems);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, JSON.stringify(newItems));
     }
   };
 
-  const [queue, setQueue] = useState<IQueueItem[]>(getQueue());
-
-  const saveQueue = (newQueue: IQueueItem[]) => {
-    setQueue(newQueue);
-    localStorage.setItem(key, JSON.stringify(newQueue));
+  const addSearch = (item: IOptions) => {
+    const filtered = items.filter((i) => i.value !== item.value);
+    const newItems = [item, ...filtered].slice(0, maxItems);
+    save(newItems);
   };
 
-  const addItem = useCallback(
-    (item: IQueueItem) => {
-      let newQueue = queue.filter((q) => q.value !== item.value);
-      newQueue.unshift(item);
-      if (newQueue.length > maxLength) newQueue = newQueue.slice(0, maxLength);
-      saveQueue(newQueue);
-    },
-    [queue, maxLength, key]
-  );
+  const removeItem = (item: IOptions) => {
+    const newItems = items.filter((i) => i.value !== item.value);
+    save(newItems);
+  };
 
-  const removeItem = useCallback(
-    (item: IQueueItem) => {
-      const newQueue = queue.filter((q) => q.value !== item.value);
-      saveQueue(newQueue);
-    },
-    [queue, key]
-  );
-
-  return [queue, addItem, removeItem];
+  return [items, addSearch, removeItem] as const;
 }

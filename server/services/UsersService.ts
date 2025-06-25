@@ -1,29 +1,37 @@
-import { IPagerParams, Sort } from "@/client/pagination/types";
 import { IService } from ".";
 import BaseContext from "../container/BaseContext";
 import { ValidateError } from "../exceptions";
 import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole, UserStatus } from "@/constants";
-import { IUser } from "@/client/store/types";
+import { Logger } from "../logger";
+import { IPagerParams, Sort } from "@/client/pagination/IPagerParams";
+import { setOpImmutable } from "../utils/sepSequelizeOp";
 
 export default class UsersService extends BaseContext implements IService {
-	private buildWhereExpressionForUser(filter: any) {
-		return filter?.id ? { id: filter.id } : undefined;
+	protected buildWhereExpressionForUser(filter: any) {
+		if (filter) {
+			Logger.info('Filter detected:', filter)
+		} else {
+			return undefined;
+		}
+		filter = setOpImmutable(filter, ['firstName', 'lastName', 'email'], 'substring');
+
+		return filter;
 	}
 	public async pageUsers(pager: IPagerParams) {
 		const { UserModel } = this.di;
 		const { page = 1, perPage = 10, filter, sort } = pager;
 
 		const where = this.buildWhereExpressionForUser(filter);
-
+		Logger.info('Sorting:', sort)
 		const sortField =
-			sort?.sort === Sort.none || !sort?.field
+			sort?.dir === Sort.none || !sort?.field
 				// ? DEFAULT_SORT_FIELD
 				? 'id'
 				: sort?.field;
-		const sortDirection = sort?.sort === Sort.DESC ? 'DESC' : 'ASC';
+		const sortDirection = sort?.dir === Sort.DESC ? 'DESC' : 'ASC';
 
 		const count = await UserModel.count({ where });
-
+		Logger.log('limit',perPage)
 		const users = await UserModel.findAll({
 			where,
 			// 		attributes: {
@@ -45,7 +53,6 @@ export default class UsersService extends BaseContext implements IService {
 			limit: perPage,
 			offset: (page - 1) * perPage,
 		});
-
 		return {
 			items: users,
 			count,

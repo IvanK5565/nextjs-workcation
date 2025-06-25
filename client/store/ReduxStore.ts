@@ -19,27 +19,27 @@ import {
 } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
 import { Entities, IClass, ISubject, IUser } from "./types";
-import baseReducer from "./baseReducer";
+import entityReducer from "./entityReducer";
 import { IEntityContainer } from "../entities";
-import authReducer from "./authReducer";
+import authReducer from "../auth/authReducer";
 import paginationReducer from "./paginationReducer";
 
 export type AppStore = ReturnType<ReturnType<ReduxStore["getMakeStore"]>>;
 export type AppState = ReturnType<AppStore["getState"]> & {
-	users: Record<string,IUser>;
-	classes: Record<string,IClass>;
-	subjects: Record<string,ISubject>;
+	users: Record<string, IUser>;
+	classes: Record<string, IClass>;
+	subjects: Record<string, ISubject>;
 };
 export type AppDispatch = AppStore["dispatch"];
 
 export class ReduxStore extends BaseContext {
 	private _wrapper: ReturnType<typeof createWrapper>;
 	private persistConfig;
-	private _state?:AppState;
-	public get state(){
+	private _state?: AppState;
+	public get state() {
 		return this._state;
 	}
-	
+
 	public get wrapper() {
 		return this._wrapper;
 	}
@@ -66,7 +66,9 @@ export class ReduxStore extends BaseContext {
 
 	private *rootSaga() {
 		const sagas = BaseEntity.sagas(this.di).map(saga => fork(saga));
-			yield all(sagas);
+		yield all([
+			...sagas,
+		]);
 	}
 	private reducers() {
 		const names: (keyof Entities)[] =
@@ -74,9 +76,9 @@ export class ReduxStore extends BaseContext {
 		const reducers = names.reduce(
 			(acc, name) => ({
 				...acc,
-				[name]: baseReducer(name),
+				[name]: entityReducer(name),
 			}),
-			{} as Record<string, ReturnType<typeof baseReducer>>
+			{} as Record<string, ReturnType<typeof entityReducer>>
 		);
 		return reducers;
 	}

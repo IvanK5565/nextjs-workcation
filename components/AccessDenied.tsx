@@ -1,4 +1,5 @@
 import { useTranslation } from "next-i18next";
+import { NavButton } from "./layout/SearchFilters";
 
 export default function AccessDenied() {
   const {t} = useTranslation('common')
@@ -9,6 +10,7 @@ export default function AccessDenied() {
       <AccessDeniedSVG />
       <h3 className="text-lg font-medium text-gray-700">{title}</h3>
       <p className="text-gray-500 text-sm mt-1">{describe}</p>
+			<NavButton className="w-min m-2" href="/signIn" >{t('signIn')}</NavButton>
     </div>
   );
 }

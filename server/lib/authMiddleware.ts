@@ -8,9 +8,9 @@ export async function authMiddleware(req:NextApiRequest&{session?:Session|null},
   if(!req.session){
     req.session = await getServerSession(req, res, container.resolve('authOptions'));
   }
-  console.log("authMiddleware: ",req.session?.user);
+  console.log("authMiddleware: ",req.session?.identity);
   
-  if(!req.session || !req.session.user){
+  if(!req.session || !req.session.identity){
     throw new UnauthorizedError();
   }
   return next();

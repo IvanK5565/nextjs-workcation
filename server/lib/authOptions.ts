@@ -10,12 +10,13 @@ import { ApiError } from "../exceptions";
 import { StatusCodes } from "http-status-codes";
 import { AnswerType } from "@/types";
 import { Logger } from "../logger";
+import { guestRulesNRoles } from "../utils";
 
-export default function authOptionsContainer(ctx: IContextContainer) {
-	const log = ctx.Logger.log;
+export default function authOptionsContainer({UserModel,adapter,rules,roles}: IContextContainer) {
+	const log = Logger.log;
 	const authOptions = {
 		debug:true,
-		adapter:ctx.adapter,
+		adapter,
 		providers: [
 			GitHub({
 				clientId: process.env.AUTH_GITHUB_ID!,
@@ -28,7 +29,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 				},
 				async authorize(credentials) {
 					if (!credentials) return null;
-					const user = await ctx.UserModel.findOne({
+					const user = await UserModel.findOne({
 						where: {
 							email: credentials.email,
 							status: UserStatus.ACTIVE,
@@ -54,9 +55,9 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 			},
 			async session({session, user}) {
 				Logger.info('Seesion callback', session);
-				session.user = user as unknown as IIdentity;
+				session.identity = user as unknown as IIdentity;
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				session.acl = (user as any).acl
+				session.acl = (user as any).acl ?? guestRulesNRoles(rules,roles);
 				// Logger.log('session:', session, user);
 				return session
 			},
@@ -71,7 +72,7 @@ export default function authOptionsContainer(ctx: IContextContainer) {
 						throw new ApiError('No user ID found in token', StatusCodes.INTERNAL_SERVER_ERROR, AnswerType.Toast)
 					}
 
-					const createdSession = await ctx.adapter.createSession?.({
+					const createdSession = await adapter.createSession?.({
 						sessionToken:sessionToken,
 						userId: param.token.sub,
 						expires: new Date(Date.now() + TimesInMS.DAY*30),

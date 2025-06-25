@@ -16,7 +16,7 @@ class Guard {
 	constructor(
 		roles: IRoles,
 		rules: IRules,
-		identity: {role:ROLE, secret?:string},
+		identity: { role: ROLE, secret?: string },
 		resource: string
 	) {
 		this.mAcl = new Acl();
@@ -90,14 +90,6 @@ class Guard {
 			isRouter = false;
 		}
 		return isRouter;
-	}
-
-	public getAllow(
-		resource: string,
-		secret: string | null = null,
-		role: ROLE | null = null
-	) {
-		return (grant: GRANT) => this.allow(grant, resource, secret, role);
 	}
 
 	public allow(

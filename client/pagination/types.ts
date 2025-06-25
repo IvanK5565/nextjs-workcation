@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Entities } from "../store/types";
+import { ISortParams } from "./IPagerParams";
 
 export interface TPaginationInfo {
   [key: string]: IPaginationInfo
@@ -7,7 +7,7 @@ export interface TPaginationInfo {
 
 // In-redux entity
 export interface IPaginationInfo {
-  entityName: keyof Entities;
+  entityName: string;
   pageName: string;
   currentPage: number;
   count: number;
@@ -15,10 +15,7 @@ export interface IPaginationInfo {
   filter?: {
     [key: string]: any;
   };
-  sort?: {
-    field: string;
-    dir: SortDirection;
-  };
+  sort?: ISortParams;
   pages?: {
     [key: number]: [number];
   };
@@ -28,15 +25,3 @@ export interface IPaginationInfo {
 
 // In-controller parameter
 export type {IPagerParams} from './IPagerParams'
-
-enum SortDirection {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
-
-
-export enum Sort{
-  none='NONE',
-  ASC = 'ASC',
-  DESC = 'DESC',
-}

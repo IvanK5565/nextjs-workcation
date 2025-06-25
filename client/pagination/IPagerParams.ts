@@ -3,15 +3,14 @@ import {JSX} from 'react';
 
 export interface ISortParams {
     field: string;
-    sort?: number;
-    dir?: number;
+    dir?: Sort;
 }
 
 export interface IPagerParams {
-    pageName?: string;
+    pageName: string;
     sort?: ISortParams;
     filter?: object; //object;    // object with filtering key/values
-    page?: number; // page number
+    page: number; // page number
     perPage: number; // count items on one page
     force?: boolean; // reload data in the redux and pager
     count?: number; // count by filter, if 0 need to recalculate, if > 0 count doesn't need to calculate
