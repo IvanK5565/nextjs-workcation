@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import get from "lodash/get";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { JSX, useCallback, useEffect, useMemo, useState } from "react";
 
 import { IPaginationInfo } from "@/client/constants";
 import { isEmpty } from "@/client/utils/random";
@@ -26,7 +26,7 @@ export default function FilterBar(props: IFilterBarProps) {
     },
     [pager]
   );
-  const [filterItems, setFilterItems] = useState([]);
+  const [filterItems, setFilterItems] = useState<JSX.Element[]>([]);
 
   useEffect(() => {
     if (isEmpty(fields)) {
@@ -35,12 +35,12 @@ export default function FilterBar(props: IFilterBarProps) {
     setFilterItems(
       Object.entries(
         Object.keys(fields)
-          .filter((field) => fields[field]?.filter)
+          .filter((field) => Boolean(fields[field]?.filter))
           .reduce(
-            (r: any, v, i, a, k = fields[v].filter.group) => (
+            (r, v, i, a, k = fields[v].filter!.group) => (
               (r[k] || (r[k] = [])).push(v), r
             ),
-            {}
+            {} as {[key:string]:string[]}
           )
       ).map((pair) => {
         return (
@@ -52,7 +52,7 @@ export default function FilterBar(props: IFilterBarProps) {
               return (
                 <FilterItem
                   key={`AdaptiveTable_Filter_Field_${j}`}
-                  className={fields[field].filter.className}
+                  className={fields[field].filter?.className}
                   labelClassName={fields[field].filter?.labelClassName}
                   inputClassName={fields[field].filter?.inputClassName}
                   activeClassName={fields[field].filter?.activeClassName}
@@ -60,21 +60,21 @@ export default function FilterBar(props: IFilterBarProps) {
                     fields[field].filter?.customLabel ?? fields[field].label
                   }
                   iconPosition={fields[field].filter?.iconPosition}
-                  type={fields[field].type}
-                  icon={fields[field].filter.icon}
+                  type={fields[field].type!}
+                  icon={fields[field].filter!.icon}
                   name={field}
-                  showLabel={fields[field].filter.showLabel}
-                  options={fields[field].filter.options}
-                  placeholder={fields[field].placeholder}
+                  showLabel={fields[field].filter!.showLabel}
+                  options={fields[field].filter!.options}
+                  placeholder={fields[field].placeholder ?? ''}
                   value={getFieldInitialValue(field)}
                   onFilterChanged={onFilterChanged}
-                  onSearch={fields[field].filter.onSearch}
-                  debounceTime={fields[field].filter.debounceTime}
-                  minSearchLength={fields[field].filter.minSearchLength}
-                  disabled={fields[field].filter.disabled}
-                  isImmediatelyChange={fields[field].filter.isImmediatelyChange}
-                  additionalLabel={fields[field].filter.additionalLabel}
-                  isLocalSearch={fields[field].filter.isLocalSearch}
+                  onSearch={fields[field].filter!.onSearch}
+                  debounceTime={fields[field].filter!.debounceTime}
+                  minSearchLength={fields[field].filter!.minSearchLength}
+                  disabled={fields[field].filter!.disabled}
+                  isImmediatelyChange={fields[field].filter!.isImmediatelyChange}
+                  additionalLabel={fields[field].filter!.additionalLabel}
+                  isLocalSearch={fields[field].filter!.isLocalSearch}
                 />
               );
             })}
