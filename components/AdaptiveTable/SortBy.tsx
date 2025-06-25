@@ -106,8 +106,8 @@ function SortBy(props: ISortByProps) {
     );
 }
 
-export const GetNextSort = (sort: Sort): Sort => {
-    switch (sort) {
+export const GetNextSort = (direction: Sort): Sort => {
+    switch (direction) {
         case Sort.none:
             return Sort.ASC;
         case Sort.ASC:
@@ -117,8 +117,8 @@ export const GetNextSort = (sort: Sort): Sort => {
     }
 };
 
-export const GetSortIcon = (sort: Sort, className = ''): JSX.Element => {
-    switch (sort) {
+export const GetSortIcon = (direction: Sort, className = ''): JSX.Element => {
+    switch (direction) {
         case Sort.none:
             return <FaSort className={className} />;
         case Sort.ASC:
