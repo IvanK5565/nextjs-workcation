@@ -7,13 +7,13 @@ import {clickOutSideTheBlock} from '@/client/utils/random';
 import {FaBars, FaSort, FaSortDown, FaSortUp} from '../FaIcons/icons';
 
 export interface ISortOptions extends IOptions {
-    sort: Sort;
+    dir: Sort;
 }
 
 interface ISortByProps {
     idSortBy: string;
     options: Array<ISortOptions>;
-    changeSort: (field: string, sort: Sort) => void;
+    changeSort: (field: string, dir: Sort) => void;
 }
 
 function SortBy(props: ISortByProps) {
@@ -43,13 +43,13 @@ function SortBy(props: ISortByProps) {
 
     const onSortItemClick = useCallback(
         (option: ISortOptions) => {
-            changeSort(option.value.toString(), option.sort);
+            changeSort(option.value.toString(), option.dir);
         },
         [changeSort],
     );
 
     const SortByOptions = options?.map((option, i) => {
-        const {label, sort} = option;
+        const {label, dir: sort} = option;
 
         const activeSort =
             sort !== Sort.none ? 'text-yellow-600' : 'text-gray-200';

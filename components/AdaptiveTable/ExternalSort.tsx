@@ -21,7 +21,7 @@ export default function ExternalSort({
   const onSortChange = useCallback(
     (name: string, value: string) => {
       const preparedData = {
-        sort: { field: value, sort: Sort.ASC },
+        sort: { field: value, dir: Sort.ASC },
         force: true,
         perPage: pager?.perPage,
         pageName: pagerName,

@@ -36,6 +36,7 @@ import { ISortOptions } from "./SortBy";
 import TableActions from "./TableActions";
 import { withRequestResult } from "./withRequest";
 import { usePagerIds } from "@/client/hooks/usePagerIds";
+import { toast } from "react-toastify";
 
 const FILTER_TIMEOUT = 500;
 
@@ -284,6 +285,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
         clearTimeout(timerID.current);
         timerID.current = null;
       }
+      toast('handleSortEvent '+JSON.stringify(pSort))
       timerID.current = setTimeout(() => {
         onLoadMore?.({
           page: 1,
@@ -444,16 +446,16 @@ function AdaptiveTable(props: IAdaptiveTable) {
     }
   }, [count, currPage, handleLoadMore, perPage, paginationType]);
 
-  const sort = useMemo(() => {
+  const sort:ISortParams = useMemo(() => {
     // only paginators have sort and filter properties in redux
     const pagerSort = pager && get(pager, "sort");
     if (pagerSort) {
       return {
         field: get(pagerSort, "field"),
-        sort: get(pagerSort, "dir"),
+        dir: get(pagerSort, "dir"),
       };
     } else {
-      return { field: "", sort: Sort.none };
+      return { field: "", dir: Sort.none };
     }
   }, [pager]);
 
@@ -533,7 +535,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
         Object({
           label: fields[f]?.label,
           value: f,
-          sort: getFieldSort(sort, f),
+          dir: getFieldSort(sort, f),
         })
       );
   }, [fields, sort]);
@@ -563,7 +565,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
                         field={f}
                         fieldType={fields[f].type}
                         sorted={fields[f]?.sorted && !isExternalSort}
-                        sort={getFieldSort(sort, f)}
+                        dir={getFieldSort(sort, f)}
                         isTouchedAll={isTouchedAll}
                         onSortChanged={handleSortEvent}
                         onSelectAllRowClick={onSelectAllRows}

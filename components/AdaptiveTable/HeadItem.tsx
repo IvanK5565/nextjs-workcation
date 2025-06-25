@@ -5,6 +5,7 @@ import {Sort, FilterType} from '@/client/pagination/IPagerParams';
 import {useTranslation} from 'react-i18next';
 import {isFunction} from '@/client/utils/random';
 import SortBy, {GetNextSort, GetSortIcon, ISortOptions} from './SortBy';
+import { toast } from 'react-toastify';
 
 export interface IHeadItemProps {
     pagerName?: string;
@@ -13,9 +14,9 @@ export interface IHeadItemProps {
     label?: string;
     headClassName?: string;
     sorted?: boolean;
-    sort?: Sort;
+    dir: Sort;
     sortBy?: Array<ISortOptions>;
-    onSortChanged?: (field: string, sort: Sort) => void;
+    onSortChanged?: (field: string, dir: Sort) => void;
     onSelectAllRowClick?: () => void;
     isTouchedAll?: boolean;
 }
@@ -32,7 +33,7 @@ export default function HeadItem(props: IHeadItemProps) {
         fieldType,
         isTouchedAll,
         sorted,
-        sort,
+        dir,
         sortBy,
         onSortChanged,
         onSelectAllRowClick,
@@ -46,9 +47,11 @@ export default function HeadItem(props: IHeadItemProps) {
     }, [onSelectAllRowClick]);
 
     const changeSort = useCallback(
-        (field: string, sort: Sort) => {
+        (field: string, dir: Sort) => {
             if (isFunction(onSortChanged)) {
-                onSortChanged(field, GetNextSort(sort));
+                const nextSort = GetNextSort(dir);
+                toast('changeSort ' + dir + ' ' + nextSort )
+                onSortChanged?.(field, GetNextSort(dir));
             }
         },
         [onSortChanged],
@@ -56,16 +59,16 @@ export default function HeadItem(props: IHeadItemProps) {
 
     const handleSortClick = useCallback(() => {
         if (sorted) {
-            changeSort(field, sort);
+            changeSort(field, dir);
         }
-    }, [changeSort, field, sort, sorted]);
+    }, [changeSort, field, dir, sorted]);
 
     const activeSort =
-        sorted && sort !== Sort.none ? 'text-gray-600' : 'text-gray-400';
+        sorted && dir !== Sort.none ? 'text-gray-600' : 'text-gray-400';
     const sortedStyle = sorted ? 'cursor-pointer' : '';
     const sortIcon = useMemo(
-        () => GetSortIcon(sort, 'transform hover:scale-125'),
-        [sort],
+        () => GetSortIcon(dir, 'transform hover:scale-125'),
+        [dir],
     );
     const isTouched = fieldType === FilterType.Touche && onSelectAllRowClick;
 

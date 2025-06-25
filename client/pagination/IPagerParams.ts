@@ -3,7 +3,7 @@ import {JSX} from 'react';
 
 export interface ISortParams {
     field: string;
-    dir?: Sort;
+    dir: Sort;
 }
 
 export interface IPagerParams {

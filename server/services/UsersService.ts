@@ -7,13 +7,12 @@ import { IPagerParams, Sort } from "@/client/pagination/IPagerParams";
 import { setOpImmutable } from "../utils/sepSequelizeOp";
 
 export default class UsersService extends BaseContext implements IService {
-	protected buildWhereExpressionForUser(filter: any) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	protected buildWhereExpressionForUser(filter?: any) {
 		if (filter) {
 			Logger.info('Filter detected:', filter)
-		} else {
-			return undefined;
+			filter = setOpImmutable(filter, ['firstName', 'lastName', 'email'], 'substring');
 		}
-		filter = setOpImmutable(filter, ['firstName', 'lastName', 'email'], 'substring');
 
 		return filter;
 	}
@@ -52,6 +51,10 @@ export default class UsersService extends BaseContext implements IService {
 			order: [[sortField, sortDirection]],
 			limit: perPage,
 			offset: (page - 1) * perPage,
+			include: [{
+				model: this.di.ClassesModel,
+				as: 'userClasses'
+			}]
 		});
 		return {
 			items: users,

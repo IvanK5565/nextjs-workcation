@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Op } from "sequelize";
 
 function setOpImmutable(filter: any, keys: string[], op: keyof typeof Op) {
