@@ -63,7 +63,7 @@ export default Home;
 function GetEntityBar({ entity }: { entity: keyof Entities }) {
 	const [input, setInput] = useState("1");
 	const dispatch = useDispatch();
-	const { getUserById, getAllUsers } = useActions("UserEntity");
+	const { fetchUserById: getUserById, fetchAllUsers: getAllUsers } = useActions("UserEntity");
 	const { getClassById, getAllClasses } = useActions("ClassEntity");
 	const { getAllSubjects, getSubjectById } = useActions("SubjectEntity");
 	const { t } = useTranslation('common');

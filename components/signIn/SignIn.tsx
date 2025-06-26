@@ -1,12 +1,14 @@
 'use client'
 
-import { signIn } from "next-auth/react";
+// import { signIn } from "next-auth/react";
 import Button from "../ui/button";
 import clsx from "clsx";
 import { Field, Form, Formik } from 'formik'
 import { TextInput } from "../ui/textInput";
 import * as Yup from 'yup'
 import { useTranslation } from "next-i18next";
+import { useAuth } from "@/client/hooks/useAuth";
+import { useActions } from "@/client/hooks";
 
 interface ILogin{
   email:string;
@@ -14,7 +16,9 @@ interface ILogin{
 }
 
 export default function SignIn({ className, onRegister }: { className?: string, onRegister: ()=>void }) {
-  const {t} = useTranslation('common')
+  const {t} = useTranslation('common');
+  // const { signIn } = useAuth();
+  const { signIn } = useActions('UserEntity');
   // const credentialsAction = (formData: FormData) => {
   //   signIn('credentials', { email, password });
   // }
@@ -38,7 +42,7 @@ export default function SignIn({ className, onRegister }: { className?: string, 
           .required('Required'),
       })}
       onSubmit={(values, { setSubmitting }) => {
-        signIn('credentials', { ...values, callbackUrl: '/' });
+        signIn({args:['credentials', { ...values, callbackUrl: '/' }]});
         setSubmitting(false);
       }}
     >

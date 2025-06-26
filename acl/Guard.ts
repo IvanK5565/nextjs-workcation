@@ -5,6 +5,7 @@ import { ROLE, IRoles, IRules, GRANT } from "./types";
 class Guard {
 	private mAcl: Acl;
 	private mRules?: IRules;
+	private mRoles?: IRoles;
 	private mRole?: ROLE;
 	private secret?: string;
 	public resource?: string;
@@ -16,6 +17,7 @@ class Guard {
 		secret?: string,
 	) {
 		this.mRules = rules;
+		this.mRoles = roles;
 		this.mRole = role;
 		this.secret = secret && secret.length > 0 ? secret : undefined;
 		this.mAcl = new Acl(roles, rules, this.secret);
@@ -30,6 +32,21 @@ class Guard {
 	public get rules() {
 		return this.mRules;
 	}
+	public get roles() {
+		return this.mRoles;
+	}
+	public update(
+		roles?: IRoles,
+		rules?: IRules,
+		role?: ROLE,
+		secret?: string,
+	) {
+		this.secret = secret && secret.length > 0 ? secret : undefined;
+		this.mRules = rules;
+		this.mRoles = roles;
+		this.mAcl = new Acl(roles, rules, this.secret);
+		this.mRole = role;
+	}
 
 	/**
  * Checks if the given path matches any of the defined routing rules.
@@ -39,7 +56,7 @@ class Guard {
  * @returns The matched rule string if found, or null if no match is found.
  */
 	private isRouteMatch(path: string): string | null {
-		if(!this.rules) return null;
+		if (!this.rules) return null;
 		// allow to use '/' in end of path
 		if (path.length > 1 && path.substring(path.length - 1) === "/") {
 			path = path.substring(0, path.length - 1);
@@ -74,7 +91,7 @@ class Guard {
  * @returns true if the resource matches a route, false otherwise.
  */
 	public inRouter(resource: string) {
-		if(!this.rules) return false;
+		if (!this.rules) return false;
 		let isRouter = false;
 		try {
 			if (this.rules.hasOwnProperty(resource)) {
@@ -106,7 +123,10 @@ class Guard {
 		let isAllowed = false;
 
 		// if(!resource) throw new Error('No Resource in Guard')
-		if(!resource || !role || !this.rules) return false;
+		if (!resource || !role || !this.rules) {
+			Logger.warn('Guard does not contain a resource/role/rules')
+			return false;
+		}
 		try {
 			if (this.rules.hasOwnProperty(resource)) {
 				isAllowed = this.acl.isAllowed(s + role, s + resource, grant);

@@ -11,7 +11,7 @@ import { getServerSession } from "next-auth";
 import { AuthOptions } from "next-auth";
 import { Session } from "next-auth";
 import { GSSPFactory } from "@/types";
-import { DEFAULT_PER_PAGE } from "@/constants";
+import { DEFAULT_PER_PAGE, GUEST_IDENTITY } from "@/constants";
 import { IPagerParams } from "@/client/pagination/IPagerParams";
 import { AuthState } from "@/client/auth/authReducer";
 import { guestRulesNRoles } from "../utils";
@@ -43,9 +43,13 @@ export default function getServerSidePropsContainer(
 					redirect: { destination: "/403", permanent: true },
 				};
 			}
-			const acl = req.session?.acl ?? guestRulesNRoles(ctx.rules, ctx.roles);
-			const auth: AuthState = req.session ? { ...(acl), identity: req.session.identity } : null;
+
+			const [acl, identity] = req.session
+				? [req.session.acl, req.session.identity]
+				: [guestRulesNRoles(ctx.rules, ctx.roles), GUEST_IDENTITY];
+			const auth: AuthState | null = { ...(acl), identity };
 			store.dispatch(setAuth(auth))
+
 			// collect promises from controllers
 			const promises = controllersNames.map((name) => {
 				return ctx[name]

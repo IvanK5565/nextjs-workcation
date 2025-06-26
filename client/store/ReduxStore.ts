@@ -16,12 +16,13 @@ import {
 	PERSIST,
 	PURGE,
 	REGISTER,
+	Persistor,
 } from 'redux-persist'
 import storage from "redux-persist/lib/storage";
 import { Entities, IClass, ISubject, IUser } from "./types";
 import entityReducer from "./entityReducer";
 import { IEntityContainer } from "../entities";
-import authReducer from "../auth/authReducer";
+import /*authReducer,*/ { authReducerContainer, AuthState } from "../auth/authReducer";
 import paginationReducer from "./paginationReducer";
 
 export type AppStore = ReturnType<ReturnType<ReduxStore["getMakeStore"]>>;
@@ -33,31 +34,41 @@ export type AppState = ReturnType<AppStore["getState"]> & {
 export type AppDispatch = AppStore["dispatch"];
 
 export class ReduxStore extends BaseContext {
-	private _wrapper: ReturnType<typeof createWrapper>;
+	private mWrapper: ReturnType<typeof createWrapper>;
 	private persistConfig;
-	private _state?: AppState;
+	private mState?: AppState;
+	private mPersistor?:Persistor;
 	public get state() {
-		return this._state;
+		return this.mState;
 	}
 
 	public get wrapper() {
-		return this._wrapper;
+		return this.mWrapper;
+	}
+	public get persistor(){
+		return this.mPersistor;
 	}
 
 	constructor(di: IClientContainer) {
 		super(di);
-		this._wrapper = this.createWrapper();
+		this.mWrapper = this.createWrapper();
 		this.persistConfig = {
 			key: "root",
 			storage,
 		};
 	}
 
+	public updateGuard(auth:AuthState){
+		const {roles, rules} = auth;
+		const role = auth.identity.role;
+		this.di.guard.update(roles, rules, role);
+	}
+
 	public get useWrappedStore() {
-		return this._wrapper.useWrappedStore;
+		return this.mWrapper.useWrappedStore;
 	}
 	public get getServerSideProps() {
-		return this._wrapper.getServerSideProps;
+		return this.mWrapper.getServerSideProps;
 	}
 	public normalizer(name: keyof IEntityContainer): BaseEntity['normalize'] {
 		const entity = this.di[name];
@@ -91,7 +102,8 @@ export class ReduxStore extends BaseContext {
 				entities: combineReducers(reducers),
 				// ...reducers,
 				error: errorReducer,
-				auth: authReducer,
+				// auth: authReducer,
+				auth: authReducerContainer(this.di),
 				pagination: paginationReducer,
 			});
 			const persistedReducer = persistReducer(this.persistConfig, reducer);
@@ -116,13 +128,14 @@ export class ReduxStore extends BaseContext {
 			});
 			const saga = sagaMiddleware.run(rootSaga);
 			const persistor = persistStore(store);
+			this.mPersistor = persistor;
 			const state = {
 				...store,
 				__persistor: persistor,
 				sagaTask: saga,
 			};
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			this._state = state as any;
+			this.mState = state as any;
 			return state;
 		};
 		return makeStore;

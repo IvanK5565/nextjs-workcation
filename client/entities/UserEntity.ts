@@ -6,6 +6,7 @@ import type { IClientContainer } from "../di/container";
 import { put } from "redux-saga/effects";
 import type { IPagerParams } from "../pagination/types";
 import { Entities } from "../store/types";
+import { signIn, signOut } from "next-auth/react";
 
 export type UserAction = EntityAction<UserEntity>;
 
@@ -25,7 +26,7 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *getAllUsers() {
+	public *fetchAllUsers() {
 		yield this.xRead("/users");
 	}
 
@@ -36,7 +37,7 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *getUserById(payload: {id:number|string}) {
+	public *fetchUserById(payload: {id:number|string}) {
 		const id = payload.id;
 		if (!id) throw new Error("Id required");
 		yield this.xRead(`/users/${id}`);
@@ -56,7 +57,19 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *fetchProjectPage(data: IPagerParams) {
+	public *fetchUsersPage(data: IPagerParams) {
 		yield this.pageEntity('/users/page', data);
+	}
+
+	@action
+	public *signOut(redirect?:boolean){
+		yield signOut({callbackUrl:'/signIn', redirect});
+		yield this.di.persistor?.purge();
+	}
+
+	@action
+	public *signIn(p:{args:Parameters<typeof signIn>}){
+		yield signIn(...p.args);
+		yield this.di.persistor?.purge();
 	}
 }

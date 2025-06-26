@@ -2,9 +2,11 @@
 import { useState } from "react";
 import clsx from "clsx";
 import Dropdown from "./Dropdown";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
+import { useAuth } from "@/client/hooks/useAuth";
+import { useDispatch } from "react-redux";
 
 export default function Header() {
 	const [isNavOpen, setNavOpen] = useState(false);
@@ -71,7 +73,9 @@ const navButtonStyle =
 
 function Navigation({ isOpen }: { isOpen: boolean }) {
 	const session = useSession();
-	const {t} = useTranslation();
+	const { t } = useTranslation();
+	const dispatch = useDispatch();
+	const signOut = () => dispatch({type:'signOut'})
 	return (
 		<nav
 			className={clsx(
@@ -97,13 +101,13 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 					type="text"
 					name="search"
 					id="search"
-					placeholder={t('search-placeholder')}
+					placeholder={t("search-placeholder")}
 				/>
 			</div>
 			<div className="sm:flex sm:items-center">
 				<div className="px-2 pt-2 pb-5 border-b border-gray-800 sm:flex sm:items-center sm:border-b-0 sm:py-0 sm:px-0">
 					<Link href="/messages" className={"mt-1 sm:mt-0 " + navButtonStyle}>
-						{t('messages')}
+						{t("messages")}
 					</Link>
 					<Link href="/classes/1" className={"mt-1 sm:mt-0 " + navButtonStyle}>
 						Classes/1
@@ -128,20 +132,20 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 							href="/profile"
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-						{t('accountSettings')}
+							{t("accountSettings")}
 						</Link>
 						<Link
 							href="/"
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-						{t('support')}
+							{t("support")}
 						</Link>
 						<Link
 							href="/signIn"
-							onClick={() => signOut({ redirect: false })}
+							onClick={signOut}
 							className="mt-3 block text-gray-400 hover:text-white"
 						>
-							{t('signOut')}
+							{t("signOut")}
 						</Link>
 					</div>
 					<Dropdown
@@ -164,20 +168,20 @@ function Navigation({ isOpen }: { isOpen: boolean }) {
 								href="/profile"
 								className="block hover:text-white text-gray-800 px-4 py-2 hover:bg-indigo-500"
 							>
-								{t('accountSettings')}
+								{t("accountSettings")}
 							</Link>
 							<Link
 								href=""
 								className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500"
 							>
-								{t('support')}
+								{t("support")}
 							</Link>
 							<Link
 								href="/signIn"
-								onClick={() => signOut({ redirect: false })}
+								onClick={signOut}
 								className="block hover:text-white text-gray-800 mt-0 px-4 py-2 hover:bg-indigo-500"
 							>
-								{t('signOut')}
+								{t("signOut")}
 							</Link>
 						</div>
 					</Dropdown>

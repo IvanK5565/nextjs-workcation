@@ -1,5 +1,5 @@
 import { GRANT } from "@/acl/types";
-import { IMenu } from "../types";
+import { IMenu } from "../../client/types";
 
 export const TopNavigationMenu: IMenu = {
     "NavigationMenu/Users": {

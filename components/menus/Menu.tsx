@@ -1,11 +1,6 @@
 import { useState } from "react";
-import { useAcl } from "../hooks/useAcl";
-import { IMenu, IMenuData } from "../types";
-
-export function FilterMenu(menu:IMenu):IMenu{
-	const { allow } = useAcl();
-	return Object.fromEntries(Object.entries(menu).filter(([key, value]) => (value.grant ? allow(value.grant, key) : true)))
-}
+import { useAcl } from "../../client/hooks/useAcl";
+import { IMenu, IMenuData } from "../../client/types";
 
 export function RenderMenu({ menu }: { menu: IMenu }) {
 	const { allow } = useAcl();

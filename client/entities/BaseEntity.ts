@@ -118,8 +118,8 @@ export default abstract class BaseEntity extends BaseContext {
 				// 	}
 				// })
 			}
-			const text = this.di.t('requestCompleted')
-			toast.success(res.message ?? text ?? 'Request Completed!')
+			const text = this.di.t(res.message??'requestCompleted')
+			toast.success(text)
 		} catch (e) {
 			if (e instanceof XFetchError) {
 				const text = this.di.t('requestFailed')
@@ -164,8 +164,8 @@ export default abstract class BaseEntity extends BaseContext {
 		}
 
 		// set filter to paginator, in case fetch from getInitProps()
-		const pFilter = params.filter ?? {};
-		const pSort = params.sort ?? {};
+		const pFilter = params.filter;
+		const pSort = params.sort;
 		yield put(pageSetFilter(pageName, pFilter, pSort));
 
 		const pagerData = {

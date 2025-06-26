@@ -1,9 +1,9 @@
-import Guard from "@/acl/Guard";
 import { GRANT, IIdentity, ROLE } from "@/acl/types";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { useSelector } from "react-redux";
 import { AppState } from "../store/ReduxStore";
+import { useContainerContext } from "../ContainerContext";
 
 interface IUseAclResult {
   allow: (grant: GRANT, res?: string, role?: ROLE) => boolean;
@@ -15,6 +15,7 @@ interface IUseAclResult {
 
 export function useAcl() {
   const { pathname, query } = useRouter();
+  const guard = useContainerContext().resolve('guard')
   let resource = pathname;
   const id = query?.id?.toString();
   if (id) {
@@ -52,9 +53,9 @@ export function useAcl() {
     return res;
   }
 
-  const { roles, rules, identity } = auth;
+  const { /*roles, rules,*/ identity } = auth;
   try {
-    const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
+    // const guard = new Guard(roles, rules, identity?.role ?? ROLE.GUEST)
 
     res.allow = (grant: GRANT, res?: string, role?: ROLE) => {
       const r = res ? res : resource;
