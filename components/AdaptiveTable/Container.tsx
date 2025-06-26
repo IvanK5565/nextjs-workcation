@@ -211,7 +211,7 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
           <LeftRight
             count={count}
             perPage={perPage}
-            page={currPage}
+            currPage={currPage}
             onLoadMore={handleLoadMore}
           />
         );

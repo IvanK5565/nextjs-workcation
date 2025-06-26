@@ -68,8 +68,8 @@ export default class UserEntity extends BaseEntity {
 	}
 
 	@action
-	public *signIn(p:{args:Parameters<typeof signIn>}){
-		yield signIn(...p.args);
+	public *signIn(args:Parameters<typeof signIn>){
+		yield signIn(...args);
 		yield this.di.persistor?.purge();
 	}
 }

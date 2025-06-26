@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { RenderMenu } from "@/components/menus/Menu";
-import { SideBarnavigationMenu, SideBarNavigationMenuParams } from "@/components/menus/SideBarNavigationMenu";
+import { SideBarnavigationMenu } from "@/components/menus/SideBarNavigationMenu";
 
 export function NavButton({
 	href,
@@ -38,7 +37,6 @@ export default function Navigation({ isHidden, onClose }: { isHidden: boolean, o
 				<NavButton onClick={onClose} href="/classes">{t('classes')}</NavButton>
 				<NavButton onClick={onClose} href="/diary">{t('diary')}</NavButton>
 				<NavButton onClick={onClose} href="/admin">{t('admin')}</NavButton> */}
-				{/* <RenderMenu menu={SideBarnavigationMenuParams} /> */}
 				<SideBarnavigationMenu />
 			</div>
 			{/* <div className="bg-gray-900 px-4 py-4 sm:text-right">

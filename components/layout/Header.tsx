@@ -5,7 +5,6 @@ import Dropdown from "./Dropdown";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
-import { useAuth } from "@/client/hooks/useAuth";
 import { useDispatch } from "react-redux";
 
 export default function Header() {

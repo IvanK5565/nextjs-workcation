@@ -3,7 +3,6 @@ import { About, SignIn } from "@/components/signIn";
 
 import { /*useEffect,*/ useState } from "react"
 import Register from "@/components/signIn/Register";
-import { useSession } from "next-auth/react";
 // import { useRouter } from "next/router";
 
 enum Landing {
