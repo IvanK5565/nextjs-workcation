@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import get from "lodash/get";
 import { JSX, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -35,7 +34,7 @@ export default function FilterBar(props: IFilterBarProps) {
     setFilterItems(
       Object.entries(
         Object.keys(fields)
-          .filter((field) => Boolean(fields[field]?.filter))
+          .filter((field) => Boolean(fields[field]?.filter) && Boolean(fields[field]?.type))
           .reduce(
             (r, v, i, a, k = fields[v].filter!.group) => (
               (r[k] || (r[k] = [])).push(v), r

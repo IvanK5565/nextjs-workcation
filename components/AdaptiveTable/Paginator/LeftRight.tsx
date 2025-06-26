@@ -1,27 +1,34 @@
 import ContainerContext from "@/client/ContainerContext";
 import { useContext } from "react";
 
+interface ILeftRightPaginatorProps {
+    count: number;
+    currPage: number;
+    perPage: number;
+    onLoadMore: (page: number, dir?:'next'|'prev') => void;
+}
+
 export default function LeftRight({
     count,
-    page,
+    currPage,
     perPage,
     onLoadMore,
 
-}) {
+}:ILeftRightPaginatorProps) {
     const di = useContext(ContainerContext);
     const t = di.resolve("t");
-    const start = (page - 1) * perPage;
+    const start = (currPage - 1) * perPage;
    
 
     const pageCount = count % (perPage ?? 1) == 0
         ? Math.trunc(count / (perPage ?? 1))
         : Math.trunc(count / (perPage ?? 1)) + 1
 
-    const previousActive = page > 1;
-    const nextActive = page < pageCount;
+    const previousActive = currPage > 1;
+    const nextActive = currPage < pageCount;
 
-    const onPrevious = () => onLoadMore(page - 1, 'prev');
-    const onNext = () => onLoadMore(page + 1, 'next');
+    const onPrevious = () => onLoadMore(currPage - 1, 'prev');
+    const onNext = () => onLoadMore(currPage + 1, 'next');
 
     const disableStyle = 'bg-white text-gray-900';
     const activeStyle = 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100';

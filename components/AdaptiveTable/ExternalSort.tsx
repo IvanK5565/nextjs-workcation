@@ -9,12 +9,14 @@ interface IExternalSortProps {
   fields: IFieldList;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onLoadMore?: (loadParams: any) => void;
+  defaultField?: string;
 }
 
 export default function ExternalSort({
   fields,
   pagerName,
   onLoadMore,
+  defaultField = /*"createdAt"*/ 'id',
 }: IExternalSortProps) {
   const { t } = useTranslation();
   const pager = usePageSelector(pagerName);
@@ -32,12 +34,13 @@ export default function ExternalSort({
   );
 
   const currentValue = useMemo(() => {
-    const sortField = pager?.sort?.[0];
+    // const sortField = pager?.sort?.[0];
+    const sortField = pager?.sort;
     if (sortField) {
       return sortField?.field;
     }
-    return "createdAt";
-  }, [pager]);
+    return defaultField;
+  }, [defaultField, pager?.sort]);
 
   const sortOptions = useMemo(() => {
     const filedOptions = Object.entries(fields)

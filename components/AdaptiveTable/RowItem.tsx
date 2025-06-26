@@ -11,7 +11,7 @@ import DateSelector from './Inputs/DateSelector';
 import {isFunction} from '@/client/utils/random';
 
 interface IRowItemProps {
-    data: Map<string, any>;
+    data: any;
     field: string;
     columns: IFieldList;
     onTdClick?: (field: string, data: any) => void;
@@ -38,7 +38,7 @@ export default function RowItem(props: IRowItemProps) {
         (e: MouseEvent) => {
             if (isFunction(onTdClick)) {
                 e.stopPropagation();
-                onTdClick(field, data);
+                onTdClick?.(field, data);
             }
         },
         [data, field, onTdClick],
@@ -63,12 +63,12 @@ export default function RowItem(props: IRowItemProps) {
         [onSelectOneRow],
     );
 
-    const editable = columns[field].column.editable;
-    const draw = columns[field].column.draw;
+    const editable = columns[field].column?.editable;
+    const draw = columns[field].column?.draw;
     const tdClass = editable
         ? 'text-center'
-        : columns[field].column.itemClassName;
-    const disabled = columns[field].column.disabled;
+        : columns[field].column?.itemClassName;
+    const disabled = columns[field].column?.disabled;
     const disabledItem: any = disabled && disabled(data, field);
 
     /**
@@ -85,8 +85,8 @@ export default function RowItem(props: IRowItemProps) {
                         <Input
                             name={field}
                             value={state[field]}
-                            className={columns[field].column.inputClassName}
-                            placeholder={columns[field].placeholder}
+                            className={columns[field].column?.inputClassName}
+                            placeholder={String(columns[field].placeholder)}
                             onChange={handleChange}
                         />
                     );
@@ -95,8 +95,8 @@ export default function RowItem(props: IRowItemProps) {
                         <Input
                             name={field}
                             value={state[field]}
-                            placeholder={columns[field].placeholder}
-                            className={columns[field].column.inputClassName}
+                            placeholder={String(columns[field].placeholder)}
+                            className={columns[field].column?.inputClassName}
                             onChange={handleChange}
                             onlyNumber
                         />
@@ -106,8 +106,8 @@ export default function RowItem(props: IRowItemProps) {
                         <Select
                             name={field}
                             value={state[field]}
-                            className={columns[field].column.inputClassName}
-                            items={columns[field].column.options}
+                            className={columns[field].column?.inputClassName}
+                            items={columns[field].column?.options ?? []}
                             onChange={handleChange}
                         />
                     );
@@ -117,7 +117,7 @@ export default function RowItem(props: IRowItemProps) {
                             name={field}
                             checked={data && get(data, field) ? true : false}
                             option={{label: 'need set label', value: 'xxx'}}
-                            className={columns[field].column.inputClassName}
+                            className={columns[field].column?.inputClassName}
                             onChange={handleChange}
                         />
                     );
@@ -131,8 +131,8 @@ export default function RowItem(props: IRowItemProps) {
                         <RadioContainer
                             name={''}
                             value={'null'}
-                            items={columns[field].column.options}
-                            className={columns[field].column.inputClassName}
+                            items={columns[field].column?.options ?? []}
+                            className={columns[field].column?.inputClassName}
                             type={type}
                             onChange={handleChange}
                         />
@@ -145,7 +145,7 @@ export default function RowItem(props: IRowItemProps) {
                     return (
                         <Checkbox
                             checked={checked}
-                            className={columns[field].column.inputClassName}
+                            className={columns[field].column?.inputClassName}
                             option={{label: '', value: itemID}}
                             onChange={handleSelectOneRow}
                         />

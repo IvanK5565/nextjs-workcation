@@ -22,11 +22,12 @@ import FilterBar from "./FilterBar";
 import LeftRight from "./Paginator/LeftRight";
 import TableActions from "./TableActions";
 import { withRequestResult } from "./withRequest";
+import { Entities } from "@/client/store/types";
 
 const FILTER_TIMEOUT = 500;
 
 interface IAdaptiveContainer {
-  fields?: IFieldList;
+  fields: IFieldList;
   pagerName: PagerName;
   perPage?: number;
   typeOfPagination?: PaginationType;
@@ -69,9 +70,9 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const pager = usePageSelector(pagerName);
-  const entities = useEntitySelector(pager?.entityName);
-  const currPage = pager ? get(pager, "currentPage") : null;
-  const count = pager ? get(pager, "count") : null;
+  const entities = useEntitySelector(pager?.entityName as keyof Entities);
+  const currPage = pager ? get(pager, "currentPage") : /*null*/ 1;
+  const count = pager ? get(pager, "count") : /*null*/ 1;
   const paginationType = typeOfPagination || PaginationType.SHORT;
 
   const bufItems: any = useMemo(() => {
@@ -84,8 +85,8 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
   const observerRef = useRef<IntersectionObserver | null>(null);
   useEffect(() => {
     if (pagerName && !pager?.pages?.[1]) {
-      const pFilter: any = has(pager, "filter") ? get(pager, "filter") : {};
-      const pSort = has(pager, "sort") ? get(pager, "sort") : {};
+      const pFilter = has(pager, "filter") ? get(pager, "filter") : {};
+      const pSort = has(pager, "sort") ? get(pager, "sort") : undefined;
 
       Object.keys(fields).map((field: any) => {
         const fieldValue = fields[field];
@@ -135,7 +136,7 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
         timerID.current = null;
       }
       timerID.current = setTimeout(() => {
-        onFilterChanged(name, value);
+        onFilterChanged?.(name, value);
       }, FILTER_TIMEOUT);
     },
     [onFilterChanged]
@@ -149,7 +150,8 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
       }
 
       const pFilter = has(pager, "filter") ? { ...get(pager, "filter") } : {};
-      const pSort = has(pager, "sort") ? { ...get(pager, "sort") } : {};
+      // const pSort = has(pager, "sort") ? { ...get(pager, "sort") } : undefined;
+      const pSort = pager.sort ? {...pager.sort} : undefined;
 
       if (pagerName) {
         if (name === "filterReset") {
@@ -163,7 +165,7 @@ function AdaptiveContainer(props: IAdaptiveContainer) {
             delete pFilter[name];
           }
         }
-        dispatch(pageSetFilter(pagerName, { ...pFilter }, { ...pSort }));
+        dispatch(pageSetFilter(pagerName, { ...pFilter }, pSort));
       }
       timerID.current = setTimeout(() => {
         onLoadMore({

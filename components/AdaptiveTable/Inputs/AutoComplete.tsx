@@ -21,7 +21,7 @@ interface IAutoCompleteProps {
   debounceTime?: number;
   minSearchLength?: number;
   disabled?: boolean;
-  form?: { errors: object };
+  form?: { errors: {[key:string]:string} };
   label?: string;
   labelClassName?: string;
   needSaveToLocalStorage?: boolean;
@@ -119,16 +119,16 @@ export default function AutoComplete({
   }, [showDropdown, updateDropdownPosition]);
 
   const handleSelectItem = (selected: IOptions) => {
-    onChange(name, selected?.value?.toString() ?? "");
+    onChange?.(name, selected?.value?.toString() ?? "");
     if (needSaveToLocalStorage) addSearch(selected);
     setShowDropdown(false);
   };
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleSearchChange = (name: string, value: string) => {
     setSearchValue(value);
     if (value === "") {
-      onChange(name, value);
+      onChange?.(name, value);
       return;
     }
     setShowDropdown(true);

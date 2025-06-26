@@ -13,7 +13,7 @@ import AutoComplete from "./Inputs/AutoComplete";
 import { DEFAULT_SEARCH_LENGTH } from "@/client/constants";
 
 export interface IFilterItemProps {
-  className: string;
+  className?: string;
   label: string;
   type: FilterType;
   icon?: InputIcon;
@@ -39,12 +39,12 @@ export interface IFilterItemProps {
 export default function FilterItem(props: IFilterItemProps) {
   const {
     value,
-    className,
+    className = '',
     type,
     icon,
     name,
     label,
-    options,
+    options = [],
     showLabel,
     placeholder,
     labelClassName,
@@ -165,7 +165,7 @@ export default function FilterItem(props: IFilterItemProps) {
 
   return (
     <div
-      className={`${className ? className : ""} flex flex-row justify-start `}
+      className={`${className} flex flex-row justify-start `}
     >
       {showLabel && label && (
         <div className={"flex flex-row items-center mx-1"}>

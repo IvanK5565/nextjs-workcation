@@ -71,7 +71,7 @@ const Row = forwardRef<HTMLTableRowElement, IRowProps>((props, ref) => {
     onSelectOneRow,
     actionIsDisabled: isActionActivePredicate,
   } = props;
-  const data = useSelector<AppState, object>(state => state.entities[pager.entityName][id]) as object
+  const data = useSelector<AppState, object|undefined>(state => state.entities?.[pager.entityName]?.[id])
 
   const handleActionClick = useCallback(
     (action: Actions, data: any) => {

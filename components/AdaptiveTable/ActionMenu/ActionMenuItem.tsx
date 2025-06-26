@@ -29,6 +29,7 @@ export function ActionMenuItem(props: IMenuItemProps) {
     (e: FocusEvent<HTMLButtonElement>) => {
       e.preventDefault();
       e.stopPropagation();
+      // @ts-expect-error: focusLosted is a custom property not defined on FocusEvent
       e["focusLosted"] = menuItem["index"];
     },
     [menuItem]

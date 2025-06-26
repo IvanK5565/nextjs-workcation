@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 
 function Pager() {
 	const [page, setPage] = useState(1);
-	const { fetchProjectPage } = useActions("UserEntity");
+	const { fetchUsersPage: fetchProjectPage } = useActions("UserEntity");
 	const dispatch = useDispatch();
 	const usersPage = usePageItems('users');
 	return (

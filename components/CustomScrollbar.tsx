@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const CustomScrollbar: React.FC<{
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement|null>;
   activeStyle?: string;
   defaultStyle?: string;
 }> = ({

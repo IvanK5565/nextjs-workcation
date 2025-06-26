@@ -14,7 +14,7 @@ const fields: IFieldList = {
 		label: 'id-label',
 		sorted: true,
 		placeholder: 'Id',
-		type: FilterType.Text,
+		type: FilterType.Touche,
 		column:{
 			headClassName:
 				"bg-gray-50 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6",
@@ -22,11 +22,12 @@ const fields: IFieldList = {
 				"whitespace-nowrap pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6",
 		}
 	},
+
 	firstName:{
 		label: 'firstName-label',
 		sorted: true,
 		placeholder: 'First Name',
-		type: FilterType.Text,
+		type: FilterType.Touche,
 		column:{
 			editable: true,
 			headClassName:
@@ -103,8 +104,8 @@ const fields: IFieldList = {
 
 
 export default function Page() {
-	const {fetchProjectPage} = useActions('UserEntity')
-	const { getUserById } = useActions('UserEntity');
+	const {fetchUsersPage: fetchProjectPage} = useActions('UserEntity')
+	const { fetchUserById: getUserById } = useActions('UserEntity');
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function onActionClick(action: Actions, data: any/*, pagerParams: IPagerParams*/){

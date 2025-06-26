@@ -5,11 +5,14 @@ export interface ISortParams {
     field: string;
     dir: Sort;
 }
+export interface IFilterParams {
+    [field:string]:string
+}
 
 export interface IPagerParams {
     pageName: string;
     sort?: ISortParams;
-    filter?: object; //object;    // object with filtering key/values
+    filter?: IFilterParams; //object;    // object with filtering key/values
     page: number; // page number
     perPage: number; // count items on one page
     force?: boolean; // reload data in the redux and pager

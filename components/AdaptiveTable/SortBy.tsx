@@ -24,7 +24,7 @@ function SortBy(props: ISortByProps) {
 
     const ACTION_MENU_ID = useMemo(() => `SortBy_${idSortBy}`, [idSortBy]);
     const windowClickSortBy = useCallback(
-        event => {
+        (event: MouseEvent) => {
             isOpen &&
                 !clickOutSideTheBlock(event, ACTION_MENU_ID) &&
                 setIsOpen(false);

@@ -5,10 +5,9 @@ import {Sort, FilterType} from '@/client/pagination/IPagerParams';
 import {useTranslation} from 'react-i18next';
 import {isFunction} from '@/client/utils/random';
 import SortBy, {GetNextSort, GetSortIcon, ISortOptions} from './SortBy';
-import { toast } from 'react-toastify';
 
 export interface IHeadItemProps {
-    pagerName?: string;
+    pagerName: string;
     field: string;
     fieldType?: FilterType;
     label?: string;
@@ -42,15 +41,13 @@ export default function HeadItem(props: IHeadItemProps) {
 
     const handleChange = useCallback(() => {
         if (isFunction(onSelectAllRowClick)) {
-            onSelectAllRowClick();
+            onSelectAllRowClick?.();
         }
     }, [onSelectAllRowClick]);
 
     const changeSort = useCallback(
         (field: string, dir: Sort) => {
             if (isFunction(onSortChanged)) {
-                const nextSort = GetNextSort(dir);
-                toast('changeSort ' + dir + ' ' + nextSort )
                 onSortChanged?.(field, GetNextSort(dir));
             }
         },
@@ -70,7 +67,7 @@ export default function HeadItem(props: IHeadItemProps) {
         () => GetSortIcon(dir, 'transform hover:scale-125'),
         [dir],
     );
-    const isTouched = fieldType === FilterType.Touche && onSelectAllRowClick;
+    const isTouched = fieldType === FilterType.Touche && Boolean(onSelectAllRowClick);
 
     const SortByOptions = useMemo(() => {
         if (sortBy) {
@@ -87,7 +84,7 @@ export default function HeadItem(props: IHeadItemProps) {
         <th className={`${headClassName ? headClassName : ''}`}>
             <div className={`flex flex-row justify-start items-center`}>
                 {isTouched && (
-                    <Checkbox checked={isTouchedAll} onChange={handleChange} />
+                    <Checkbox checked={!!isTouchedAll} onChange={handleChange} />
                 )}
                 {typeof label === 'string' ? (
                     <p className="whitespace-nowrap"> {t(label)} </p>

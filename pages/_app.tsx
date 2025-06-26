@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
 import { redux } from "@/client/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { AppStore } from "@/client/store/ReduxStore";
@@ -31,14 +31,14 @@ function App({
 	// const { store, props } = wrapper.useWrappedStore(rest);
 	return (
 		<ContainerContext.Provider value={container}>
-			<Provider store={store}>
+			<ReduxProvider store={store}>
 				<PersistGate persistor={(store as AppStore).__persistor}>
 					<SessionProvider session={props.session}>
 						{layout(<Component {...props.pageProps} />)}
 						{/* <Component {...props.pageProps} /> */}
 					</SessionProvider>
 				</PersistGate>
-			</Provider>
+			</ReduxProvider>
 			<ToastContainer autoClose={1000}/>
 		</ContainerContext.Provider>
 	);

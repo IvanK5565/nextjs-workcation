@@ -15,7 +15,7 @@ export default function DateInput(props: IDateInputProps) {
     const {placeholder, value, onDayChange} = props;
 
     const dayChangeHandler = useCallback(
-        day => {
+        (day:any) => {
             if (day) {
                 onDayChange(day);
             }
@@ -23,7 +23,7 @@ export default function DateInput(props: IDateInputProps) {
         [onDayChange],
     );
 
-    const [ref, setRef] = useState<DayPickerInput>(null);
+    const [ref, setRef] = useState<DayPickerInput|null>(null);
     useEffect(() => {
         if (ref && !value) {
             ref.setState({
