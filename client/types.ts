@@ -14,6 +14,11 @@ export interface IMenuData {
     route?: string;
     order?: number;
     handler?: any;
+    
+    //AdaptiveTable::ActionMenuItem
+    onClick?: (item:any)=>any;
+    className?: string;
+    index?: number;
 }
 
 export interface IMenu {

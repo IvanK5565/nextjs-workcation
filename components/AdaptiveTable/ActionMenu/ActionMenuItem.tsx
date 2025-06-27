@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, MouseEvent, FocusEvent } from "react";
-import { IMenuData } from "@/acl/types";
+import { IMenuData } from "@/client/types";
 
 interface IMenuItemProps {
   className?: string;

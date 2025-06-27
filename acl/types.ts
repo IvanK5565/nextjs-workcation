@@ -85,26 +85,3 @@ export interface IIdentityACL {
     rules: IRules;
 }
 
-export interface IMenuData {
-    icon?: any; //ReactIcon
-    label: string;
-    component?: any;
-    url?: string;
-    hide?: boolean;
-    resources?: string[];
-    items?: IMenu;
-    grant?: GRANT;
-    data?: any; // save any data within menu item
-    route?: string;
-    order?: number;
-    handler?: any;
-    
-    //AdaptiveTable::ActionMenuItem
-    onClick?: (item:any)=>any;
-    className?: string;
-    index?: number;
-}
-
-export interface IMenu {
-    [key: string]: IMenuData;
-}

@@ -1,4 +1,4 @@
-import { IMenuData } from "@/acl/types";
+import { IMenuData } from "@/client/types";
 import { useCallback, useMemo } from "react";
 
 interface MultiSelectActionItemProps {

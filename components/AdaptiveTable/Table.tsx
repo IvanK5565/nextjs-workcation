@@ -6,7 +6,7 @@ import has from "lodash/has";
 import union from "lodash/union";
 import { JSX, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { IMenu } from "@/acl/types";
+import { IMenu } from "@/client/types";
 import { PagerName, usePageSelector } from "@/client/hooks/usePageSelector";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "next-i18next";

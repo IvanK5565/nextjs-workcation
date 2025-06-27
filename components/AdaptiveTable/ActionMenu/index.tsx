@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { clickOutSideTheBlock } from "@/client/utils/random";
 import { ActionMenuItem } from "./ActionMenuItem";
 import { FaCog, FaDots } from "@/components/FaIcons/icons";
-import { IMenu, IMenuData } from "@/acl/types";
+import { IMenu, IMenuData } from "@/client/types";
 
 interface IActionMenuProps {
   data: any;

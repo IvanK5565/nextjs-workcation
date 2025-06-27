@@ -1,4 +1,4 @@
-import { IMenu, IMenuData } from "@/acl/types";
+import { IMenu, IMenuData } from "@/client/types";
 import { useAcl } from "@/client/hooks/useAcl";
 import { useMemo } from "react";
 import Button from "../ui/button";

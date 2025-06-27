@@ -1,3 +1,4 @@
+import { IMenu } from '@/client/types';
 import { useActions } from '@/client/hooks/useActions';
 import {
 	Actions,
@@ -114,25 +115,42 @@ interface IChanges {
 	[id: number]: Record<string, string>;
 }
 
-function updateChanges(
-	changes: IChanges,
-	id: number,
-	field: string,
-	value: string
-): IChanges {
-	return {
-		...changes,
-		[id]: {
-			...(changes[id] ?? {}),
-			[field]: value,
-		},
-	};
-}
-
 export default function Page() {
 	const { fetchUsersPage: fetchProjectPage } = useActions('UserEntity');
 	const { fetchUserById: getUserById } = useActions('UserEntity');
 	const [changes, setChanges] = useState<IChanges>({});
+
+	const actionsMenu: IMenu = {
+	'select-action1': {
+		label: 'msAction1',
+		onClick: (touched:number[]) => toast('action1:' + JSON.stringify(touched)),
+		icon: (
+			<svg className="w-6 h-6">
+				<circle
+					cx="12"
+					cy="12"
+					r="10"
+					stroke="currentColor"
+					strokeWidth="2"
+					fill="none"
+				/>
+				<path
+					d="M8 12h8M12 8v8"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+				/>
+			</svg>
+		),
+	},
+	'select-action2': {
+		label: 'Save',
+		onClick: () =>
+			toast(
+				'action2: saving changes for: ' + JSON.stringify(Object.keys(changes))
+			),
+	},
+};
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function onActionClick(
@@ -164,7 +182,8 @@ export default function Page() {
 					[field]: value,
 				},
 			});
-		}, [changes]
+		},
+		[changes]
 	);
 
 	return (
@@ -182,34 +201,7 @@ export default function Page() {
 			onItemChange={handleChanges}
 			typeOfPagination={PaginationType.LIGHT}
 			isMultiSelect={true}
-			multiSelectActions={{
-				'select-action1': {
-					label: 'msAction1',
-					onClick: (item) => toast('action1:' + JSON.stringify(item)),
-					icon: (
-						<svg className="w-6 h-6">
-							<circle
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								strokeWidth="2"
-								fill="none"
-							/>
-							<path
-								d="M8 12h8M12 8v8"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-							/>
-						</svg>
-					),
-				},
-				'select-action2': {
-					label: 'Save',
-					onClick: () => toast('action2: saving changes for: ' + JSON.stringify(Object.keys(changes))),
-				},
-			}}
+			multiSelectActions={actionsMenu}
 		/>
 	);
 }
