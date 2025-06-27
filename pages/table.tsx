@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IMenu } from '@/client/types';
 import { useActions } from '@/client/hooks/useActions';
 import {
@@ -152,7 +153,6 @@ export default function Page() {
 	},
 };
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function onActionClick(
 		action: Actions,
 		data: any /*, pagerParams: IPagerParams*/
