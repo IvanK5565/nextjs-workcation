@@ -82,4 +82,32 @@ export default class ClassesService extends BaseContext implements IService {
 			where: { class_id: id },
 		});
 	}
+
+	public async addToClass(userId:number, classId:number){
+		const finded = await this.di.UserClassesModel.findOne({
+			where:{
+				student_id: userId,
+				class_id:classId,
+			}
+		});
+		if(finded){
+			throw new Error('userActualyInClass');
+		}
+		return this.di.UserClassesModel.create({
+			student_id:userId,
+			class_id:classId
+		})
+	}
+	public async removeFromClass(userId:number, classId:number){
+		const finded = await this.di.UserClassesModel.findOne({
+			where:{
+				student_id: userId,
+				class_id:classId,
+			}
+		});
+		if(!finded){
+			throw new Error('userActualyNotInClass');
+		}
+		return finded.destroy();
+	}
 }
