@@ -132,7 +132,7 @@ export default function paginationReducer(state = initialPagerState, action: any
             ...state[pageName],
             ...pagination,
             touched: [
-              ...(pagination.touched ?? []),
+              // ...(pagination.touched ?? []),
               ...(touched ?? [])
             ],
           },

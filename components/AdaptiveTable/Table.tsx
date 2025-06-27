@@ -76,7 +76,7 @@ interface IAdaptiveTable {
 	onTdClick?: (field: string, data: any) => void;
 	onRowClick?: (data: any) => void;
 
-	onItemChange?: (id: string, value: any, field: string) => void;
+	onItemChange?: (id: number, value: any, field: string, data?:any) => void;
 	tableClassName?: string;
 	tableTitle?: string;
 	isMultiSelect?: boolean;
@@ -332,9 +332,9 @@ function AdaptiveTable(props: IAdaptiveTable) {
 	}, [pager, bufItems]);
 
 	const handleOnItemChange = useCallback(
-		(id: string, value: any, field: string) => {
+		(id: number, value: any, field: string, data?:any) => {
 			if ("function" === typeof onItemChange) {
-				onItemChange(id, value, field);
+				onItemChange(id, value, field, data);
 			}
 		},
 		[onItemChange]
@@ -363,7 +363,7 @@ function AdaptiveTable(props: IAdaptiveTable) {
 					selected = [...touched, selectedIds];
 				}
 			}
-			dispatch(pageSelectItem(get(pager, "pageName"), selected));
+			dispatch(pageSelectItem(get(pager, "pageName"), selected.map((a:any)=>typeof a === 'string' ? parseInt(a) : a)));
 			setTouched(selected);
 		},
 		[dispatch, pager, isMultiSelect]

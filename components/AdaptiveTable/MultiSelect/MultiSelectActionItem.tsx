@@ -26,6 +26,7 @@ export default function MultiSelectActionItem({
   const onActionMenuItemBlur = useCallback(
     (e: React.FocusEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      // @ts-expect-error: focusLosted is a custom property added to the event object
       e["focusLosted"] = menuItem["index"];
     },
     [menuItem]
