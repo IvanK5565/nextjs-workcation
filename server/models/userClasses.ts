@@ -9,7 +9,7 @@ export class UserClasses extends Model {
 
 export type UserClassesType = typeof UserClasses;
 
-export default (ctx: IContextContainer) => {
+const UserClassesContainer = (ctx: IContextContainer) => {
 
   UserClasses.init(
     {
@@ -46,3 +46,5 @@ export default (ctx: IContextContainer) => {
   );
   return UserClasses;
 }
+
+export default UserClassesContainer;
