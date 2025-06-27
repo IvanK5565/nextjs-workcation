@@ -46,5 +46,7 @@
   "id-label":"Ідентифікатор",
   "firstName-label":"Ім'я",
   "lastName-label":"Прізвище",
-  "email-label":"Електронна Пошта"
+  "email-label":"Електронна Пошта",
+  "status-label":"Статус",
+  "select-an-option":"Оберіть значення"
 }

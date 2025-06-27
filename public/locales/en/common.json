@@ -46,5 +46,7 @@
   "id-label":"Id",
   "firstName-label":"First Name",
   "lastName-label":"Last Name",
-  "email-label":"Email"
+  "email-label":"Email",
+  "status-label":"Status",
+  "select-an-option":"Select an option"
 }
