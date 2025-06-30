@@ -18,11 +18,12 @@ export type RouterRun = (
 
 export type Entity = User | Classes | Subjects | UserClasses;
 
-export type ActionResult = Entity | Entity[] | {
-	items:Entity | Entity[],
-	count:number,
-	isPager:true,
-};
+// export type ActionResult = Entity | Entity[] | {
+// 	items:Entity | Entity[],
+// 	count:number,
+// 	isPager:true,
+// };
+export type ActionResult = Entity | PageArray<Entity>;
 
 export type Middleware = (
 	req: NextApiRequest,
@@ -73,3 +74,7 @@ export type GSSPFactory = (
 	isPublic?:boolean,
 	route?: string
 ) => GetServerSideProps;
+
+export type PageArray<T> = Array<T> & {
+	pagerCount?:number;
+}

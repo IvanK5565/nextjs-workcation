@@ -1,7 +1,7 @@
 import Header from "@/components/layout/Header";
 import SearchBar from "@/components/layout/SearchBar";
 import { useSession } from "next-auth/react";
-import { GetLayout } from "../_app";
+import { Layout } from "../_app";
 
 
 const Page = () => {
@@ -29,7 +29,7 @@ function JournalPreview(){
   </div>
 }
 
-Page.getLayout = ((page) => <Layout>{page}</Layout>) as GetLayout
+Page.getLayout = ((page) => <Layout>{page}</Layout>) as Layout
 
 export default Page;
 

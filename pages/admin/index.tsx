@@ -10,6 +10,7 @@ import { Entities } from "@/client/store/types";
 import { useTranslation } from "next-i18next";
 import container from "@/server/container/container";
 import { EntitiesExplorer } from "@/components/admin/entitiesExplorer";
+import { Layout } from "../types";
 
 export const getServerSideProps = container.resolve("getServerSideProps")(
 	[]
@@ -53,7 +54,7 @@ const Home = () => {
 		</div>
 	);
 };
-Home.getLayout = (page: React.ReactNode) => page;
+Home.getLayout = ((page) => page) as Layout;
 export default Home;
 
 

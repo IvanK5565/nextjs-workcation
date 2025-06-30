@@ -5,6 +5,9 @@ import { DEFAULT_LIMIT, DEFAULT_PAGE, UserRole, UserStatus } from "@/constants";
 import { Logger } from "../logger";
 import { IPagerParams, Sort } from "@/client/pagination/IPagerParams";
 import { setOpImmutable } from "../utils/sepSequelizeOp";
+import { User } from "../models";
+import { PageArray } from "@/types";
+
 
 export default class UsersService extends BaseContext implements IService {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,7 +34,7 @@ export default class UsersService extends BaseContext implements IService {
 
 		const count = await UserModel.count({ where });
 		Logger.log('limit',perPage)
-		const users = await UserModel.findAll({
+		const users:PageArray<User> = await UserModel.findAll({
 			where,
 			// 		attributes: {
 			// 			include: [
@@ -56,10 +59,12 @@ export default class UsersService extends BaseContext implements IService {
 				as: 'userClasses'
 			}]
 		});
-		return {
-			items: users,
-			count,
-		};
+		users.pagerCount = count;
+		// return {
+		// 	items: users,
+		// 	count,
+		// };
+		return users;
 	}
 	public signIn(email: string, password: string) {
 		return this.di.UserModel.findOne({

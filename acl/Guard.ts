@@ -124,7 +124,14 @@ class Guard {
 
 		// if(!resource) throw new Error('No Resource in Guard')
 		if (!resource || !role || !this.rules) {
-			Logger.warn('Guard does not contain a resource/role/rules')
+			Logger.warn(
+				'Guard missing: ' +
+				[
+					!resource && 'resource',
+					!role && 'role',
+					!this.rules && 'rules'
+				].filter(Boolean).join(' & ')
+			);
 			return false;
 		}
 		try {

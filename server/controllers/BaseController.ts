@@ -50,13 +50,12 @@ export default abstract class BaseController extends BaseContext {
 			const fn: Action = (this as any)[handler].bind(this);
 			return this.getActionProps(req, res, route)
 				.then((props) => fn(props))
-				.then((results) => JSON.parse(JSON.stringify(results)))
-				.then(r => {
-					if((Reflect.getMetadata('pagers',this) as string[] ?? []).includes(handler)){
-						r.isPager = true;
-					}
-					return r;
-				})
+				// .then(r => {
+				// 	if((Reflect.getMetadata('pagers',this) as string[] ?? []).includes(handler)){
+				// 		r.isPager = true;
+				// 	}
+				// 	return r;
+				// })
 				.catch((error) => {
 					this.di.Logger.error(`Error in action: ${handler}. ${error}`);
 					throw error;
@@ -172,7 +171,9 @@ export default abstract class BaseController extends BaseContext {
 			};
 			set(req, ['pager'], pagerParams);
 
-			const data = router.run(req, res).then((d) => d as ActionResult);
+			const data = router.run(req, res).then((d) => {
+				return d as ActionResult;
+			});
 			if (ssr) return data;
 
 			
@@ -200,18 +201,18 @@ export default abstract class BaseController extends BaseContext {
 	}
 }
 
-export function onSuccessResponse(data: Response['data'], pagerParams?: IPagerParams): Response {
+export function onSuccessResponse(data: ActionResult, pagerParams?: IPagerParams): Response {
 	let pager:any = undefined;
-	if (pagerParams && data && 'isPager' in data) {
+	if (pagerParams && 'pagerCount' in data) {
 		pager = {
-			count: data.count,
+			count: data.pagerCount,
 			page: pagerParams.page,
 			pageName: pagerParams.pageName,
 			perPage: pagerParams.perPage,
 			entityName: pagerParams.entityName,
 		};
-		data = data.items;
 	}
+	data = JSON.parse(JSON.stringify(data));
 
 	return {
 		code: StatusCodes.OK,

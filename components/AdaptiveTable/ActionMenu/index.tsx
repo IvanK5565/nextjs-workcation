@@ -15,16 +15,17 @@ import { clickOutSideTheBlock } from "@/client/utils/random";
 import { ActionMenuItem } from "./ActionMenuItem";
 import { FaCog, FaDots } from "@/components/FaIcons/icons";
 import { IMenu, IMenuData } from "@/client/types";
+import { useProtectedMenu } from "@/client/hooks/useProtectedMenu";
 
 interface IActionMenuProps {
   data: any;
   menu?: IMenu;
   item?: any;
 }
-export default function ActionMenu(props: IActionMenuProps) {
-  const { data, menu, item } = props;
+export default function ActionMenu({ data, menu, item }: IActionMenuProps) {
   const { t } = useTranslation();
   const { allow } = useAcl();
+  menu = useProtectedMenu(menu ?? {});
 
   const ACTION_MENU_ID = useMemo(() => `ActionMenu_${get(data, "id")}`, [data]);
 
@@ -34,12 +35,12 @@ export default function ActionMenu(props: IActionMenuProps) {
     return (
       menu &&
       Object.keys(menu)
-        .filter((key: string) => {
-          const i: IMenuData = menu[key];
-          const isAllowed = allow(i.grant, key);
-          /* FOR TEST TEMPORARY RETURN NOT ALLOWED */
-          return !isAllowed;
-        })
+        // .filter((key: string) => {
+        //   const i: IMenuData = menu[key];
+        //   const isAllowed = allow(i.grant, key);
+        //   /* FOR TEST TEMPORARY RETURN NOT ALLOWED */
+        //   return !isAllowed;
+        // })
         .map((key: string, i: number) => {
           const menuItem: IMenuData = menu[key];
           menuItem["index"] = i;
@@ -53,7 +54,7 @@ export default function ActionMenu(props: IActionMenuProps) {
           );
         })
     );
-  }, [allow, menu, item, setIsOpen]);
+  }, [menu, item, setIsOpen]);
 
   const windowClickActionMenu = useCallback(
     (event: any) => {

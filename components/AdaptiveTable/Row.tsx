@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IMenu } from '@/acl/types';
+import { IMenu } from '@/client/types';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import {
